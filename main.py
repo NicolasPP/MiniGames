@@ -18,3 +18,4 @@ while not done:
 	game_app.run()	
 
 	pygame.display.flip()
+	
