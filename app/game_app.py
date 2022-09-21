@@ -4,6 +4,7 @@ from app.GUI.screen import Screen
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
+from app.GUI.sidebar import Sidebar
 
 class MiniGameApp:
 	def __init__(self, s_width, s_height, full_screen):
@@ -16,9 +17,7 @@ class MiniGameApp:
 		self.screen.display()
 
 		# GUI elements Rect : function
-		self.buttons = []
-		self.gui_add_button((30, 30), 50, 20, "white", Snake.create_game)
-		self.gui_add_button((100, 30), 50, 20, "red", Snake.create_game)
+		self.sidebar = Sidebar((10, 10), s_width, s_height)
 		self.in_game = False 
 
 	# Main Game Functions
@@ -29,32 +28,16 @@ class MiniGameApp:
 
 	def update(self):
 		if self.in_game: pass
+		self.sidebar.update(self.in_game)
 
 	def render(self):
 		if self.in_game: pass
-		else: self.gui_render()
+		self.sidebar.render(self.screen.surface, self.in_game)
     
 
 	# Game events Parser 
 
 	def parse_event(self, event):
-		if self.in_game:
-			pass
-		else:
-			if event.type == pygame.MOUSEBUTTONDOWN: self.gui_update()
-		
-
-	# GUI
-	def gui_render(self):
-		for b in self.buttons:
-			pygame.draw.rect(self.screen.surface, "White", b)
-
-	def gui_update(self):
-		for b in self.buttons:
-			if b.collidepoint(pygame.mouse.get_pos()):
-				print('youve clicked me')
-
-	def gui_add_button(self, topleft, width, height, color, on_click):
-		rect = pygame.Rect(topleft, (width, height))
-		self.buttons.append(rect)
+		self.sidebar.parse_event(event)
+		if self.in_game: pass
 

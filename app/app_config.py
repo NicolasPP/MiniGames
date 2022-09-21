@@ -1,3 +1,8 @@
 S_WIDTH = 1220
 S_HEIGHT = 700
 FULLSCREEN = False
+
+
+# GUI
+BG_COLOR = "white"
+PADDING = 10
