@@ -22,3 +22,6 @@ while not done:
 	game_app.run()	
 
 	pygame.display.flip()
+
+
+print("Game over")
