@@ -1,6 +1,6 @@
 import pygame
 
-from app.screen import Screen
+from app.GUI.screen import Screen
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
