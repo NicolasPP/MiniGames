@@ -1,15 +1,11 @@
 import pygame
-form app.game_app import MiniGameApp
+from app.game_app import MiniGameApp
 from app.app_config import *
-from app.screen import Screen
 
 
-screen = Screen(S_WIDTH, S_HEIGHT, FULLSCREEN)
+
 done = False
-
-game_app = MiniGameApp()
-
-screen.display()
+game_app = MiniGameApp(S_WIDTH, S_HEIGHT, FULLSCREEN)
 
 
 while not done:
@@ -22,6 +18,3 @@ while not done:
 	game_app.run()	
 
 	pygame.display.flip()
-
-
-print("Game over")

@@ -1,4 +1,8 @@
 class Snake:
+	@staticmethod
+	def create_game():
+		print("snake")
+
 	def __init__(self):
 		pass
 
