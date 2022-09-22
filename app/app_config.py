@@ -4,5 +4,6 @@ FULLSCREEN = False
 
 
 # GUI
+NO_GAME_COLOR = "Orange"
 BG_COLOR = "white"
 PADDING = 10

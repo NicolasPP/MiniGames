@@ -1,4 +1,9 @@
 import pygame
+from enum import Enum
+
+class Button_Type(Enum):
+	SWITCH = 1
+	PRESS = 2
 
 class Button:
 	def __init__(self,\
@@ -31,11 +36,7 @@ class Button:
 		s.fill(self.color)
 		return s
 
-	def click(self):
-		if self.state == Button_Type.PRESS:
-			if self.on_click: self.on_click()
+	def click(self, *kwargs):
+		if self.type == Button_Type.PRESS:
+			if self.on_click: self.on_click(*kwargs)
 		else: self.active = not self.active
-		
-class Button_Type(Enum):
-	SWITCH = 1
-	PRESS = 2
