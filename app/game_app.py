@@ -17,7 +17,7 @@ class MiniGameApp:
 		self.screen.display()
 
 		# GUI elements Rect : function
-		self.sidebar = Sidebar((10, 10), s_width, s_height)
+		self.sidebar = Sidebar(s_width, s_height)
 		self.in_game = False 
 
 	# Main Game Functions
