@@ -1,7 +1,16 @@
 import pygame
 
 class Button:
-	def __init__(self, topleft, width, height, color, lable = "", on_click = False, alpha = 1, offset = (0,0)):
+	def __init__(self,\
+	 			topleft,\
+	 			width,\
+	 			height,\
+	 			color,\
+	 			lable = "",\
+	 			on_click = False,\
+	 			alpha = 1,\
+	 			offset = (0,0),\
+	 			button_type = Button_Type.PRESS):
 		self.topleft = topleft
 		self.width, self.height  = width, height
 		self.rect = pygame.Rect((topleft[0] + offset[0], topleft[1] + offset[1]), (width, height))
@@ -9,6 +18,8 @@ class Button:
 		self.alpha = alpha
 		self.lable = lable
 		self.on_click = on_click
+		self.type = button_type
+		self.active = False
 
 		self.surface = self.get_button_surface()
 		
@@ -21,4 +32,10 @@ class Button:
 		return s
 
 	def click(self):
-		if self.on_click: self.on_click()
+		if self.state == Button_Type.PRESS:
+			if self.on_click: self.on_click()
+		else: self.active = not self.active
+		
+class Button_Type(Enum):
+	SWITCH = 1
+	PRESS = 2
