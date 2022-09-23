@@ -1,5 +1,5 @@
 import pygame
-from app.GUI.button import Button, Button_Type
+
 from app.GUI.screen import Screen
 from games.snake import Snake
 from games.wordle import Wordle
