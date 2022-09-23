@@ -30,8 +30,14 @@ class Button:
 		self.active = False
 		self.font = pygame.font.Font(None, LABLE_FONT_SIZE)
 
+		self.switch_button_styles = {
+			True : (place_holder,()),
+			False: (place_holder,())
+		}
+
 		self.surface = self.get_button_surface()
-		
+
+
 	def render(self, parent_surface):
 		parent_surface.blit(self.surface, self.topleft)
 
@@ -43,6 +49,22 @@ class Button:
 		lable_rect = lable_render.get_rect(topleft = (width_diff // 2, height_diff // 2))
 		surface.blit(lable_render, lable_rect)
 
+	def style(self, func, *kwargs):
+		func(*kwargs)
+
+	def set_active_style(self, func, *kwargs):
+		self.switch_button_styles[True] = func, kwargs
+
+	def set_inctive_style(self, func, *kwargs):
+		self.switch_button_styles[False] = func, kwargs
+
+	def update_style(self):
+		self.surface.fill(self.color)
+		func = self.switch_button_styles[self.active][0]
+		kwargs = self.switch_button_styles[self.active][1]
+		func(*kwargs)
+
+
 	def get_button_surface(self):
 		s =  pygame.Surface((self.width, self.height))
 		s.fill(self.color)
@@ -50,6 +72,13 @@ class Button:
 		return s
 
 	def click(self, *kwargs):
-		if self.type == Button_Type.PRESS:
-			if self.on_click: self.on_click(*kwargs)
-		else: self.active = not self.active
+		if self.type == Button_Type.SWITCH:
+			self.active = not self.active
+			self.update_style()
+		if self.on_click: self.on_click(*kwargs)
+
+
+def place_holder():
+	pass
+
+
