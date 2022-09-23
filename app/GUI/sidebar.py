@@ -3,7 +3,7 @@ from app.app_config import *
 from games.games_config import *
 from app.GUI.button import Button, Button_Type
 class Sidebar:
-	def __init__(self, width, height, parent, screen_cover_ratio = .1, alpha = 1, bg_color = BG_COLOR):
+	def __init__(self, width, height, parent, screen_cover_ratio = .3, alpha = 1, bg_color = BG_COLOR):
 		self.width = (width * screen_cover_ratio) - PADDING
 		self.height = height - (PADDING * 2)
 		self.rect = pygame.Rect((PADDING,PADDING), (width, height))
@@ -27,7 +27,7 @@ class Sidebar:
 
 	def check_comp_collision(self):
 		for comp in self.components:
-			if comp.rect.collidepoint(pygame.mouse.get_pos()): comp.click(self.parent, comp.lable)
+			if comp.rect.collidepoint(pygame.mouse.get_pos()): comp.click(self.parent, comp)
 
 	def get_sidebar_surface(self):
 		s = pygame.Surface((self.width, self.height))
@@ -35,11 +35,13 @@ class Sidebar:
 		return s
 	
 	def add_sidebar_content(self):
-		snake = Button((30 , 30), 50, 20, SNAKE_BG, on_click = set_current_game,lable = "Snake", offset = self.rect.topleft)
-		tictactoe = Button((30, 100), 50, 20, TICTACTOE_BG, on_click = set_current_game, lable = "Tictactoe", offset = self.rect.topleft)
-		wordle = Button((30, 170), 50, 20, WORDLE_BG, on_click = set_current_game, lable = "Wordle", offset = self.rect.topleft)
-		return [snake, tictactoe, wordle]
-	
-def set_current_game(parent, lable):
-	parent.current_game_surface = parent.games[lable].surface
+		snake = Button((PADDING , PADDING), BUTTON_W, BUTTON_H, SNAKE_BG, on_click = set_game,lable = "Snake", offset = self.rect.topleft)
+		tictactoe = Button((PADDING, (PADDING * 3) + BUTTON_H), BUTTON_W, BUTTON_H, TICTACTOE_BG, on_click = set_game, lable = "Tictactoe", offset = self.rect.topleft)
+		wordle = Button((PADDING, (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, WORDLE_BG, on_click = set_game, lable = "Wordle", offset = self.rect.topleft)
+		back = Button((PADDING, self.height - PADDING - BUTTON_H), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "main_menu", offset = self.rect.topleft )
+		return [snake, tictactoe, wordle, back]
+
+def set_game(parent, comp):
+	if parent.current_game == comp.lable: return
+	parent.current_game = comp.lable
 
