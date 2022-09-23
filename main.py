@@ -3,12 +3,10 @@ from app.game_app import MiniGameApp
 from app.app_config import *
 
 
-
-done = False
 game_app = MiniGameApp(S_WIDTH, S_HEIGHT, FULLSCREEN)
 
 
-while not done:
+while game_app.running:
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT: done = True
@@ -18,4 +16,4 @@ while not done:
 	game_app.run()	
 
 	pygame.display.flip()
-	
+pygame.quit()
