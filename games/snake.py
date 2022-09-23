@@ -1,20 +1,20 @@
 from games.games_config import *
+from games.game import Game
 
-class Snake:
+class Snake(Game):
 	def __init__(self, app):
-		self.app = app
-		self.surface = self.get_surface()
+		super().__init__(app)
+		self.surface.fill(SNAKE_BG)
 
 	def update(self):
-		pass
+		if self.paused: return
 
 	def render(self):
+		if self.paused: self.display_paused()
+
+	def display_paused():
 		pass
 
-	def update_surface_size(self):
-		self.surface = self.get_surface()
-
-	def get_surface(self):
-		s = self.app.get_game_surface()
-		s.fill(SNAKE_BG)
-		return s
+	def parse_event(self):
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_SPACE: self.pause = not self.paused
