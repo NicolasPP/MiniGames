@@ -3,4 +3,5 @@ from games.game import Game
 class Tictactoe(Game):
 	def __init__(self, app):
 		super().__init__(app)
-		self.surface.fill(TICTACTOE_BG)
+		self.bg_color = TICTACTOE_BG
+		self.surface.fill(self.bg_color)

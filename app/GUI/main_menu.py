@@ -3,4 +3,5 @@ from games.game import Game
 class Main_menu(Game):
 	def __init__(self, app):
 		super().__init__(app)
-		self.surface.fill(MAIN_MENU_COLOR)
+		self.bg_color = MAIN_MENU_COLOR
+		self.surface.fill(self.bg_color)
