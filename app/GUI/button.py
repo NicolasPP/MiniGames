@@ -17,6 +17,7 @@ class Button:
 	 			alpha = 1,\
 	 			offset = (0,0),\
 	 			show_lable = False,\
+	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
 		self.show_lable = show_lable
 		self.topleft = topleft
@@ -28,6 +29,7 @@ class Button:
 		self.on_click = on_click
 		self.type = button_type
 		self.active = False
+		self.font_color = font_color
 		self.font = pygame.font.Font(None, LABLE_FONT_SIZE)
 
 		self.switch_button_styles = {
@@ -42,7 +44,7 @@ class Button:
 		parent_surface.blit(self.surface, self.topleft)
 
 	def render_lable(self, surface):
-		lable_render = self.font.render(self.lable, True, "Black")
+		lable_render = self.font.render(self.lable, True, self.font_color)
 		lable_rect = lable_render.get_rect(topleft = (0, 0))
 		width_diff = self.width - lable_rect.width
 		height_diff = self.height - lable_rect.height
