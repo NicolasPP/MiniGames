@@ -23,7 +23,7 @@ class Sidebar:
 	def update_surface_size(self):
 		self.width, self.height = self.set_dimensions()
 		self.surface = self.get_sidebar_surface()
-		self.components = self.add_sidebar_content()
+		# self.components = self.add_sidebar_content()
 
 	def set_dimensions(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
@@ -38,14 +38,17 @@ class Sidebar:
 		s = pygame.Surface((self.width, self.height))
 		s.fill(self.bg_color)
 		return s
-	
+
 	def add_sidebar_content(self):
-		snake = Button((PADDING , PADDING), BUTTON_W, BUTTON_H, SNAKE_BG, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True)
-		tictactoe = Button((PADDING, (PADDING * 3) + BUTTON_H), BUTTON_W, BUTTON_H, TICTACTOE_BG, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True)
-		wordle = Button((PADDING, (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, WORDLE_BG, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True)
-		back = Button((PADDING, self.height - (PADDING * 2) - (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True)
-		quit = Button((PADDING, self.height - PADDING - BUTTON_H), (BUTTON_W - PADDING) // 2, BUTTON_H, "Red", on_click = quit_game, lable = "Quit", offset = self.topleft, show_lable= False)
-		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, self.height - PADDING - BUTTON_H), (BUTTON_W - PADDING) // 2, BUTTON_H, "Green", on_click = fullscreen, lable = "Fullscreen", offset = self.topleft, show_lable= False)
+		quit = Button((PADDING, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = quit_game, lable = "Quit", offset = self.topleft, show_lable= False,)
+		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, "Green", on_click = fullscreen, lable = "Fullscreen", offset = self.topleft, show_lable= False, button_type = Button_Type.SWITCH)
+		back = Button((PADDING, (PADDING * 2) + BUTTON_H), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)	
+		snake = Button((PADDING , (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True, font_color = FONT_COLOR)
+		tictactoe = Button((PADDING , (PADDING * 6) + (BUTTON_H * 3)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
+		wordle = Button((PADDING , (PADDING * 7) + (BUTTON_H * 4)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
+		quit.style(style_quit, quit)
+		full_screen.set_active_style(fullscreen_active_style, full_screen)
+		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
 		return [snake, tictactoe, wordle, quit, back, full_screen]
 
 
@@ -61,3 +64,12 @@ def fullscreen(parent, comp):
 def quit_game(parent, comp):
 	parent.running = False
 
+def style_quit(button):
+	pygame.draw.line(button.surface, "Red", (5, 5), (button.width - 5, button.height - 5), 4)
+	pygame.draw.line(button.surface, "Red", (button.width - 5, 5), (5, button.height - 5), 4)
+
+def fullscreen_active_style(button):
+	button.surface.fill("Blue")
+
+def fullscreen_inactive_style(button):
+	button.surface.fill(button.color)
