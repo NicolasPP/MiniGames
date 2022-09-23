@@ -12,9 +12,7 @@ from enum import Enum
 class MiniGameApp:
 	def __init__(self, s_width, s_height, full_screen):
 
-		# Selected Game -- if false player hasnt choosen the game yet
-		self.current_game = False
-
+		self.running = True
 		# initialize main pygame surface
 		self.screen = Screen(s_width, s_height, full_screen)
 		self.screen.display()
@@ -62,8 +60,6 @@ class MiniGameApp:
 	# Game events Parser 
 	def parse_event(self, event):
 		self.sidebar.parse_event(event)
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_SPACE: self.toggle_fullscreen()
 	
 
 

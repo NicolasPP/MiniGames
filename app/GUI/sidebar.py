@@ -43,10 +43,21 @@ class Sidebar:
 		snake = Button((PADDING , PADDING), BUTTON_W, BUTTON_H, SNAKE_BG, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True)
 		tictactoe = Button((PADDING, (PADDING * 3) + BUTTON_H), BUTTON_W, BUTTON_H, TICTACTOE_BG, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True)
 		wordle = Button((PADDING, (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, WORDLE_BG, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True)
-		back = Button((PADDING, self.height - PADDING - BUTTON_H), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True)
-		return [snake, tictactoe, wordle, back]
+		back = Button((PADDING, self.height - (PADDING * 2) - (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True)
+		quit = Button((PADDING, self.height - PADDING - BUTTON_H), (BUTTON_W - PADDING) // 2, BUTTON_H, "Red", on_click = quit_game, lable = "Quit", offset = self.topleft, show_lable= False)
+		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, self.height - PADDING - BUTTON_H), (BUTTON_W - PADDING) // 2, BUTTON_H, "Green", on_click = fullscreen, lable = "Fullscreen", offset = self.topleft, show_lable= False)
+		return [snake, tictactoe, wordle, quit, back, full_screen]
+
+
+# GUI BUTTON LOGIC
 
 def set_game(parent, comp):
 	if parent.current_game == comp.lable: return
 	parent.current_game = comp.lable
+
+def fullscreen(parent, comp):
+	parent.toggle_fullscreen()
+
+def quit_game(parent, comp):
+	parent.running = False
 
