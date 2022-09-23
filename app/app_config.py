@@ -6,6 +6,9 @@ FULLSCREEN = False
 
 
 # GUI
-NO_GAME_COLOR = color_palette2[1]
+MAIN_MENU_COLOR = color_palette2[1]
 BG_COLOR = color_palette1[0]
+BACK_BUTTON_COLOR = color_palette2[3]
 PADDING = 10
+BUTTON_W = 80
+BUTTON_H = 30

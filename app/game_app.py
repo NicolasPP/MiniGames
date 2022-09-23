@@ -5,6 +5,7 @@ from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
 from app.GUI.sidebar import Sidebar
+from app.GUI.main_menu import Main_menu
 from app.app_config import *
 from enum import Enum
 
@@ -23,12 +24,12 @@ class MiniGameApp:
 		#Games
 
 		self.games = {
+			"main_menu" : Main_menu(self.get_game_surface()),
 			"Snake" : Snake(self.get_game_surface()),
 			"Tictactoe" : Tictactoe(self.get_game_surface()),
 			"Wordle" : Wordle(self.get_game_surface()),
 		}
-
-		self.current_game_surface = self.get_game_surface()
+		self.current_game = "main_menu"
 
 
 	# Main Game Functions
@@ -41,7 +42,7 @@ class MiniGameApp:
 		self.sidebar.update()
 
 	def render(self):
-		self.screen.surface.blit(self.current_game_surface, self.get_gs_position())
+		self.screen.surface.blit(self.games[self.current_game].surface, self.get_gs_position())
 		self.sidebar.render(self.screen.surface)
 
 	def get_game_surface(self):
@@ -49,7 +50,6 @@ class MiniGameApp:
 		gs_width = self.screen.current_width - (gs_x + PADDING)
 		gs_height = self.screen.current_height - (gs_y + PADDING)
 		game_surface = pygame.Surface((gs_width, gs_height)) 
-		game_surface.fill(NO_GAME_COLOR)
 		return game_surface
 
 	def get_gs_position(self):
