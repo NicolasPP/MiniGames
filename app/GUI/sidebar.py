@@ -3,25 +3,30 @@ from app.app_config import *
 from games.games_config import *
 from app.GUI.button import Button, Button_Type
 class Sidebar:
-	def __init__(self, width, height, parent, screen_cover_ratio = .3, alpha = 1, bg_color = BG_COLOR):
-		self.width = (width * screen_cover_ratio) - PADDING
-		self.height = height - (PADDING * 2)
-		self.rect = pygame.Rect((PADDING,PADDING), (width, height))
-		self.screen_cover_ratio = screen_cover_ratio
+	def __init__(self, width, height, parent, alpha = 1, bg_color = BG_COLOR):
+		self.parent = parent
+		self.width, self.height = self.set_dimensions()
+		self.topleft = (PADDING,PADDING)
 		self.alpha = alpha
 		self.bg_color = bg_color
 		self.surface = self.get_sidebar_surface()
 		self.components = self.add_sidebar_content()
-		self.parent = parent
 
 	def render(self, parent_surface):
 		for comp in self.components: comp.render(self.surface)
-		parent_surface.blit(self.surface, self.rect.topleft)
+		parent_surface.blit(self.surface, self.topleft)
 
 
 	def update(self):
 		pass
 
+	def update_surface_size(self):
+		self.width, self.height = self.set_dimensions()
+		self.surface = self.get_sidebar_surface()
+		self.components = self.add_sidebar_content()
+
+	def set_dimensions(self):
+		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
 	def parse_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN: self.check_comp_collision()
 
@@ -35,10 +40,10 @@ class Sidebar:
 		return s
 	
 	def add_sidebar_content(self):
-		snake = Button((PADDING , PADDING), BUTTON_W, BUTTON_H, SNAKE_BG, on_click = set_game,lable = "Snake", offset = self.rect.topleft)
-		tictactoe = Button((PADDING, (PADDING * 3) + BUTTON_H), BUTTON_W, BUTTON_H, TICTACTOE_BG, on_click = set_game, lable = "Tictactoe", offset = self.rect.topleft)
-		wordle = Button((PADDING, (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, WORDLE_BG, on_click = set_game, lable = "Wordle", offset = self.rect.topleft)
-		back = Button((PADDING, self.height - PADDING - BUTTON_H), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "main_menu", offset = self.rect.topleft )
+		snake = Button((PADDING , PADDING), BUTTON_W, BUTTON_H, SNAKE_BG, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True)
+		tictactoe = Button((PADDING, (PADDING * 3) + BUTTON_H), BUTTON_W, BUTTON_H, TICTACTOE_BG, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True)
+		wordle = Button((PADDING, (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, WORDLE_BG, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True)
+		back = Button((PADDING, self.height - PADDING - BUTTON_H), BUTTON_W, BUTTON_H, BACK_BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True)
 		return [snake, tictactoe, wordle, back]
 
 def set_game(parent, comp):

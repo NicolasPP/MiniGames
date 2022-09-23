@@ -20,16 +20,16 @@ class MiniGameApp:
 		self.screen.display()
 
 		# GUI elements Rect : function
-		self.sidebar = Sidebar(s_width, s_height, self)
+		self.sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
 		#Games
 
 		self.games = {
-			"main_menu" : Main_menu(self.get_game_surface()),
-			"Snake" : Snake(self.get_game_surface()),
-			"Tictactoe" : Tictactoe(self.get_game_surface()),
-			"Wordle" : Wordle(self.get_game_surface()),
+			"Menu" : Main_menu(self),
+			"Snake" : Snake(self),
+			"Tictactoe" : Tictactoe(self),
+			"Wordle" : Wordle(self),
 		}
-		self.current_game = "main_menu"
+		self.current_game = "Menu"
 
 
 	# Main Game Functions
@@ -55,10 +55,15 @@ class MiniGameApp:
 	def get_gs_position(self):
 		return self.sidebar.width + (PADDING * 2), PADDING
 
-		
+	def toggle_fullscreen(self):
+		self.screen.toggle_full_screen()
+		for name, game in self.games.items(): game.update_surface_size()
+		self.sidebar.update_surface_size()
 	# Game events Parser 
 	def parse_event(self, event):
 		self.sidebar.parse_event(event)
+		if event.type == pygame.KEYDOWN:
+			if event.key == pygame.K_SPACE: self.toggle_fullscreen()
 	
 
 
