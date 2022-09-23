@@ -9,4 +9,4 @@ class Game:
 	def update(self): pass
 	def render(self): pass
 	def parse_event(self): pass
-	def update_surface_size(self): return self.app.get_game_surface()
+	def update_surface_size(self): self.surface = self.app.get_game_surface()
