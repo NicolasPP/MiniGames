@@ -9,7 +9,7 @@ class Game:
 		self.paused = True
 		self.bg_color = "White"
 
-	def update(self): pass
+	def update(self, dt): pass
 	def render(self, parent_surface): parent_surface.blit(self.current_surface, self.app.get_gs_position())
 	def parse_event(self, event): pass
 	def update_surface_size(self):

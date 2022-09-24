@@ -14,7 +14,7 @@ class Snake(Game):
 		self.display_paused()
 		self.blink_delay = 750 #milisecs
 
-	def update(self):
+	def update(self, dt):
 		if self.paused:
 			if regular_interval_tick_wait(self.blink_delay):
 				self.blink = not self.blink
