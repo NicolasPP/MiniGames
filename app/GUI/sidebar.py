@@ -17,8 +17,7 @@ class Sidebar:
 		parent_surface.blit(self.surface, self.topleft)
 
 
-	def update(self):
-		pass
+	def update(self, dt): pass
 
 	def update_surface_size(self):
 		self.width, self.height = self.set_dimensions()
@@ -63,7 +62,7 @@ def fullscreen(parent, comp):
 	parent.toggle_fullscreen()
 
 def quit_game(parent, comp):
-	parent.running = False
+	parent.quit_game()
 
 def style_quit(button):
 	pygame.draw.line(button.surface, "Red", (5, 5), (button.width - 5, button.height - 5), 4)

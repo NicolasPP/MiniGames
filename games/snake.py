@@ -13,40 +13,51 @@ class Snake(Game):
 		self.blink = False
 		self.display_paused()
 		self.blink_delay = 750 #milisecs
+		self.grid = []
+		self.create_grid()
+		self.pause_message_render = self.get_pause_message_render()
 
-	def update(self):
+	def update(self, dt):
 		if self.paused:
-			if regular_interval_tick_wait(750):
+			if regular_interval_tick_wait(self.blink_delay):
 				self.blink = not self.blink
 				self.paused_surface.fill(self.bg_color)
 				self.display_paused()
 
-				
-
-	
-
 	def display_paused(self):
 		if not self.blink: return
-		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "Black")
+		self.paused_surface.blit(*self.pause_message_render)
+
+	def get_pause_message_render(self):
+		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "White")
 		pause_lable_render.set_alpha(PAUSE_ALPHA)
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
-		self.paused_surface.blit(pause_lable_render, pause_lable_rect)
+		return pause_lable_render, pause_lable_rect
 
 	def toggle_pause(self):
 		self.paused = not self.paused
 		self.set_current_surface()
-	
+
+	def create_grid(self):
+		for h in range(self.current_surface.get_rect().height // S_CELL_SIZE):
+			row = []
+			for w in range(self.current_surface.get_rect().width // S_CELL_SIZE):
+				row.append(pygame.Rect((w * S_CELL_SIZE, h * S_CELL_SIZE),(S_CELL_SIZE, S_CELL_SIZE)))
+			self.grid.append(row)
+
 	def update_surface_size(self):
-		new_s = self.app.get_game_surface()
-		new_ps = self.app.get_game_pause_surface()
+		new_s = self.app.get_game_surface(False)
+		new_ps = self.app.get_game_surface(True)
 		new_s.fill(self.bg_color)
 		new_ps.fill(self.bg_color)
 		self.paused_surface = new_ps
-		self.display_paused()
 		self.surface =  new_s
 		self.set_current_surface()
+		self.create_grid()
+		self.pause_message_render = self.get_pause_message_render()
+		self.display_paused()
 
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:

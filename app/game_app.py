@@ -1,4 +1,4 @@
-import pygame
+import pygame, sys, time
 
 from app.GUI.screen import Screen
 from games.snake import Snake
@@ -11,7 +11,9 @@ from enum import Enum
 
 class MiniGameApp:
 	def __init__(self, s_width, s_height, full_screen):
-
+		pygame.init()
+		self.delta_time = 0
+		self.prev_time = time.time()
 		self.running = True
 		# initialize main pygame surface
 		self.screen = Screen(s_width, s_height, full_screen)
@@ -33,33 +35,37 @@ class MiniGameApp:
 	# Main Game Functions
 
 	def run(self):
-		self.update()
-		self.render()
+		while self.running:
+			self.set_delta_time()
+			for event in pygame.event.get(): self.parse_event(event)
+			self.update(self.delta_time)
+			self.render()
+			pygame.display.flip()
 
-	def update(self):
-		self.sidebar.update()
-		self.games[self.current_game].update()
+	def update(self, dt): self.games[self.current_game].update(dt)
 
 	def render(self):
 		self.games[self.current_game].render(self.screen.surface)
 		self.sidebar.render(self.screen.surface)
 
-	def get_game_surface(self):
-		gs_x, gs_y = self.get_gs_position()
-		gs_width = self.screen.current_width - (gs_x + PADDING)
-		gs_height = self.screen.current_height - (gs_y + PADDING)
-		game_surface = pygame.Surface((gs_width, gs_height)) 
-		return game_surface
 
-	def get_game_pause_surface(self):
+	def get_game_surface(self, is_paused_surface):
+		gs_width, gs_height = self.get_gs_dimension()
+		if is_paused_surface: return pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
+		return pygame.Surface((gs_width, gs_height))
+	
+	def get_gs_dimension(self):
 		gs_x, gs_y = self.get_gs_position()
 		gs_width = self.screen.current_width - (gs_x + PADDING)
 		gs_height = self.screen.current_height - (gs_y + PADDING)
-		game_surface = pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
-		return game_surface
+		return gs_width, gs_height
 
 	def get_gs_position(self):
 		return self.sidebar.width + (PADDING * 2), PADDING
+
+	def set_delta_time(self):
+		self.delta_time = time.time() - self.prev_time
+		self.prev_time = time.time()
 
 	def toggle_fullscreen(self):
 		self.screen.toggle_full_screen()
@@ -71,7 +77,10 @@ class MiniGameApp:
 		self.sidebar.parse_event(event)
 		self.games[self.current_game].parse_event(event)
 	
-
+	def quit_game(self):
+		self.running = False
+		pygame.quit()
+		sys.exit()
 
 
 
