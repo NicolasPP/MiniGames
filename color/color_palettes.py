@@ -1,4 +1,4 @@
-def rgb(r, g, b):
+def rgb(r, g, b,):
 	return (r, g, b)
 
 
