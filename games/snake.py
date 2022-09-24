@@ -41,9 +41,9 @@ class Snake(Game):
 		self.set_current_surface()
 
 	def create_grid(self):
-		for h in range(self.current_surface.get_rect().height):
+		for h in range(self.current_surface.get_rect().height // S_CELL_SIZE):
 			row = []
-			for w in range(self.current_surface.get_rect().width):
+			for w in range(self.current_surface.get_rect().width // S_CELL_SIZE):
 				row.append(pygame.Rect((w * S_CELL_SIZE, h * S_CELL_SIZE),(S_CELL_SIZE, S_CELL_SIZE)))
 			self.grid.append(row)
 
