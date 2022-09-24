@@ -8,9 +8,11 @@ class Game:
 		self.current_surface = self.paused_surface
 		self.paused = True
 		self.bg_color = "White"
+		self.sidebar_offset = self.app.sidebar.get_sidebar_game_offset()
 
 	def update(self, dt): pass
-	def render(self, parent_surface): parent_surface.blit(self.current_surface, self.app.get_gs_position())
+	def render(self, parent_surface):
+		parent_surface.blit(self.current_surface, self.app.get_gs_position())
 	def parse_event(self, event): pass
 	def update_surface_size(self):
 		new_s = self.app.get_game_surface(False)
