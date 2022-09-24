@@ -35,8 +35,8 @@ class Snake(Game):
 		self.set_current_surface()
 	
 	def update_surface_size(self):
-		new_s = self.app.get_game_surface()
-		new_ps = self.app.get_game_pause_surface()
+		new_s = self.app.get_game_surface(False)
+		new_ps = self.app.get_game_surface(True)
 		new_s.fill(self.bg_color)
 		new_ps.fill(self.bg_color)
 		self.paused_surface = new_ps
