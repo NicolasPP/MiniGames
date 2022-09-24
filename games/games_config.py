@@ -6,3 +6,6 @@ WORDLE_BG = color_palette3[3]   #(178, 80, 104)
 # ---------------------
 
 PAUSE_ALPHA = 100 # 0 is fully transparent and 255 fully opaque.
+
+# SANKE
+S_CELL_SIZE = 10
