@@ -45,19 +45,21 @@ class MiniGameApp:
 		self.sidebar.render(self.screen.surface)
 
 	def get_game_surface(self):
-		gs_x, gs_y = self.get_gs_position()
-		gs_width = self.screen.current_width - (gs_x + PADDING)
-		gs_height = self.screen.current_height - (gs_y + PADDING)
+		gs_width, gs_height = self.get_gs_dimension()
 		game_surface = pygame.Surface((gs_width, gs_height)) 
 		return game_surface
 
 	def get_game_pause_surface(self):
-		gs_x, gs_y = self.get_gs_position()
-		gs_width = self.screen.current_width - (gs_x + PADDING)
-		gs_height = self.screen.current_height - (gs_y + PADDING)
+		gs_width, gs_height = self.get_gs_dimension()
 		game_surface = pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
 		return game_surface
 
+	def get_gs_dimension(self):
+		gs_x, gs_y = self.get_gs_position()
+		gs_width = self.screen.current_width - (gs_x + PADDING)
+		gs_height = self.screen.current_height - (gs_y + PADDING)
+		return gs_width, gs_height
+		
 	def get_gs_position(self):
 		return self.sidebar.width + (PADDING * 2), PADDING
 

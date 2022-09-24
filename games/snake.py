@@ -16,14 +16,10 @@ class Snake(Game):
 
 	def update(self):
 		if self.paused:
-			if regular_interval_tick_wait(750):
+			if regular_interval_tick_wait(self.blink_delay):
 				self.blink = not self.blink
 				self.paused_surface.fill(self.bg_color)
 				self.display_paused()
-
-				
-
-	
 
 	def display_paused(self):
 		if not self.blink: return
