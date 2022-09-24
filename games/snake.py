@@ -12,25 +12,36 @@ class Snake(Game):
 		self.font = pygame.font.Font(None, 50)
 		self.blink = False
 		self.display_paused()
-		self.blink_delay = 750 #milisecs
+		self.blink_delay = 650 #milisecs
 		self.grid = []
 		self.create_grid()
 		self.pause_message_render = self.get_pause_message_render()
+		self.paused_surface.set_alpha(5)
 
 	def update(self, dt):
-		if self.paused:
-			if regular_interval_tick_wait(self.blink_delay):
-				self.blink = not self.blink
-				self.paused_surface.fill(self.bg_color)
-				self.display_paused()
+		if self.paused: pass
+			# if regular_interval_tick_wait(self.blink_delay):
+			# 	self.blink = not self.blink
+			# 	self.paused_surface.fill( pygame.Color(0,0,0,0))
+			# 	self.display_paused()
+		else: self.grid_test()
+
+	def grid_test(self):
+		for row in self.grid:
+			for cell in row:
+				mp = pygame.mouse.get_pos()
+				print(self.sidebar_offset)
+				x, y = mp[0] - self.sidebar_offset[0], mp[1] - self.sidebar_offset[1]
+				if cell.collidepoint((x, y)):
+					pygame.draw.rect(self.current_surface, "Black", cell)
 
 	def display_paused(self):
+		self.paused_surface.fill(self.bg_color)
 		if not self.blink: return
 		self.paused_surface.blit(*self.pause_message_render)
 
 	def get_pause_message_render(self):
 		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "White")
-		pause_lable_render.set_alpha(PAUSE_ALPHA)
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
