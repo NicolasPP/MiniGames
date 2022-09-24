@@ -38,9 +38,10 @@ class MiniGameApp:
 
 	def update(self):
 		self.sidebar.update()
+		self.games[self.current_game].update()
 
 	def render(self):
-		self.screen.surface.blit(self.games[self.current_game].surface, self.get_gs_position())
+		self.games[self.current_game].render(self.screen.surface)
 		self.sidebar.render(self.screen.surface)
 
 	def get_game_surface(self):
@@ -50,16 +51,25 @@ class MiniGameApp:
 		game_surface = pygame.Surface((gs_width, gs_height)) 
 		return game_surface
 
+	def get_game_pause_surface(self):
+		gs_x, gs_y = self.get_gs_position()
+		gs_width = self.screen.current_width - (gs_x + PADDING)
+		gs_height = self.screen.current_height - (gs_y + PADDING)
+		game_surface = pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
+		return game_surface
+
 	def get_gs_position(self):
 		return self.sidebar.width + (PADDING * 2), PADDING
 
 	def toggle_fullscreen(self):
 		self.screen.toggle_full_screen()
-		for name, game in self.games.items(): game.update_surface_size()
 		self.sidebar.update_surface_size()
+		for name, game in self.games.items(): game.update_surface_size()
+		
 	# Game events Parser 
 	def parse_event(self, event):
 		self.sidebar.parse_event(event)
+		self.games[self.current_game].parse_event(event)
 	
 
 
