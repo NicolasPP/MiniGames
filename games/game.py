@@ -12,7 +12,7 @@ class Game:
 
 	def update(self, dt): pass
 	def render(self, parent_surface):
-		parent_surface.blit(self.current_surface, self.app.get_gs_position())
+		parent_surface.blit(self.surface, self.app.get_gs_position())
 	def parse_event(self, event): pass
 	def update_surface_size(self):
 		new_s = self.app.get_game_surface(False)
