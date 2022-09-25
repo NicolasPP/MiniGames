@@ -1,35 +1,49 @@
 from games.games_config import *
 from games.game import Game
-from utils.time import regular_interval_tick_wait
 import pygame
 from random import choice
+from enum import Enum
+from utils.time import Time_Man
 
 
 class SNAKE:
 	def __init__(self, rect, sidebar_offset):
 		self.rect = rect
+		self.rect.width -= 1
+		self.rect.height -= 1
 		self.size = 1
 		self.body = [self.rect]
 		self.sidebar_offset = sidebar_offset
+		self.direction_input = {
+			"UP" : (0, -1),
+			"DOWN" : (0 ,1),
+			"RIGHT" : (1,0),
+			"LEFT" : (-1, 0)
+		}
+		self.timer = Time_Man()
+		self.speed = 20
+		self.direction = choice(list(self.direction_input.values()))
 
 	def render(self, grid_surface):
 		for bdy in self.body: pygame.draw.rect(grid_surface, "Black", bdy)
 
-	def update(self, dt): 
-		mx, my = pygame.mouse.get_pos()
-		ox, oy = self.sidebar_offset
-		self.rect.topleft = (mx - ox, my - oy)
+
+	def update(self, dt):
+		direc_x, direc_y = self.direction
+		if self.timer.dt_wait(dt, 200):
+			prev_rec = self.rect.copy()
+			self.rect.x += S_CELL_SIZE * direc_x
+			self.rect.y += S_CELL_SIZE * direc_y
+			self.add(prev_rec)
 
 	def add(self, rect):
 		self.body.append(rect)
 		body_size = len(self.body)
-		if body_size + 1 > self.size: self.body = self.body[1:body_size]
+		if body_size > self.size: self.body = self.body[1:body_size]
 		
 
-	def collide_cells(self, cells):
-		for cell in cells:
-			if cell.collidepoint(self.rect.center):
-				if cell not in self.body: self.add(cell)
+	def set_direction(self, new_direction):
+		self.direction = self.direction_input[new_direction]
 
 	
 
@@ -51,14 +65,14 @@ class Snake(Game):
 		self.pause_message_render = self.get_pause_message_render()
 		self.paused_surface.set_alpha(5)
 		self.snake = SNAKE(choice(self.cells), self.sidebar_offset)
-
+		self.fruit_timer = Time_Man()
 	def update(self, dt):
 		if self.paused: pass
 		else:
 			self.snake.update(dt)
-			self.snake.collide_cells(self.cells)
+			# self.snake.collide_cells(self.cells)
 			self.collide_fruits()
-			self.spawn_fruit()
+			self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
 		for fruit in self.fruits: pygame.draw.rect(self.surface, "Green", fruit)
@@ -121,9 +135,8 @@ class Snake(Game):
 		self.pause_message_render = self.get_pause_message_render()
 		self.display_paused()
 
-	def spawn_fruit(self):
-		t = 3000
-		if regular_interval_tick_wait(t):
+	def spawn_fruit(self, dt):
+		if self.fruit_timer.dt_wait(dt, 5000):
 			fruit = choice(self.cells)
 			while not self.is_valid_fruit_pos(fruit): fruit =choice(self.cells)
 			self.fruits.append(fruit)
@@ -135,6 +148,10 @@ class Snake(Game):
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE: self.toggle_pause()
+			if event.key == pygame.K_UP or event.key == pygame.K_w: self.snake.set_direction("UP")
+			if event.key == pygame.K_DOWN or event.key == pygame.K_s: self.snake.set_direction("DOWN")
+			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.set_direction("RIGHT")
+			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.set_direction("LEFT")
 
 
 

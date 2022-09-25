@@ -22,7 +22,6 @@ class Sidebar:
 	def update_surface_size(self):
 		self.width, self.height = self.get_dimensions()
 		self.surface = self.get_sidebar_surface()
-		# self.components = self.add_sidebar_content()
 
 	def get_dimensions(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
