@@ -23,18 +23,45 @@ class SNAKE:
 		self.timer = Time_Man()
 		self.speed = 20
 		self.direction = choice(list(self.direction_input.values()))
+		self.speed = 200
+		self.move_distance = 0
+		self.x = rect.x
+		self.y = rect.y
+
 
 	def render(self, grid_surface):
 		for bdy in self.body: pygame.draw.rect(grid_surface, "Black", bdy)
 
 
-	def update(self, dt):
+	# def update(self, dt): #snake bound to the board
+	# 	direc_x, direc_y = self.direction
+	# 	if self.timer.dt_wait(dt, 300):
+	# 		prev_rec = self.rect.copy()
+	# 		self.rect.x += S_CELL_SIZE * direc_x
+	# 		self.rect.y += S_CELL_SIZE * direc_y
+	# 		self.add(prev_rec)
+
+	def update(self, dt): # snake not bound to the board
 		direc_x, direc_y = self.direction
-		if self.timer.dt_wait(dt, 200):
+		if self.timer.dt_wait(dt, 300):
+			self.move_distance += S_CELL_SIZE
 			prev_rec = self.rect.copy()
 			self.rect.x += S_CELL_SIZE * direc_x
 			self.rect.y += S_CELL_SIZE * direc_y
 			self.add(prev_rec)
+		if self.move_distance <= 0: return
+
+		dist = self.speed * dt
+
+		if self.move_distance - (self.speed * dt) < 0: dist += (self.move_distance - (self.speed * dt))
+
+		self.x += (dist) * direc_x
+		self.y += (dist) * direc_y
+		self.move_distance -= (dist)
+		self.rect.x = round(self.x)
+		self.rect.y = round(self.y)
+
+
 
 	def add(self, rect):
 		self.body.append(rect)
