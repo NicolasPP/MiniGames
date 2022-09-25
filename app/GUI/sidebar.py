@@ -5,7 +5,7 @@ from app.GUI.button import Button, Button_Type
 class Sidebar:
 	def __init__(self, width, height, parent, alpha = 1, bg_color = BG_COLOR):
 		self.parent = parent
-		self.width, self.height = self.set_dimensions()
+		self.width, self.height = self.get_dimensions()
 		self.topleft = (PADDING,PADDING)
 		self.alpha = alpha
 		self.bg_color = bg_color
@@ -20,11 +20,11 @@ class Sidebar:
 	def update(self, dt): pass
 
 	def update_surface_size(self):
-		self.width, self.height = self.set_dimensions()
+		self.width, self.height = self.get_dimensions()
 		self.surface = self.get_sidebar_surface()
 		# self.components = self.add_sidebar_content()
 
-	def set_dimensions(self):
+	def get_dimensions(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
 	def parse_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN: self.check_comp_collision()
@@ -37,7 +37,8 @@ class Sidebar:
 		s = pygame.Surface((self.width, self.height))
 		s.fill(self.bg_color)
 		return s
-
+	def get_sidebar_game_offset(self):
+		return (PADDING * 4) + BUTTON_W, PADDING
 	def add_sidebar_content(self):
 		quit = Button((PADDING, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = quit_game, lable = "Quit", offset = self.topleft, show_lable= False,)
 		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = fullscreen, lable = "Fullscreen", offset = self.topleft, show_lable= False, button_type = Button_Type.SWITCH)

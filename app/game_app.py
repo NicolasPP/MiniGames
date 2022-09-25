@@ -36,12 +36,16 @@ class MiniGameApp:
 
 	def run(self):
 		while self.running:
+			
 			self.set_delta_time()
 			for event in pygame.event.get(): self.parse_event(event)
+
+			self.games[self.current_game].surface.fill(self.games[self.current_game].bg_color)
+
 			self.update(self.delta_time)
 			self.render()
-			pygame.display.flip()
-
+			pygame.display.update()
+			
 	def update(self, dt): self.games[self.current_game].update(dt)
 
 	def render(self):
