@@ -23,7 +23,7 @@ class SNAKE:
 		self.timer = Time_Man()
 		self.speed = 20
 		self.direction = choice(list(self.direction_input.values()))
-		self.speed = 200
+		self.speed = S_CELL_SIZE * 10
 		self.move_distance = 0
 		self.x = rect.x
 		self.y = rect.y
@@ -135,7 +135,7 @@ class Snake(Game):
 	def collide_fruits(self):
 		collided = []
 		for fruit in self.fruits:
-			if fruit.collidepoint(self.snake.rect.center):
+			if fruit.colliderect(self.snake.rect):
 				self.snake.size += 1
 				collided.append(fruit)
 		for fruit in collided: self.fruits.remove(fruit)
