@@ -18,11 +18,11 @@ class MiniGameApp:
 		# initialize main pygame surface
 		self.screen = Screen(s_width, s_height, full_screen)
 		self.screen.display()
+		self.clock = pygame.time.Clock()
 
 		# GUI elements Rect : function
 		self.sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
 		#Games
-
 		self.games = {
 			"Menu" : Main_menu(self),
 			"Snake" : Snake(self),
@@ -44,6 +44,7 @@ class MiniGameApp:
 
 			self.update(self.delta_time)
 			self.render()
+
 			pygame.display.update()
 			
 	def update(self, dt): self.games[self.current_game].update(dt)
