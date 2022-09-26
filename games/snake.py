@@ -74,8 +74,13 @@ class SNAKE:
 
 
 	def set_direction(self, new_direction):
+		if self.direction_input[new_direction] == self.direction: return
+		if self.direction_input[new_direction] == self.get_inverse_direction(): return
 		self.direction = self.direction_input[new_direction]
 
+	def get_inverse_direction(self):
+		x, y = self.direction
+		return x * -1, y * -1
 	def get_collision_points(self):
 		h_offset = S_CELL_SIZE // 2
 		direc_x, direc_y = self.direction
