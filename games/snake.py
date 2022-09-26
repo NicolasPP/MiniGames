@@ -12,7 +12,7 @@ class SNAKE:
 		self.rect = choice(snake_game.cells)
 		self.rect.width -= 1
 		self.rect.height -= 1
-		self.size = 15
+		self.size = 0
 		self.body = []
 		self.direction_input = {
 			"UP" : (0, -1),
@@ -78,6 +78,7 @@ class SNAKE:
 		for fruit in self.snake_game.fruits:
 			if fruit.colliderect(self.rect):
 				self.size += 1
+				self.snake_game.score += 1
 				collided.append(fruit)
 		for fruit in collided: self.snake_game.fruits.remove(fruit)
 
@@ -128,6 +129,7 @@ class Snake(Game):
 		self.paused_surface.set_alpha(5)
 		self.snake = SNAKE(self)
 		self.fruit_timer = Time_Man()
+		self.score = 0
 	
 
 	def update(self, dt):
@@ -138,7 +140,8 @@ class Snake(Game):
 				self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
-		for fruit in self.fruits: pygame.draw.rect(self.surface, "Green", fruit)
+		self.dispaly_score()
+		for fruit in self.fruits: pygame.draw.rect(self.surface, F_COLOR, fruit)
 		self.snake.render()
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 		
@@ -148,7 +151,7 @@ class Snake(Game):
 		if not self.blink: return
 		self.paused_surface.blit(*self.pause_message_render)
 	def get_pause_message_render(self):
-		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "White")
+		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "white")
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
@@ -156,6 +159,14 @@ class Snake(Game):
 	def toggle_pause(self):
 		self.paused = not self.paused
 		self.set_current_surface()
+
+	def dispaly_score(self):
+		score_lable_render = self.font.render(f"Score : {self.score}", True, 'white')
+		s_width, s_height = self.surface.get_size()
+		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
+		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), 10))
+		self.surface.blit(score_lable_render, score_lable_rect)
+
 
 
 	def create_grid(self):
