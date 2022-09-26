@@ -7,8 +7,6 @@ from utils.time import Time_Man
 
 
 '''
-TODO : Chage location of score
-TODO : Make snake spawn somewhere in the middle of the screen
 TODO : Add death screen
 TODO : Add restart
 '''
@@ -17,7 +15,7 @@ TODO : Add restart
 class SNAKE:
 	def __init__(self, snake_game):
 		self.snake_game = snake_game
-		self.rect = choice(snake_game.cells)
+		self.rect = self.get_mid_cell()
 		self.rect.width -= 1
 		self.rect.height -= 1
 		self.size = 0
@@ -120,6 +118,11 @@ class SNAKE:
 		x, y = self.direction
 		return x * -1, y * -1
 
+	def get_mid_cell(self):
+		row_num = len(self.snake_game.grid)
+		col_num = len(self.snake_game.grid[0])
+		return self.snake_game.grid[row_num // 2][col_num // 2]
+
 class Snake(Game):
 	def __init__(self, app):
 		super().__init__(app)
@@ -128,7 +131,6 @@ class Snake(Game):
 		self.paused_surface.fill(self.bg_color)
 		self.pause_font = pygame.font.Font(None, PAUSE_FONT_SIZE)
 		self.score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
-		self.blink_delay = 650 #milisecs
 		self.grid = []
 		self.cells = []
 		self.fruits = []
