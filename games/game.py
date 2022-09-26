@@ -5,7 +5,6 @@ class Game:
 		self.app = app
 		self.surface = app.get_game_surface(False)
 		self.paused_surface = app.get_game_surface(True)
-		self.current_surface = self.paused_surface
 		self.paused = True
 		self.bg_color = "White"
 		self.sidebar_offset = self.app.sidebar.get_sidebar_game_offset()
@@ -21,10 +20,3 @@ class Game:
 		new_ps.fill(self.bg_color)
 		self.paused_surface = new_ps
 		self.surface =  new_s
-		self.set_current_surface()
-
-
-	def set_current_surface(self):
-		if self.paused: self.current_surface = self.paused_surface
-		else: self.current_surface = self.surface
-		
