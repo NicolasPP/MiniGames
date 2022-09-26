@@ -1,7 +1,7 @@
 from color.color_palettes import color_palette2, color_palette1
 
-S_WIDTH = 1220
-S_HEIGHT = 700
+S_WIDTH = 640
+S_HEIGHT = 480
 FULLSCREEN = False
 
 
@@ -18,3 +18,4 @@ LABLE_FONT_SIZE = 15
 	# Fullscreen style
 FS_RECT_WIDTH = 9
 FS_RECT_HEIGHT = 3
+

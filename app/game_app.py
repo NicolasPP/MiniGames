@@ -7,6 +7,7 @@ from games.tictactoe import Tictactoe
 from app.GUI.sidebar import Sidebar
 from app.GUI.main_menu import Main_menu
 from app.app_config import *
+import games.games_config as gcfg
 from enum import Enum
 
 class MiniGameApp:
@@ -56,8 +57,10 @@ class MiniGameApp:
 
 	def get_game_surface(self, is_paused_surface):
 		gs_width, gs_height = self.get_gs_dimension()
-		if is_paused_surface: return pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
-		return pygame.Surface((gs_width, gs_height))
+		g_surface =pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
+		if is_paused_surface: g_surface.set_alpha(gcfg.PAUSE_ALPHA)
+		if is_paused_surface: return g_surface
+		return g_surface
 	
 	def get_gs_dimension(self):
 		gs_x, gs_y = self.get_gs_position()

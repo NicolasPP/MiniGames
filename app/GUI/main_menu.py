@@ -6,4 +6,3 @@ class Main_menu(Game):
 		self.paused = False
 		self.bg_color = MAIN_MENU_COLOR
 		self.surface.fill(self.bg_color)
-		self.set_current_surface()
