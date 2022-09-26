@@ -6,6 +6,14 @@ from enum import Enum
 from utils.time import Time_Man
 
 
+'''
+TODO : Chage location of score
+TODO : Make snake spawn somewhere in the middle of the screen
+TODO : Add death screen
+TODO : Add restart
+'''
+
+
 class SNAKE:
 	def __init__(self, snake_game):
 		self.snake_game = snake_game
@@ -118,13 +126,13 @@ class Snake(Game):
 		self.bg_color = SNAKE_BG
 		self.surface.fill(self.bg_color)
 		self.paused_surface.fill(self.bg_color)
-		self.font = pygame.font.Font(None, 50)
+		self.pause_font = pygame.font.Font(None, PAUSE_FONT_SIZE)
+		self.score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
 		self.blink_delay = 650 #milisecs
 		self.grid = []
 		self.cells = []
 		self.fruits = []
 		self.create_grid()
-		self.paused_surface.set_alpha(15)
 		self.snake = SNAKE(self)
 		self.fruit_timer = Time_Man()
 		self.score = 0
@@ -166,13 +174,13 @@ class Snake(Game):
 
 
 	def display_paused(self):
-		self.paused_surface.fill("white")
+		self.paused_surface.fill(SCORE_COLOR)
 		self.surface.blit(self.paused_surface, (0,0))
 		self.render_pause_message()
 
 
 	def render_pause_message(self):
-		pause_lable_render = self.font.render("PAUSED", True, "black")
+		pause_lable_render = self.pause_font.render("PAUSED", True, PAUSE_COLOR)
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
@@ -183,10 +191,10 @@ class Snake(Game):
 		self.paused = not self.paused
 
 	def dispaly_score(self):
-		score_lable_render = self.font.render(f"Score : {self.score}", True, 'white')
+		score_lable_render = self.score_font.render(f"{self.score}", True, SCORE_COLOR)
 		s_width, s_height = self.surface.get_size()
 		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
-		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), 10))
+		score_lable_rect = score_lable_render.get_rect(center = ((s_width) - score_lable_rect.width * 2, score_lable_rect.width * 2))
 		if self.paused : score_lable_render.set_alpha(PAUSE_ALPHA)
 		self.surface.blit(score_lable_render, score_lable_rect)
 

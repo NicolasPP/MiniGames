@@ -18,3 +18,4 @@ LABLE_FONT_SIZE = 15
 	# Fullscreen style
 FS_RECT_WIDTH = 9
 FS_RECT_HEIGHT = 3
+

@@ -11,6 +11,11 @@ PAUSE_ALPHA = 15 # 0 is fully transparent and 255 fully opaque.
 S_CELL_SIZE = 10
 S_COLOR = "black"
 F_COLOR = "green"
+PAUSE_COLOR = "black"
+SCORE_COLOR = "white"
+
+PAUSE_FONT_SIZE = 50
+SCORE_FONT_SIZE = 40
 
 
 	# time
