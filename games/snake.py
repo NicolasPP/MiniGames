@@ -7,13 +7,13 @@ from utils.time import Time_Man
 
 
 class SNAKE:
-	def __init__(self, rect, sidebar_offset):
-		self.rect = rect
+	def __init__(self, snake_game):
+		self.snake_game = snake_game
+		self.rect = choice(snake_game.cells)
 		self.rect.width -= 1
 		self.rect.height -= 1
 		self.size = 15
 		self.body = []
-		self.sidebar_offset = sidebar_offset
 		self.direction_input = {
 			"UP" : (0, -1),
 			"DOWN" : (0 ,1),
@@ -24,15 +24,14 @@ class SNAKE:
 		self.direction = choice(list(self.direction_input.values()))
 		self.speed = S_CELL_SIZE * 10
 		self.move_distance = 0
-		self.x = rect.x
-		self.y = rect.y
+		self.x = self.rect.x
+		self.y = self.rect.y
 		self.alive = True
 
 
-	def render(self, grid_surface):
-		for bdy in self.body: pygame.draw.rect(grid_surface, S_COLOR, bdy)
-		pygame.draw.rect(grid_surface, S_COLOR, self.rect)
-
+	def render(self):
+		for bdy in self.body: pygame.draw.rect(self.snake_game.surface, S_COLOR, bdy)
+		pygame.draw.rect(self.snake_game.surface, S_COLOR, self.rect)
 
 	def update(self, dt):# snake not bound to the board
 		self.check_collision()
@@ -45,8 +44,6 @@ class SNAKE:
 			self.move_distance += S_CELL_SIZE
 			prev_rec = self.rect.copy()
 			self.add(prev_rec)
-
-	
 	def move(self, dt):
 		direc_x, direc_y = self.direction
 		if self.move_distance <= 0: return
@@ -62,25 +59,28 @@ class SNAKE:
 		self.body.append(rect)
 		body_size = len(self.body)
 		if body_size > self.size: self.body = self.body[1:body_size]
-		
 
 	def check_collision(self):
+		self.body_collision()
+		self.wall_collision()
+		self.fruit_collision()
+	def body_collision(self):
 		p1, p2 = self.get_collision_points()
 		for bdy in self.body:
 			if bdy.collidepoint(p1) or bdy.collidepoint(p2):
 				self.die()
+	def wall_collision(self):
+		width, height = self.snake_game.surface.get_size()
+		if self.rect.x >= width or self.rect.x <= 0 \
+			or self.rect.y >= height or self.rect.y <= 0: self.die()
+	def fruit_collision(self):
+		collided = []
+		for fruit in self.snake_game.fruits:
+			if fruit.colliderect(self.rect):
+				self.size += 1
+				collided.append(fruit)
+		for fruit in collided: self.snake_game.fruits.remove(fruit)
 
-	def die(self): self.alive = False
-
-
-	def set_direction(self, new_direction):
-		if self.direction_input[new_direction] == self.direction: return
-		if self.direction_input[new_direction] == self.get_inverse_direction(): return
-		self.direction = self.direction_input[new_direction]
-
-	def get_inverse_direction(self):
-		x, y = self.direction
-		return x * -1, y * -1
 	def get_collision_points(self):
 		h_offset = S_CELL_SIZE // 2
 		direc_x, direc_y = self.direction
@@ -100,6 +100,16 @@ class SNAKE:
 
 		return tuple(p1), tuple(p2)
 
+	def die(self): self.alive = False
+
+	def set_direction(self, new_direction):
+		if self.direction_input[new_direction] == self.direction: return
+		if self.direction_input[new_direction] == self.get_inverse_direction(): return
+		self.direction = self.direction_input[new_direction]
+	def get_inverse_direction(self):
+		x, y = self.direction
+		return x * -1, y * -1
+
 class Snake(Game):
 	def __init__(self, app):
 		super().__init__(app)
@@ -116,19 +126,20 @@ class Snake(Game):
 		self.create_grid()
 		self.pause_message_render = self.get_pause_message_render()
 		self.paused_surface.set_alpha(5)
-		self.snake = SNAKE(choice(self.cells), self.sidebar_offset)
+		self.snake = SNAKE(self)
 		self.fruit_timer = Time_Man()
+	
+
 	def update(self, dt):
 		if self.paused: pass
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
-				self.collide_fruits()
 				self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
 		for fruit in self.fruits: pygame.draw.rect(self.surface, "Green", fruit)
-		self.snake.render(self.surface)
+		self.snake.render()
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 		
 
@@ -136,26 +147,15 @@ class Snake(Game):
 		self.paused_surface.fill(self.bg_color)
 		if not self.blink: return
 		self.paused_surface.blit(*self.pause_message_render)
-
 	def get_pause_message_render(self):
 		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "White")
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
 		return pause_lable_render, pause_lable_rect
-
 	def toggle_pause(self):
 		self.paused = not self.paused
 		self.set_current_surface()
-
-
-	def collide_fruits(self):
-		collided = []
-		for fruit in self.fruits:
-			if fruit.colliderect(self.snake.rect):
-				self.snake.size += 1
-				collided.append(fruit)
-		for fruit in collided: self.fruits.remove(fruit)
 
 
 	def create_grid(self):

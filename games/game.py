@@ -27,3 +27,4 @@ class Game:
 	def set_current_surface(self):
 		if self.paused: self.current_surface = self.paused_surface
 		else: self.current_surface = self.surface
+		
