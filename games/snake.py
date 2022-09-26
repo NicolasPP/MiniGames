@@ -71,8 +71,9 @@ class SNAKE:
 				self.die()
 	def wall_collision(self):
 		width, height = self.snake_game.surface.get_size()
-		if self.rect.x >= width or self.rect.x <= 0 \
-			or self.rect.y >= height or self.rect.y <= 0: self.die()
+		p1, p2 = self.get_collision_points()
+		if p1[0] >= width or p1[0] <= 0 \
+			or p1[1] >= height or p1[1] <= 0: self.die()
 	def fruit_collision(self):
 		collided = []
 		for fruit in self.snake_game.fruits:
