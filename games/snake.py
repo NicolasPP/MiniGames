@@ -11,8 +11,8 @@ class SNAKE:
 		self.rect = rect
 		self.rect.width -= 1
 		self.rect.height -= 1
-		self.size = 1
-		self.body = [self.rect]
+		self.size = 15
+		self.body = []
 		self.sidebar_offset = sidebar_offset
 		self.direction_input = {
 			"UP" : (0, -1),
@@ -21,47 +21,42 @@ class SNAKE:
 			"LEFT" : (-1, 0)
 		}
 		self.timer = Time_Man()
-		self.speed = 20
 		self.direction = choice(list(self.direction_input.values()))
 		self.speed = S_CELL_SIZE * 10
 		self.move_distance = 0
 		self.x = rect.x
 		self.y = rect.y
+		self.alive = True
 
 
 	def render(self, grid_surface):
-		for bdy in self.body: pygame.draw.rect(grid_surface, "Black", bdy)
+		for bdy in self.body: pygame.draw.rect(grid_surface, S_COLOR, bdy)
+		pygame.draw.rect(grid_surface, S_COLOR, self.rect)
 
 
-	# def update(self, dt): #snake bound to the board
-	# 	direc_x, direc_y = self.direction
-	# 	if self.timer.dt_wait(dt, 300):
-	# 		prev_rec = self.rect.copy()
-	# 		self.rect.x += S_CELL_SIZE * direc_x
-	# 		self.rect.y += S_CELL_SIZE * direc_y
-	# 		self.add(prev_rec)
+	def update(self, dt):# snake not bound to the board
+		self.check_collision()
+		self.set_move_distance(dt)
+		self.move(dt)
 
-	def update(self, dt): # snake not bound to the board
-		direc_x, direc_y = self.direction
-		if self.timer.dt_wait(dt, 300):
+
+	def set_move_distance(self, dt):
+		if self.timer.dt_wait(dt, SNAKE_MOVE_FREQ):
 			self.move_distance += S_CELL_SIZE
 			prev_rec = self.rect.copy()
-			self.rect.x += S_CELL_SIZE * direc_x
-			self.rect.y += S_CELL_SIZE * direc_y
 			self.add(prev_rec)
+
+	
+	def move(self, dt):
+		direc_x, direc_y = self.direction
 		if self.move_distance <= 0: return
-
 		dist = self.speed * dt
-
 		if self.move_distance - (self.speed * dt) < 0: dist += (self.move_distance - (self.speed * dt))
-
 		self.x += (dist) * direc_x
 		self.y += (dist) * direc_y
 		self.move_distance -= (dist)
 		self.rect.x = round(self.x)
 		self.rect.y = round(self.y)
-
-
 
 	def add(self, rect):
 		self.body.append(rect)
@@ -69,11 +64,36 @@ class SNAKE:
 		if body_size > self.size: self.body = self.body[1:body_size]
 		
 
+	def check_collision(self):
+		p1, p2 = self.get_collision_points()
+		for bdy in self.body:
+			if bdy.collidepoint(p1) or bdy.collidepoint(p2):
+				self.die()
+
+	def die(self): self.alive = False
+
+
 	def set_direction(self, new_direction):
 		self.direction = self.direction_input[new_direction]
 
-	
+	def get_collision_points(self):
+		h_offset = S_CELL_SIZE // 2
+		direc_x, direc_y = self.direction
+		center_x, center_y = self.rect.center
+		center_head_x = center_x + (direc_x * h_offset)
+		center_head_y = center_y + (direc_y * h_offset)
 
+		p1 = [center_head_x, center_head_y]
+		p2 = [center_head_x, center_head_y]
+
+		if direc_x == 0: 
+			p1[0] += h_offset
+			p2[0] -= h_offset
+		if direc_y == 0: 
+			p1[1] += h_offset
+			p2[1] -= h_offset
+
+		return tuple(p1), tuple(p2)
 
 class Snake(Game):
 	def __init__(self, app):
@@ -96,24 +116,16 @@ class Snake(Game):
 	def update(self, dt):
 		if self.paused: pass
 		else:
-			self.snake.update(dt)
-			# self.snake.collide_cells(self.cells)
-			self.collide_fruits()
-			self.spawn_fruit(dt)
+			if self.snake.alive:
+				self.snake.update(dt)
+				self.collide_fruits()
+				self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
 		for fruit in self.fruits: pygame.draw.rect(self.surface, "Green", fruit)
 		self.snake.render(self.surface)
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 		
-
-	def grid_test(self):
-		for row in self.grid:
-			for cell in row:
-				mp = pygame.mouse.get_pos()
-				x, y = mp[0] - self.sidebar_offset[0], mp[1] - self.sidebar_offset[1]
-				if cell.collidepoint((x, y)):
-					pygame.draw.rect(self.current_surface, "Black", cell)
 
 	def display_paused(self):
 		self.paused_surface.fill(self.bg_color)
@@ -163,7 +175,7 @@ class Snake(Game):
 		self.display_paused()
 
 	def spawn_fruit(self, dt):
-		if self.fruit_timer.dt_wait(dt, 5000):
+		if self.fruit_timer.dt_wait(dt, FRUIT_SPAWN_DELAY):
 			fruit = choice(self.cells)
 			while not self.is_valid_fruit_pos(fruit): fruit =choice(self.cells)
 			self.fruits.append(fruit)
