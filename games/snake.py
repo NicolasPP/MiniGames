@@ -30,8 +30,8 @@ class SNAKE:
 
 
 	def render(self):
-		for bdy in self.body: pygame.draw.rect(self.snake_game.surface, S_COLOR, bdy)
-		pygame.draw.rect(self.snake_game.surface, S_COLOR, self.rect)
+		for bdy in self.body: self.snake_game.surface.blit(self.snake_game.get_rect_surface(bdy, S_COLOR), bdy.topleft)
+		self.snake_game.surface.blit(self.snake_game.get_rect_surface(self.rect, S_COLOR), self.rect.topleft)
 
 	def update(self, dt):# snake not bound to the board
 		self.check_collision()
@@ -119,61 +119,83 @@ class Snake(Game):
 		self.surface.fill(self.bg_color)
 		self.paused_surface.fill(self.bg_color)
 		self.font = pygame.font.Font(None, 50)
-		self.blink = False
-		self.display_paused()
 		self.blink_delay = 650 #milisecs
 		self.grid = []
 		self.cells = []
 		self.fruits = []
 		self.create_grid()
-		self.pause_message_render = self.get_pause_message_render()
-		self.paused_surface.set_alpha(5)
+		self.paused_surface.set_alpha(15)
 		self.snake = SNAKE(self)
 		self.fruit_timer = Time_Man()
 		self.score = 0
+		self.p_message_alpha = 255
+		self.p_alpha_change = -1
 	
 
 	def update(self, dt):
-		if self.paused: pass
+		if self.paused: self.update_pause_alpha(dt)
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
 				self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
-		self.dispaly_score()
-		for fruit in self.fruits: pygame.draw.rect(self.surface, F_COLOR, fruit)
+		for fruit in self.fruits: self.surface.blit(self.get_rect_surface(fruit, F_COLOR), fruit.topleft)
 		self.snake.render()
+		if self.paused: self.display_paused() 
+		self.dispaly_score()
 		parent_surface.blit(self.surface, self.app.get_gs_position())
-		
+
+	def update_pause_alpha(self, dt):
+		self.p_message_alpha +=  (1000 * dt * self.p_alpha_change)
+
+		if self.p_message_alpha <= 0:
+			self.p_message_alpha = 0
+			self.p_alpha_change = 1
+
+		if self.p_message_alpha >= 255:
+			self.p_message_alpha = 255
+			self.p_alpha_change = -1
+
+	def get_rect_surface(self, rect, color):
+		fruit_surface = pygame.Surface(rect.size)
+		fruit_surface.fill(color)
+		if self.paused: fruit_surface.set_alpha(15)
+		else: fruit_surface.set_alpha(255)
+		return fruit_surface
+
 
 	def display_paused(self):
-		self.paused_surface.fill(self.bg_color)
-		if not self.blink: return
-		self.paused_surface.blit(*self.pause_message_render)
-	def get_pause_message_render(self):
-		pause_lable_render = self.font.render("press ' SPACE ' to play", True, "white")
+		self.paused_surface.fill("white")
+		self.surface.blit(self.paused_surface, (0,0))
+		self.render_pause_message()
+
+
+	def render_pause_message(self):
+		pause_lable_render = self.font.render("PAUSED", True, "black")
 		s_width, s_height = self.paused_surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
-		return pause_lable_render, pause_lable_rect
+		pause_lable_render.set_alpha(self.p_message_alpha)
+		self.surface.blit(pause_lable_render, pause_lable_rect)
+
 	def toggle_pause(self):
 		self.paused = not self.paused
-		self.set_current_surface()
 
 	def dispaly_score(self):
 		score_lable_render = self.font.render(f"Score : {self.score}", True, 'white')
 		s_width, s_height = self.surface.get_size()
 		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
 		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), 10))
+		if self.paused : score_lable_render.set_alpha(15)
 		self.surface.blit(score_lable_render, score_lable_rect)
 
 
 
 	def create_grid(self):
-		for h in range(self.current_surface.get_rect().height // S_CELL_SIZE):
+		for h in range(self.surface.get_rect().height // S_CELL_SIZE):
 			row = []
-			for w in range(self.current_surface.get_rect().width // S_CELL_SIZE):
+			for w in range(self.surface.get_rect().width // S_CELL_SIZE):
 				cell = pygame.Rect((w * S_CELL_SIZE, h * S_CELL_SIZE),(S_CELL_SIZE, S_CELL_SIZE))
 				row.append(cell)
 				self.cells.append(cell)
@@ -186,10 +208,7 @@ class Snake(Game):
 		new_ps.fill(self.bg_color)
 		self.paused_surface = new_ps
 		self.surface =  new_s
-		self.set_current_surface()
 		self.create_grid()
-		self.pause_message_render = self.get_pause_message_render()
-		self.display_paused()
 
 	def spawn_fruit(self, dt):
 		if self.fruit_timer.dt_wait(dt, FRUIT_SPAWN_DELAY):
