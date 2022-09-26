@@ -7,8 +7,8 @@ from utils.time import Time_Man
 
 
 '''
-TODO : Add death screen
-TODO : Add restart
+TODO : clean display functions with fonts
+TODO : change pause and death screen to say press space
 '''
 
 
@@ -121,7 +121,7 @@ class SNAKE:
 	def get_mid_cell(self):
 		row_num = len(self.snake_game.grid)
 		col_num = len(self.snake_game.grid[0])
-		return self.snake_game.grid[row_num // 2][col_num // 2]
+		return self.snake_game.grid[row_num // 2][col_num // 2].copy()
 
 class Snake(Game):
 	def __init__(self, app):
@@ -131,6 +131,7 @@ class Snake(Game):
 		self.paused_surface.fill(self.bg_color)
 		self.pause_font = pygame.font.Font(None, PAUSE_FONT_SIZE)
 		self.score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
+		self.final_score_font = pygame.font.Font(None, 30)
 		self.grid = []
 		self.cells = []
 		self.fruits = []
@@ -143,17 +144,21 @@ class Snake(Game):
 	
 
 	def update(self, dt):
-		if self.paused: self.update_pause_alpha(dt)
+		if self.paused or not self.snake.alive: self.update_pause_alpha(dt)
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
 				self.spawn_fruit(dt)
 
 	def render(self, parent_surface):
-		for fruit in self.fruits: self.surface.blit(self.get_rect_surface(fruit, F_COLOR), fruit.topleft)
-		self.snake.render()
-		if self.paused: self.display_paused() 
-		self.dispaly_score()
+		
+		if self.snake.alive:
+			for fruit in self.fruits: self.surface.blit(self.get_rect_surface(fruit, F_COLOR), fruit.topleft)
+			self.snake.render()
+			self.dispaly_score()
+		if self.paused: self.display_paused()
+		if not self.snake.alive: self.display_death_screen()
+
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 
 	def update_pause_alpha(self, dt):
@@ -190,7 +195,8 @@ class Snake(Game):
 		self.surface.blit(pause_lable_render, pause_lable_rect)
 
 	def toggle_pause(self):
-		self.paused = not self.paused
+		if self.snake.alive:
+			self.paused = not self.paused
 
 	def dispaly_score(self):
 		score_lable_render = self.score_font.render(f"{self.score}", True, SCORE_COLOR)
@@ -200,7 +206,33 @@ class Snake(Game):
 		if self.paused : score_lable_render.set_alpha(PAUSE_ALPHA)
 		self.surface.blit(score_lable_render, score_lable_rect)
 
+	def display_final_score(self):
+		score_lable_render = self.final_score_font.render(f"final score : {self.score}", True, SCORE_COLOR)
+		s_width, s_height = self.surface.get_size()
+		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
+		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), (s_height // 2) - (score_lable_rect.height // 2)))
+		self.surface.blit(score_lable_render, score_lable_rect)
 
+	def display_death_screen(self):
+		death_surface = self.app.get_game_surface(False)
+		death_surface.set_alpha(50)
+		death_surface.fill('red')
+		self.surface.blit(death_surface, (0,0))
+		self.display_final_score()
+		self.display_restart()
+
+	def display_restart(self):
+		restart_lable_render = self.final_score_font.render(f"SPACE", True, SCORE_COLOR)
+		s_width, s_height = self.surface.get_size()
+		restart_lable_rect = restart_lable_render.get_rect(topleft = (0, 0))
+		restart_lable_rect = restart_lable_render.get_rect(topleft = ((s_width // 2) - (restart_lable_rect.width // 2), (s_height // 2) - (restart_lable_rect.height // 2) + 50))
+		restart_lable_render.set_alpha(self.p_message_alpha)
+		self.surface.blit(restart_lable_render, restart_lable_rect)
+	def restart(self):
+		self.score = 0
+		self.fruits = []
+		del self.snake
+		self.snake = SNAKE(self)
 
 	def create_grid(self):
 		for h in range(self.surface.get_rect().height // S_CELL_SIZE):
@@ -237,7 +269,7 @@ class Snake(Game):
 			if event.key == pygame.K_DOWN or event.key == pygame.K_s: self.snake.set_direction("DOWN")
 			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.set_direction("RIGHT")
 			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.set_direction("LEFT")
-
+			if event.key == pygame.K_SPACE and not self.snake.alive: self.restart()
 
 
 
