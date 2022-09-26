@@ -9,3 +9,6 @@ PAUSE_ALPHA = 100 # 0 is fully transparent and 255 fully opaque.
 
 # SANKE
 S_CELL_SIZE = 10
+S_COLOR = "black"
+FRUIT_SPAWN_DELAY = 5000
+SNAKE_MOVE_FREQ = 500
