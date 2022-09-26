@@ -147,7 +147,7 @@ class Snake(Game):
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 
 	def update_pause_alpha(self, dt):
-		self.p_message_alpha +=  (1000 * dt * self.p_alpha_change)
+		self.p_message_alpha +=  (ALPHA_CHANGE * dt * self.p_alpha_change)
 
 		if self.p_message_alpha <= 0:
 			self.p_message_alpha = 0
@@ -160,7 +160,7 @@ class Snake(Game):
 	def get_rect_surface(self, rect, color):
 		fruit_surface = pygame.Surface(rect.size)
 		fruit_surface.fill(color)
-		if self.paused: fruit_surface.set_alpha(15)
+		if self.paused: fruit_surface.set_alpha(PAUSE_ALPHA)
 		else: fruit_surface.set_alpha(255)
 		return fruit_surface
 
@@ -187,7 +187,7 @@ class Snake(Game):
 		s_width, s_height = self.surface.get_size()
 		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
 		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), 10))
-		if self.paused : score_lable_render.set_alpha(15)
+		if self.paused : score_lable_render.set_alpha(PAUSE_ALPHA)
 		self.surface.blit(score_lable_render, score_lable_rect)
 
 
