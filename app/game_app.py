@@ -51,7 +51,7 @@ class MiniGameApp:
 	def update(self, dt): self.games[self.current_game].update(dt)
 
 	def render(self):
-		self.games[self.current_game].render(self.screen.surface)
+		self.games[self.current_game].render()
 		self.sidebar.render(self.screen.surface)
 
 

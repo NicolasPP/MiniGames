@@ -157,7 +157,7 @@ class Snake(Game):
 				self.snake.update(dt)
 				self.spawn_food(dt)
 
-	def render(self, parent_surface):
+	def render(self):
 		
 		if self.snake.alive:
 			for food in self.foods: self.surface.blit(self.get_rect_surface(food, FOOD_COLOR), food.topleft)
@@ -166,7 +166,7 @@ class Snake(Game):
 		if self.paused: self.display_paused()
 		if not self.snake.alive: self.display_loose_screen()
 
-		parent_surface.blit(self.surface, self.app.get_gs_position())
+		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 
 	def update_pause_alpha(self, dt):
 		self.p_message_alpha +=  (ALPHA_CHANGE * dt * self.p_alpha_change)
