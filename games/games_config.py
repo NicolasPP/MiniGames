@@ -1,27 +1,47 @@
 from color.color_palettes import color_palette2, color_palette3, color_palette1
-# ------ GENERAL COLORS ------
-GAME_BG = color_palette2[0] # rgb(220, 215, 201)
+# ------ GENERAL ------
+GAME_BG = color_palette2[0] #rgb(44, 54, 57)
 PAUSE_COLOR = "white"
-SCORE_COLOR = color_palette3[3]
-LOOSE_COLOR = color_palette2[3]
-
+SCORE_COLOR = color_palette3[3] #rgb(231, 171, 121)
+LOOSE_COLOR = color_palette2[3] #rgb(220, 215, 201)
 
 PAUSE_ALPHA = 15 # 0 is fully transparent and 255 fully opaque.
 LOOSE_ALPHA = 150
-#---------------------------
+#----------------------
 
 
-# SNAKE
+#------ SNAKE ------
 S_CELL_SIZE = 10
 
-SNAKE_COLOR = color_palette2[3]
-FOOD_COLOR = color_palette3[3]
+SNAKE_COLOR = color_palette2[3] #rgb(220, 215, 201)
+FOOD_COLOR = color_palette3[3] #rgb(231, 171, 121)
 
 PAUSE_FONT_SIZE = 50
 SCORE_FONT_SIZE = 40
 
 
-	# time
+	# time (ms)
 FOOD_SPAWN_DELAY = 5000
 SNAKE_MOVE_FREQ = 250
 ALPHA_CHANGE = 700
+#-------------------
+
+
+#------ WORDLE ------
+LETTER_BORDER_COLOR = color_palette3[3]
+BLANK_COLOR = color_palette1[0]
+FILLED_COLOR = color_palette1[0]
+PRESENT_OUT_OF_PLACE_COLOR = (181, 159, 59) #rgb(181, 159, 59)
+PRESENT_IN_PLACE_COLOR = (181, 159, 59) #rgb(83, 141, 78)
+NOT_PRESENT_COLOR = (58, 58, 60) #rgb(58, 58, 60)
+LETTER_COLOR = "white"
+LETTER_CARD_SIZE = 60
+LETTER_FONT_SIZE = 50
+WORD_BANK = 'games/wordBank.txt'
+WORD_SIZE = 5
+TRYS = 6
+#-------------------
+
+
+#------ TICTACTOE ------
+#-----------------------
