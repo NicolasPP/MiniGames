@@ -55,11 +55,13 @@ class MiniGameApp:
 		self.sidebar.render(self.screen.surface)
 
 
-	def get_game_surface(self, is_paused_surface):
+	def get_game_surface(self, color, alpha = False):
 		gs_width, gs_height = self.get_gs_dimension()
-		g_surface =pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
-		if is_paused_surface: g_surface.set_alpha(gcfg.PAUSE_ALPHA)
-		if is_paused_surface: return g_surface
+		g_surface = pygame.Surface((gs_width, gs_height))
+		if alpha:
+			g_surface =pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
+			g_surface.set_alpha(alpha)
+		g_surface.fill(color)
 		return g_surface
 	
 	def get_gs_dimension(self):
