@@ -17,7 +17,7 @@ class MiniGameApp:
 		self.prev_time = time.time()
 		self.running = True
 		# initialize main pygame surface
-		self.screen = Screen(s_width, s_height, full_screen)
+		self.screen = Screen(s_width, s_height, full_screen, color = APP_BG_COLOR)
 		self.screen.display()
 		self.clock = pygame.time.Clock()
 
