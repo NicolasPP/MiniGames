@@ -9,6 +9,9 @@ from utils.time import Time_Man
 '''
 TODO : clean display functions with fonts
 TODO : change pause and death screen to say press space
+TODO : change update function so its always moving, then it uses
+	   dt_wait to wait a certain amount of time before mooving again
+TODO : change self.paused, self.snake.isalive, 
 '''
 
 
@@ -26,6 +29,7 @@ class SNAKE:
 			"RIGHT" : (1,0),
 			"LEFT" : (-1, 0)
 		}
+		self.color = SNAKE_COLOR
 		self.timer = Time_Man()
 		self.direction = choice(list(self.direction_input.values()))
 		self.speed = S_CELL_SIZE * 10
@@ -36,8 +40,8 @@ class SNAKE:
 
 
 	def render(self):
-		for bdy in self.body: self.snake_game.surface.blit(self.snake_game.get_rect_surface(bdy, S_COLOR), bdy.topleft)
-		self.snake_game.surface.blit(self.snake_game.get_rect_surface(self.rect, S_COLOR), self.rect.topleft)
+		for bdy in self.body: self.snake_game.surface.blit(self.snake_game.get_rect_surface(bdy, self.color), bdy.topleft)
+		self.snake_game.surface.blit(self.snake_game.get_rect_surface(self.rect, self.color), self.rect.topleft)
 
 	def update(self, dt):# snake not bound to the board
 		self.check_collision()
@@ -69,7 +73,7 @@ class SNAKE:
 	def check_collision(self):
 		self.body_collision()
 		self.wall_collision()
-		self.fruit_collision()
+		self.food_collision()
 	def body_collision(self):
 		p1, p2 = self.get_collision_points()
 		for bdy in self.body:
@@ -80,14 +84,14 @@ class SNAKE:
 		p1, p2 = self.get_collision_points()
 		if p1[0] >= width or p1[0] <= 0 \
 			or p1[1] >= height or p1[1] <= 0: self.die()
-	def fruit_collision(self):
+	def food_collision(self):
 		collided = []
-		for fruit in self.snake_game.fruits:
-			if fruit.colliderect(self.rect):
+		for food in self.snake_game.foods:
+			if food.colliderect(self.rect):
 				self.size += 1
 				self.snake_game.score += 1
-				collided.append(fruit)
-		for fruit in collided: self.snake_game.fruits.remove(fruit)
+				collided.append(food)
+		for food in collided: self.snake_game.foods.remove(food)
 
 	def get_collision_points(self):
 		h_offset = S_CELL_SIZE // 2
@@ -126,18 +130,15 @@ class SNAKE:
 class Snake(Game):
 	def __init__(self, app):
 		super().__init__(app)
-		self.bg_color = SNAKE_BG
-		self.surface.fill(self.bg_color)
-		self.paused_surface.fill(self.bg_color)
 		self.pause_font = pygame.font.Font(None, PAUSE_FONT_SIZE)
 		self.score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
 		self.final_score_font = pygame.font.Font(None, 30)
 		self.grid = []
 		self.cells = []
-		self.fruits = []
+		self.foods = []
 		self.create_grid()
 		self.snake = SNAKE(self)
-		self.fruit_timer = Time_Man()
+		self.food_timer = Time_Man()
 		self.score = 0
 		self.p_message_alpha = 255
 		self.p_alpha_change = -1
@@ -148,16 +149,16 @@ class Snake(Game):
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
-				self.spawn_fruit(dt)
+				self.spawn_food(dt)
 
 	def render(self, parent_surface):
 		
 		if self.snake.alive:
-			for fruit in self.fruits: self.surface.blit(self.get_rect_surface(fruit, F_COLOR), fruit.topleft)
+			for food in self.foods: self.surface.blit(self.get_rect_surface(food, FOOD_COLOR), food.topleft)
 			self.snake.render()
 			self.dispaly_score()
 		if self.paused: self.display_paused()
-		if not self.snake.alive: self.display_death_screen()
+		if not self.snake.alive: self.display_loose_screen()
 
 		parent_surface.blit(self.surface, self.app.get_gs_position())
 
@@ -173,22 +174,22 @@ class Snake(Game):
 			self.p_alpha_change = -1
 
 	def get_rect_surface(self, rect, color):
-		fruit_surface = pygame.Surface(rect.size)
-		fruit_surface.fill(color)
-		if self.paused: fruit_surface.set_alpha(PAUSE_ALPHA)
-		else: fruit_surface.set_alpha(255)
-		return fruit_surface
+		food_surface = pygame.Surface(rect.size)
+		food_surface.fill(color)
+		if self.paused: food_surface.set_alpha(PAUSE_ALPHA)
+		else: food_surface.set_alpha(255)
+		return food_surface
 
 
 	def display_paused(self):
-		self.paused_surface.fill(SCORE_COLOR)
-		self.surface.blit(self.paused_surface, (0,0))
+		paused_surface = self.app.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
+		self.surface.blit(paused_surface, (0,0))
 		self.render_pause_message()
 
 
 	def render_pause_message(self):
-		pause_lable_render = self.pause_font.render("PAUSED", True, PAUSE_COLOR)
-		s_width, s_height = self.paused_surface.get_size()
+		pause_lable_render = self.pause_font.render("PAUSED", True, SCORE_COLOR)
+		s_width, s_height = self.surface.get_size()
 		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
 		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
 		pause_lable_render.set_alpha(self.p_message_alpha)
@@ -207,16 +208,14 @@ class Snake(Game):
 		self.surface.blit(score_lable_render, score_lable_rect)
 
 	def display_final_score(self):
-		score_lable_render = self.final_score_font.render(f"final score : {self.score}", True, SCORE_COLOR)
+		score_lable_render = self.final_score_font.render(f"[{self.score}]", True, SCORE_COLOR)
 		s_width, s_height = self.surface.get_size()
 		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
 		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), (s_height // 2) - (score_lable_rect.height // 2)))
 		self.surface.blit(score_lable_render, score_lable_rect)
 
-	def display_death_screen(self):
-		death_surface = self.app.get_game_surface(False)
-		death_surface.set_alpha(50)
-		death_surface.fill('red')
+	def display_loose_screen(self):
+		death_surface = self.app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
 		self.surface.blit(death_surface, (0,0))
 		self.display_final_score()
 		self.display_restart()
@@ -230,7 +229,7 @@ class Snake(Game):
 		self.surface.blit(restart_lable_render, restart_lable_rect)
 	def restart(self):
 		self.score = 0
-		self.fruits = []
+		self.foods = []
 		del self.snake
 		self.snake = SNAKE(self)
 
@@ -244,23 +243,18 @@ class Snake(Game):
 			self.grid.append(row)
 
 	def update_surface_size(self):
-		new_s = self.app.get_game_surface(False)
-		new_ps = self.app.get_game_surface(True)
-		new_s.fill(self.bg_color)
-		new_ps.fill(self.bg_color)
-		self.paused_surface = new_ps
-		self.surface =  new_s
+		self.surface =  self.app.get_game_surface(self.bg_color)
 		self.create_grid()
 
-	def spawn_fruit(self, dt):
-		if self.fruit_timer.dt_wait(dt, FRUIT_SPAWN_DELAY):
-			fruit = choice(self.cells)
-			while not self.is_valid_fruit_pos(fruit): fruit =choice(self.cells)
-			self.fruits.append(fruit)
+	def spawn_food(self, dt):
+		if self.food_timer.dt_wait(dt, FOOD_SPAWN_DELAY):
+			food = choice(self.cells)
+			while not self.is_valid_food_pos(food): food =choice(self.cells)
+			self.foods.append(food)
 
-	def is_valid_fruit_pos(self, fruit):
-		return fruit not in self.snake.body and \
-					fruit not in self.fruits
+	def is_valid_food_pos(self, food):
+		return food not in self.snake.body and \
+					food not in self.foods
 
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
