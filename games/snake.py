@@ -9,6 +9,9 @@ from utils.time import Time_Man
 '''
 TODO : clean display functions with fonts
 TODO : change pause and death screen to say press space
+TODO : change update function so its always moving, then it uses
+	   dt_wait to wait a certain amount of time before mooving again
+TODO : change self.paused, self.snake.isalive, 
 '''
 
 
