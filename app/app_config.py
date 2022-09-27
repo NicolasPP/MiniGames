@@ -1,4 +1,4 @@
-from color.color_palettes import color_palette2, color_palette1
+from color.color_palettes import *
 
 S_WIDTH = 640
 S_HEIGHT = 480
@@ -6,6 +6,7 @@ FULLSCREEN = False
 
 
 # GUI
+APP_BG_COLOR = color_palette2[0]
 MAIN_MENU_COLOR = color_palette2[1]
 BG_COLOR = color_palette1[0]
 BUTTON_COLOR = color_palette2[1]

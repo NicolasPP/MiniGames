@@ -195,9 +195,8 @@ class Snake(Game):
 		pause_lable_render.set_alpha(self.p_message_alpha)
 		self.surface.blit(pause_lable_render, pause_lable_rect)
 
-	def toggle_pause(self):
-		if self.snake.alive:
-			self.paused = not self.paused
+	def toggle_pause(self): 
+		if self.snake.alive: self.paused = not self.paused
 
 	def dispaly_score(self):
 		score_lable_render = self.score_font.render(f"{self.score}", True, SCORE_COLOR)

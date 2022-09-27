@@ -12,7 +12,9 @@ class Screen:
     full_screen_height = screen_info.current_h
     full_screen_width = screen_info.current_w
 
-    def __init__(self, window_width, window_height, full_screen = True):
+    def __init__(self, window_width, window_height, full_screen = True, color = "black"):
+        pygame.init()
+        self.bg_color = color
         self.full_screen = full_screen
         self.windowed_height = window_height
         self.windowed_width = window_width
@@ -31,10 +33,9 @@ class Screen:
         self.windowed_width = new_windowed_width
 
     def display(self):
-        pygame.init()
-        self.transparent_surface = pygame.Surface((self.current_width, self.current_height))
-        self.transparent_surface.set_alpha(127)
-        self.surface = pygame.display.set_mode((self.current_width, self.current_height), pygame.NOFRAME)
+        surface = pygame.display.set_mode((self.current_width, self.current_height), pygame.NOFRAME)
+        surface.fill(self.bg_color)
+        self.surface = surface
 
     
     def toggle_full_screen(self):

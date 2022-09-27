@@ -3,7 +3,7 @@ from color.color_palettes import color_palette2, color_palette3, color_palette1
 GAME_BG = color_palette2[0] # rgb(220, 215, 201)
 PAUSE_COLOR = "white"
 SCORE_COLOR = color_palette3[3]
-LOOSE_COLOR = "red"
+LOOSE_COLOR = color_palette2[3]
 
 
 PAUSE_ALPHA = 15 # 0 is fully transparent and 255 fully opaque.
