@@ -1,6 +1,4 @@
-def rgb(r, g, b,):
-	return (r, g, b)
-
+def rgb(r, g, b,): return (r, g, b)
 
 color_palette1 = [
 	rgb(27, 36, 48),
