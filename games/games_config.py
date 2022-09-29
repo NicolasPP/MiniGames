@@ -1,4 +1,6 @@
 from color.color_palettes import color_palette2, color_palette3, color_palette1
+
+
 # ------ GENERAL ------
 GAME_BG = color_palette2[0] #rgb(44, 54, 57)
 PAUSE_COLOR = "white"
@@ -28,18 +30,21 @@ ALPHA_CHANGE = 700
 
 
 #------ WORDLE ------
-LETTER_BORDER_COLOR = color_palette3[3]
-BLANK_COLOR = color_palette1[0]
-FILLED_COLOR = color_palette1[0]
+LETTER_OUTLINE_COLOR = color_palette3[3]#rgb(231, 171, 121)
+BLANK_COLOR = color_palette2[0]#rgb(44, 54, 57)
+FILLED_COLOR = color_palette2[0]#rgb(44, 54, 57)
 PRESENT_OUT_OF_PLACE_COLOR = (181, 159, 59) #rgb(181, 159, 59)
 PRESENT_IN_PLACE_COLOR = (181, 159, 59) #rgb(83, 141, 78)
 NOT_PRESENT_COLOR = (58, 58, 60) #rgb(58, 58, 60)
 LETTER_COLOR = "white"
-LETTER_CARD_SIZE = 60
+LETTER_CARD_SIZE = 65
 LETTER_FONT_SIZE = 50
+CARD_OUTLINE_THICKNESS = 3
+OUTLINE_ALPHA = 50
 WORD_BANK = 'games/wordBank.txt'
 WORD_SIZE = 5
 TRYS = 6
+
 #-------------------
 
 

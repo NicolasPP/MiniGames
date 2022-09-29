@@ -30,12 +30,26 @@ class Letter:
 		self.rect = rect
 		self.wordle_game = wordle_game
 		self.state = LSTATE.BLANK
-		self.card_surface = pygame.Surface(rect.size)
-		self.card_surface.fill('black')
+		self.card_bg_surface = pygame.Surface(rect.size)
+		self.value = ''
+		self.bg_color = self.state.value
 
 	def render(self):
-		self.wordle_game.surface.blit(self.card_surface, self.rect.topleft)
+		self.set_card_style()
+		self.wordle_game.surface.blit(self.card_bg_surface, self.rect.topleft)
 
+	def set_card_style(self):
+		self.bg_color = self.state.value
+		self.card_bg_surface.fill(self.bg_color)
+		if self.state == LSTATE.BLANK: self.render_card_outline() 
+
+	def render_card_outline(self):
+		self.card_bg_surface.fill(LETTER_OUTLINE_COLOR)
+		bg = pygame.Surface((self.rect.width - round(CARD_OUTLINE_THICKNESS / 2) * 2, self.rect.height - round(CARD_OUTLINE_THICKNESS / 2) * 2))
+		bg.fill(self.bg_color)
+		self.card_bg_surface.set_alpha(OUTLINE_ALPHA)
+		self.card_bg_surface.blit(bg, (round(CARD_OUTLINE_THICKNESS / 2), round(CARD_OUTLINE_THICKNESS / 2)))
+		
 class Wordle(Game):
 	def __init__(self, app):
 		super().__init__(app)
@@ -47,6 +61,7 @@ class Wordle(Game):
 	def update_surface_size(self):
 		self.surface = self.app.get_game_surface(self.bg_color)
 		self.resize_letters()
+
 	def render(self):
 		for letter in self.letters: letter.render()
 		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
