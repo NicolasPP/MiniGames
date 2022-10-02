@@ -34,7 +34,7 @@ class LSTATE(Enum):
 	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
 	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
 	NOT_PRESENT = NOT_PRESENT_COLOR
-class GAME_RESULT(ENUM):
+class GAME_RESULT(Enum):
 	WON = 1
 	LOST = 2
 	UNDEFINED = 3
@@ -137,7 +137,7 @@ class Wordle(Game):
 			for letter in self.letters: letter.render()
 			self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 		if self.result is GAME_RESULT.WON: self.render_win()
-		if self.result is GAME_REUSLT.LOST: self.render_lost()
+		if self.result is GAME_RESULT.LOST: self.render_lost()
 
 	def render_win(self):
 		'''
