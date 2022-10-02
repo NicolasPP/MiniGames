@@ -173,7 +173,6 @@ class Wordle(Game):
 	def check_current_board_word(self):
 		if self.current_letter_index != WORD_SIZE: return
 		for game_word_letter, user_letter in zip(self.game_word, self.words[self.current_word_index]):
-			print(game_word_letter, user_letter.value)
 			if game_word_letter == user_letter.value: user_letter.state = LSTATE.PRESENT_IN_PLACE
 			elif user_letter.value in self.game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
 			else: user_letter.state = LSTATE.NOT_PRESENT 
