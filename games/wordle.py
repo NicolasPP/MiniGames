@@ -34,6 +34,10 @@ class LSTATE(Enum):
 	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
 	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
 	NOT_PRESENT = NOT_PRESENT_COLOR
+class GAME_RESULT(ENUM):
+	WON = 1
+	LOST = 2
+	UNDEFINED = 3
 
 class Letter:
 	def __init__(self, wordle_game, rect, index, r, c):
@@ -119,6 +123,9 @@ class Wordle(Game):
 		self.letters = []
 		self.create_board()
 		self.game_word = self.word_bank.get_random_word()
+		self.running = True
+		self.result = GAME_RESULT.UNDEFINED
+		
 		print(self.game_word)
 
 	def update_surface_size(self):
@@ -126,9 +133,29 @@ class Wordle(Game):
 		self.resize_letters()
 
 	def render(self):
-		for letter in self.letters: letter.render()
-		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
+		if self.running:
+			for letter in self.letters: letter.render()
+			self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
+		if self.result is GAME_RESULT.WON: self.render_win()
+		if self.result is GAME_REUSLT.LOST: self.render_lost()
 
+	def render_win(self):
+		'''
+			rgb(83, 141, 78)
+		surface with lower alpha
+		display " GAME WON "
+		play again button/ prompt
+		'''
+		pass
+	def render_lost(self):
+		'''
+			#rgb(58, 58, 60)
+		surface with lower alpha
+		display " GAME LOST "
+		play again button/ prompt
+		'''
+		pass
+	
 	def create_board(self):
 		self.words = []
 		self.letters = []
