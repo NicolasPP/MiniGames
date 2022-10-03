@@ -14,10 +14,17 @@ TODO : change update function so its always moving, then it uses
 TODO : change self.paused, self.snake.isalive,
 TODO : change direction input to enum class
 		class DIRECTION(Enum):
-			UP : (0, -1)
-			DOWN : (0 ,1)
-			RIGHT : (1,0)
-			LEFT : (-1, 0) 
+			UP = (0, -1)
+			DOWN = (0 ,1)
+			RIGHT = (1,0)
+			LEFT = (-1, 0)
+TODO: implement 
+		self.screens = Enum(
+			"SCREENS",
+			[
+				("PAUSE",app.get_game_surface(PAUSE_COLOR, alpha = PAUSE_ALPHA)),
+				("DEATH",app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA))
+			])
 '''
 
 
@@ -158,12 +165,12 @@ class Snake(Game):
 				self.spawn_food(dt)
 
 	def render(self):
-		
+		if self.paused: self.display_paused()
 		if self.snake.alive:
 			for food in self.foods: self.surface.blit(self.get_rect_surface(food, FOOD_COLOR), food.topleft)
 			self.snake.render()
 			self.dispaly_score()
-		if self.paused: self.display_paused()
+		
 		if not self.snake.alive: self.display_loose_screen()
 
 		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
