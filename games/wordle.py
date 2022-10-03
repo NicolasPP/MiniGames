@@ -21,7 +21,7 @@ class Word_Bank:
 
 	def read_word_bank(self):
 		words = []
-		with open(WORD_BANK) as wb:
+		with open(WORD_BANK_PT) as wb:
 			while True:
 				word = wb.readline()
 				if not word: break
@@ -72,7 +72,7 @@ class Letter:
 		self.set_card_style()
 		if self.state is not LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
-		if self.wordle_game.result == GAME_RESULT.LOST: self.card_bg_surface.set_alpha(LOOSE_ALPHA)
+		if self.wordle_game.result == GAME_RESULT.LOST: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.render_value()
 	@value.setter
 	def value(self, new_value):
@@ -134,12 +134,7 @@ class Wordle(Game):
 		self.restart_message_font = pygame.font.Font(None, 30)
 		self.restart_alpha = 255
 		self.restart_alpha_change = -1
-		self.SCREENS = Enum(
-			"SCREENS",
-			[
-				("WON",app.get_game_surface(WON_COLOR, alpha = 70)),
-				("LOST",app.get_game_surface(LOST_COLOR, alpha =70))
-			])
+		self.SCREENS = self.set_screen_enum()
 
 	# --Getters--
 	@property
@@ -157,6 +152,14 @@ class Wordle(Game):
 	@result.deleter
 	def result(sefl): del self._result
 	# ------------	
+
+	def set_screen_enum(self):
+		return Enum(
+			"SCREENS",
+			[
+				("WON",self.app.get_game_surface(WON_COLOR, alpha = POST_GAME_ALPHA)),
+				("LOST",self.app.get_game_surface(LOST_COLOR, alpha = POST_GAME_ALPHA))
+			])
 
 	def update(self, dt):
 		for letter in self.letters: letter.update(dt)
@@ -177,6 +180,7 @@ class Wordle(Game):
 	def update_surface_size(self):
 		self.surface = self.app.get_game_surface(self.bg_color)
 		self.resize_letters()
+		self.SCREENS = self.set_screen_enum()
 
 
 	def render(self):
