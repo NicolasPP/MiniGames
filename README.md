@@ -9,4 +9,6 @@ Python MiniGames App \
 Pygame 2.1.2 (SDL 2.0.18) \
 Python 3.10.5 
 
-run main.py
+
+run main.py \
+or run.sh
