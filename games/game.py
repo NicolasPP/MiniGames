@@ -3,6 +3,7 @@ from games.games_config import *
 
 class Game:
 	def __init__(self, app, bg_color = GAME_BG):
+	
 		self.bg_color = bg_color
 		self.app = app
 
@@ -14,5 +15,5 @@ class Game:
 	def update(self, dt): pass
 	def parse_event(self, event): pass
 
-	def render(self, parent_surface): parent_surface.blit(self.surface, self.app.get_gs_position())
+	def render(self): self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 	def update_surface_size(self): self.surface = self.app.get_game_surface(self.bg_color)
