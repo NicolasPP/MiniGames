@@ -37,6 +37,8 @@ PRESENT_OUT_OF_PLACE_COLOR = (181, 159, 59) #rgb(181, 159, 59)
 PRESENT_IN_PLACE_COLOR = (83, 141, 78) #rgb(83, 141, 78)
 NOT_PRESENT_COLOR = (58, 58, 60) #rgb(58, 58, 60)
 LETTER_COLOR = "white"
+WON_COLOR = (83, 141, 78) #rgb(83, 141, 78)
+LOST_COLOR = color_palette3[2] #rgb(178, 80, 104)
 LETTER_CARD_SIZE = 65
 LETTER_FONT_SIZE = 50
 CARD_OUTLINE_THICKNESS = 3
@@ -45,7 +47,6 @@ NORMAL_ALPHA = 255
 WORD_BANK = 'games/wordBank.txt'
 WORD_SIZE = 5
 TRYS = 6
-
 #-------------------
 
 

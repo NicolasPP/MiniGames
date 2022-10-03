@@ -3,6 +3,7 @@ from games.games_config import *
 
 class Game:
 	def __init__(self, app, bg_color = GAME_BG):
+	
 		self.bg_color = bg_color
 		self.app = app
 
