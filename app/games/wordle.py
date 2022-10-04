@@ -1,6 +1,6 @@
 import pygame
-import app.app_config as acfg
-from games.games_config import *
+import config.app_config as acfg
+from config.games_config import *
 from games.game import Game
 from enum import Enum
 from random import choice

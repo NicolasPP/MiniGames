@@ -1,13 +1,13 @@
 import pygame, sys, time
 
-from app.GUI.screen import Screen
+from GUI.screen import Screen
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
-from app.GUI.sidebar import Sidebar
-from app.GUI.main_menu import Main_menu
-from app.app_config import *
-import games.games_config as gcfg
+from GUI.sidebar import Sidebar
+from GUI.main_menu import Main_menu
+from config.app_config import *
+import config.games_config as gcfg
 from enum import Enum
 
 class MiniGameApp:

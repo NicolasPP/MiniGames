@@ -1,5 +1,5 @@
 import pygame
-from games.games_config import *
+from config.games_config import *
 
 class Game:
 	def __init__(self, app, bg_color = GAME_BG):

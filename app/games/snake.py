@@ -1,4 +1,4 @@
-from games.games_config import *
+from config.games_config import *
 from games.game import Game
 import pygame
 from random import choice

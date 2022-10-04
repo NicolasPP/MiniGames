@@ -1,7 +1,7 @@
 import pygame
-from app.app_config import *
-import games.games_config as gcfg
-from app.GUI.button import Button, Button_Type
+from config.app_config import *
+import config.games_config as gcfg
+from GUI.button import Button, Button_Type
 class Sidebar:
 	def __init__(self, width, height, parent, alpha = 1, bg_color = BG_COLOR):
 		self.parent = parent

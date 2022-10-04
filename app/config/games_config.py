@@ -45,8 +45,8 @@ CARD_OUTLINE_THICKNESS = 3
 OUTLINE_ALPHA = 50
 NORMAL_ALPHA = 255
 POST_GAME_ALPHA = 100
-WORD_BANK = 'games/wordBank.txt'
-WORD_BANK_PT = 'games/wordBankPT.txt'
+WORD_BANK = 'app/games/wordBank.txt'
+WORD_BANK_PT = 'app/games/wordBankPT.txt'
 WORD_SIZE = 5
 TRYS = 6
 #-------------------

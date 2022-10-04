@@ -1,6 +1,6 @@
 import pygame
 from enum import Enum
-from app.app_config import *
+from config.app_config import *
 
 class Button_Type(Enum):
 	SWITCH = 1

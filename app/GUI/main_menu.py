@@ -1,4 +1,4 @@
-from app.app_config import *
+from config.app_config import *
 from games.game import Game
 class Main_menu(Game):
 	def __init__(self, app):

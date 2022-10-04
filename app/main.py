@@ -1,5 +1,5 @@
-from app.game_app import MiniGameApp
-from app.app_config import *
+from game_app import MiniGameApp
+from config.app_config import *
 
 
 '''
