@@ -1,12 +1,21 @@
 import pygame
 import config.app_config as acfg
 from config.games_config import *
+import config.app_config as acfg
 from games.game import Game
 from enum import Enum
 from random import choice
+import enchant
+import unidecode
+
+class GAMELANG(Enum):
+	ENG = enchant.Dict(acfg.ENG)
+	PT = enchant.Dict(acfg.PT)
 
 class Word_Bank:
-	def __init__(self):
+	def __init__(self, lang):
+		self.language = lang
+		self.file = self.get_file_name()
 		self.words = self.read_word_bank()
 		self.used_words = self.get_used_words()
 
@@ -17,11 +26,28 @@ class Word_Bank:
 		print(word)
 		return word
 
+
+	def get_file_name(self):
+		if self.language is GAMELANG.ENG: return WORD_BANK_ENG
+		elif self.language is GAMELANG.PT: return WORD_BANK_PT
+	def is_guess_valid(self, word):
+		if self.language is GAMELANG.ENG: return self.check_eng(word)
+		elif self.language is GAMELANG.PT: return self.check_pt(word)
+
+	def check_pt(self, word):
+		valid = False
+		suggestions = self.language.value.suggest(word)
+		for sgt in suggestions:
+			if unidecode.unidecode(sgt) == word:
+				valid = self.language.value.check(sgt)
+		return valid
+	def check_eng(self, word): return self.language.value.check(word)
+
 	def get_used_words(self): return [] # make a txt file where we can store used words
 
 	def read_word_bank(self):
 		words = []
-		with open(WORD_BANK_PT) as wb:
+		with open(self.file) as wb:
 			while True:
 				word = wb.readline()
 				if not word: break
@@ -124,7 +150,7 @@ class Wordle(Game):
 		super().__init__(app)
 		self.current_letter_index = 0
 		self.current_word_index = 0
-		self.word_bank = Word_Bank()
+		self.word_bank = Word_Bank(GAMELANG.PT)
 		self.words = []
 		self.letters = []
 		self.create_board()
@@ -261,15 +287,16 @@ class Wordle(Game):
 
 	def check_current_board_word(self):
 		correct_letters = 0
+		game_word = unidecode.unidecode(self.game_word)
 		if self.current_letter_index != WORD_SIZE: return
-		
+		if not self.word_bank.is_guess_valid(self.get_board_word()): return
 		update_letter_state = {}
 
-		for game_word_letter, user_letter in zip(self.game_word, self.words[self.current_word_index]):
+		for game_word_letter, user_letter in zip(game_word, self.words[self.current_word_index]):
 			if game_word_letter == user_letter.value:
 				user_letter.state = LSTATE.PRESENT_IN_PLACE
 				correct_letters += 1
-			elif user_letter.value in self.game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
+			elif user_letter.value in game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
 			else: user_letter.state = LSTATE.NOT_PRESENT
 
 		if correct_letters == WORD_SIZE: self.result = GAME_RESULT.WON
@@ -284,6 +311,7 @@ class Wordle(Game):
 		current_word = self.words[self.current_word_index]
 		for letter in current_word: result += letter.value
 		return result
+
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if self.result == GAME_RESULT.UNDEFINED:
