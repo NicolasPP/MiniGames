@@ -8,6 +8,10 @@ from random import choice
 import enchant
 import unidecode
 
+'''
+TODO : display message when user tries to guess a word that does not exist
+'''
+
 class GAMELANG(Enum):
 	ENG = enchant.Dict(acfg.ENG)
 	PT = enchant.Dict(acfg.PT)
