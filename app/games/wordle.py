@@ -1,6 +1,7 @@
 import pygame
 import config.app_config as acfg
 from config.games_config import *
+from GUI.lable import Lable
 from games.game import Game
 from enum import Enum
 from random import choice
@@ -43,6 +44,18 @@ ENG = 'en_US'
 class GAMELANG(Enum):
 	ENG = enchant.Dict(ENG)
 	PT = enchant.Dict(PT)
+
+class LSTATE(Enum):
+	BLANK = BLANK_COLOR
+	FILLED = FILLED_COLOR
+	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
+	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
+	NOT_PRESENT = NOT_PRESENT_COLOR
+
+class GAME_RESULT(Enum):
+	WON = 1
+	LOST = 2
+	UNDEFINED = 3
 
 class Word_Bank:
 
@@ -97,28 +110,7 @@ class Word_Bank:
 		if word in self.words: return True
 		return self.language.value.check(word)
 
-	def get_used_words(self): return [] # make a txt file where we can store used words
 
-	def read_word_bank(self):
-		words = []
-		with open(self.file) as wb:
-			while True:
-				word = wb.readline()
-				if not word: break
-				words.append(word)
-			wb.close()
-		return(words)
-
-class LSTATE(Enum):
-	BLANK = BLANK_COLOR
-	FILLED = FILLED_COLOR
-	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
-	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
-	NOT_PRESENT = NOT_PRESENT_COLOR
-class GAME_RESULT(Enum):
-	WON = 1
-	LOST = 2
-	UNDEFINED = 3
 
 class Letter:
 	def __init__(self, wordle_game, rect, index, r, c):
@@ -135,6 +127,8 @@ class Letter:
 		self._value = ''
 		self._state = LSTATE.BLANK
 		self.set_card_style()
+
+		self.lable = self.get_value_lable()
   
 	# --Getters--
 	@property
@@ -153,10 +147,12 @@ class Letter:
 		if self.state is not LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.LOST: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
+		self.lable = self.get_value_lable()
 		self.render_value()
 	@value.setter
 	def value(self, new_value):
 		self._value = new_value
+		self.lable = self.get_value_lable()
 		self.render_value()
 	# -----------
  
@@ -176,7 +172,7 @@ class Letter:
 
 	def render_value(self):
 		if not self.value: self.set_card_style()
-		self.card_bg_surface.blit(*self.get_value_render())
+		self.card_bg_surface.blit(*self.lable.get_lable_blit())
 
 	def render_card_outline(self):
 		self.card_bg_surface.fill(LETTER_OUTLINE_COLOR)
@@ -189,6 +185,12 @@ class Letter:
 		self.card_bg_surface.fill(self.bg_color)
 		if self.state is LSTATE.BLANK: self.render_card_outline() 
 	
+	def get_value_lable(self):
+		s_width, s_height = self.card_bg_surface.get_size()
+		pos = (self.rect.width // 2, self.rect.height // 2)
+		return Lable(pos, self.value, LETTER_FONT_SIZE, LETTER_COLOR)
+
+
 	def get_value_render(self):
 		value_lable_render = self.font.render(self.value.upper(), True, LETTER_COLOR)
 		s_width, s_height = self.card_bg_surface.get_size()
