@@ -1,51 +1,100 @@
 import pygame
 import config.app_config as acfg
 from config.games_config import *
-import config.app_config as acfg
 from games.game import Game
 from enum import Enum
 from random import choice
 import enchant
 import unidecode
+import pickle
 
 '''
 TODO : display message when user tries to guess a word that does not exist
+TODO : reduce the amount of suggested words
+TODO : show word when loose
+TODO : store only one list of used_words
+TODO : maybe remove pt language too many workarounds.
+TODO : find new 5 letter words file
 '''
 
+'''
+	Pickle data format - only two languages -
+	{
+		'pt_BR' : {
+			language :
+			words :
+			used_words :
+
+		},
+		'en_US' : {
+			language :
+			words :
+			used_words :
+
+		}
+
+	}
+'''
+
+PT = 'pt_BR'
+ENG = 'en_US'
+
 class GAMELANG(Enum):
-	ENG = enchant.Dict(acfg.ENG)
-	PT = enchant.Dict(acfg.PT)
+	ENG = enchant.Dict(ENG)
+	PT = enchant.Dict(PT)
 
 class Word_Bank:
+
 	def __init__(self, lang):
 		self.language = lang
-		self.file = self.get_file_name()
-		self.words = self.read_word_bank()
-		self.used_words = self.get_used_words()
+		self.lang_tag = self.get_language_tag()
+		self.load_data()
+		print(self.used_words)
 
 	def get_random_word(self):
 		word = choice(self.words)
 		while word in self.used_words: word = choice(self.words)
 		self.used_words.append(word)
+		self.write_data()
 		print(word)
 		return word
 
+	def get_language_tag(self):
+		if self.language is GAMELANG.ENG: return ENG
+		elif self.language is GAMELANG.PT: return PT
 
-	def get_file_name(self):
-		if self.language is GAMELANG.ENG: return WORD_BANK_ENG
-		elif self.language is GAMELANG.PT: return WORD_BANK_PT
+	def write_data(self):
+		file = open(WORD_FILE, 'wb')
+		self.data[self.lang_tag]['used_words'] = self.used_words
+		pickle.dump(self.data, file)
+		file.close()
+
+	def load_data(self):
+		file = open(WORD_FILE, 'rb')
+		self.data = pickle.load(file)
+		self.words = self.data[self.lang_tag]['words']
+		self.used_words = self.data[self.lang_tag]['used_words']
+		file.close()
+
 	def is_guess_valid(self, word):
 		if self.language is GAMELANG.ENG: return self.check_eng(word)
 		elif self.language is GAMELANG.PT: return self.check_pt(word)
 
 	def check_pt(self, word):
+		'''
+		checking pt word is valid without any
+		accents. We get a list of surggested words
+		and see if if its in there
+		'''
 		valid = False
 		suggestions = self.language.value.suggest(word)
 		for sgt in suggestions:
 			if unidecode.unidecode(sgt) == word:
 				valid = self.language.value.check(sgt)
 		return valid
-	def check_eng(self, word): return self.language.value.check(word)
+	def check_eng(self, word): 
+		if word in self.words: return True
+		return self.language.value.check(word)
 
 	def get_used_words(self): return [] # make a txt file where we can store used words
 
@@ -154,7 +203,7 @@ class Wordle(Game):
 		super().__init__(app)
 		self.current_letter_index = 0
 		self.current_word_index = 0
-		self.word_bank = Word_Bank(GAMELANG.PT)
+		self.word_bank = Word_Bank(GAMELANG.ENG)
 		self.words = []
 		self.letters = []
 		self.create_board()

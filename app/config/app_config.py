@@ -20,6 +20,3 @@ LABLE_FONT_SIZE = 15
 FS_RECT_WIDTH = 9
 FS_RECT_HEIGHT = 3
 
-#
-PT = 'pt_BR'
-ENG = 'en_US'

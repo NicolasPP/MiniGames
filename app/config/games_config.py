@@ -45,9 +45,8 @@ CARD_OUTLINE_THICKNESS = 3
 OUTLINE_ALPHA = 50
 NORMAL_ALPHA = 255
 POST_GAME_ALPHA = 100
-WORD_BANK_ENG = 'app/data/game_data/wordle_data/wordBank.txt'
-WORD_BANK_PT = 'app/data/game_data/wordle_data/wordBankPT.txt'
 WORD_SIZE = 5
+WORD_FILE = 'app/data/game_data/wordle_data/word_data'
 TRYS = 6
 #-------------------
 
