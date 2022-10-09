@@ -3,6 +3,7 @@ from config.app_config import *
 
 
 '''
+TODO: make class for serializing data
 TODO: make system where only the selected game is instanciated
 TODO: make sidebar be able to scroll, take any amount of buttons
 TODO: make class for drawing letter on the screen

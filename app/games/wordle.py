@@ -10,6 +10,7 @@ import pickle
 
 '''
 TODO : display message when user tries to guess a word that does not exist
+TODO : add animation for when user makes a guess. make new state color fade in
 TODO : reduce the amount of suggested words
 TODO : show word when loose
 TODO : store only one list of used_words
