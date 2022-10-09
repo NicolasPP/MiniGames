@@ -18,5 +18,6 @@ class Lable:
 
 
 '''
+TODO: replace all text rendering with Lable object
 Wordle - get_center_message_render -> render message in the center of the screen
 '''
