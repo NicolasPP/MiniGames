@@ -16,7 +16,8 @@ TODO : reduce the amount of suggested words
 TODO : show word when loose
 TODO : store only one list of used_words
 TODO : maybe remove pt language too many workarounds.
-TODO : find new 5 letter words file
+TODO : find new 5 letter words file - https://github.com/dwyl/english-words
+       python example - https://github.com/dwyl/english-words/blob/master/read_english_dictionary.py
 '''
 
 '''
@@ -148,12 +149,12 @@ class Letter:
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.LOST: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.lable = self.get_value_lable()
-		self.render_value()
+		self.draw_value()
 	@value.setter
 	def value(self, new_value):
 		self._value = new_value
 		self.lable = self.get_value_lable()
-		self.render_value()
+		self.draw_value()
 	# -----------
  
 
@@ -170,11 +171,11 @@ class Letter:
 	def render(self):
 		self.wordle_game.surface.blit(self.card_bg_surface, self.rect.topleft)
 
-	def render_value(self):
+	def draw_value(self):
 		if not self.value: self.set_card_style()
 		self.card_bg_surface.blit(*self.lable.get_lable_blit())
 
-	def render_card_outline(self):
+	def draw_card_outline(self):
 		self.card_bg_surface.fill(LETTER_OUTLINE_COLOR)
 		bg = pygame.Surface((self.rect.width - round(CARD_OUTLINE_THICKNESS / 2) * 2, self.rect.height - round(CARD_OUTLINE_THICKNESS / 2) * 2))
 		bg.fill(self.bg_color)
@@ -183,7 +184,7 @@ class Letter:
 
 	def set_card_style(self):
 		self.card_bg_surface.fill(self.bg_color)
-		if self.state is LSTATE.BLANK: self.render_card_outline() 
+		if self.state is LSTATE.BLANK: self.draw_card_outline() 
 	
 	def get_value_lable(self):
 		s_width, s_height = self.card_bg_surface.get_size()
