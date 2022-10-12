@@ -18,6 +18,9 @@ TODO : store only one list of used_words
 TODO : maybe remove pt language too many workarounds.
 TODO : find new 5 letter words file - https://github.com/dwyl/english-words
        python example - https://github.com/dwyl/english-words/blob/master/read_english_dictionary.py
+TODO : when reading new words file use a generator so the data will be stored in memory.
+	   while still being able to process them
+	   - https://youtu.be/0L3qFHiRC_I?t=401
 '''
 
 '''
