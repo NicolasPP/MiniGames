@@ -26,7 +26,7 @@ class LSTATE(Enum):
 	NOT_PRESENT = NOT_PRESENT_COLOR
 class GAME_RESULT(Enum):
 	WON = 1
-	LOST = 2
+	LOOSE = 2
 	UNDEFINED = 3
 
 
@@ -90,7 +90,7 @@ class Letter:
 		self.set_card_style()
 		if self.state is not LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
-		if self.wordle_game.result == GAME_RESULT.LOST: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
+		if self.wordle_game.result == GAME_RESULT.LOOSE: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.lable = self.get_value_lable()
 		self.draw_value()
 	@value.setter
@@ -132,7 +132,7 @@ class Letter:
 	def get_value_lable(self):
 		s_width, s_height = self.card_bg_surface.get_size()
 		pos = (self.rect.width // 2, self.rect.height // 2)
-		return Lable(pos, self.value, LETTER_FONT_SIZE, LETTER_COLOR)
+		return Lable(pos, self.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA)
 
 
 	def get_value_render(self):
@@ -160,7 +160,7 @@ class Wordle(Game):
 		self.restart_message_font = pygame.font.Font(None, 30)
 		self.restart_alpha = 255
 		self.restart_alpha_change = -1
-		self.SCREENS = self.set_screen_enum()
+		self.lables = self.get_wordle_lables()
 
 	# --Getters--
 	@property
@@ -179,13 +179,41 @@ class Wordle(Game):
 	def result(sefl): del self._result
 	# ------------	
 
-	def set_screen_enum(self):
-		return Enum(
-			"SCREENS",
-			[
-				("WON",self.app.get_game_surface(WON_COLOR, alpha = POST_GAME_ALPHA)),
-				("LOST",self.app.get_game_surface(LOST_COLOR, alpha = POST_GAME_ALPHA))
-			])
+	def get_wordle_lables(self):
+		s_width, s_height = self.surface.get_size()
+		center = s_width // 2, s_height // 2
+		restart_pos = center[0] , center[1] + 60
+		win_surface = self.app.get_game_surface(PRESENT_IN_PLACE_COLOR, alpha = POST_GAME_ALPHA)
+		loose_surface = self.app.get_game_surface(LOOSE_COLOR, alpha = POST_GAME_ALPHA)
+		return {
+			'win' : 
+				{
+				'lable' : Lable(center, " GAME WON  ", 50, LETTER_COLOR,POST_GAME_ALPHA),
+				'surface' : win_surface,
+				},
+			'loose' : 
+				{
+				'lable' : Lable(center, " GAME LOST ", 50, LETTER_COLOR,POST_GAME_ALPHA),
+				'surface' : loose_surface,
+				},
+			'restart' : 
+				{
+				'lable' : Lable(restart_pos, " SPACE TO RESTART ", 30, LETTER_COLOR,NORMAL_ALPHA),
+				'surface' : False,
+				}
+		}
+
+	def render_message(self, *lable_ids):
+		for l_id in lable_ids:
+			lable = self.lables[l_id]['lable']
+			lable_surface  = self.lables[l_id]['surface']
+			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
+			self.surface.blit(*lable.get_lable_blit())
+
+
+
+		
+
 
 	def update(self, dt):
 		for letter in self.letters: letter.update(dt)
@@ -194,7 +222,7 @@ class Wordle(Game):
 
 	def update_restart_alpha(self, dt):
 		self.restart_alpha +=  (ALPHA_CHANGE * dt * self.restart_alpha_change)
-
+		self.lables['restart']['lable'].alpha = self.restart_alpha
 		if self.restart_alpha <= 0:
 			self.restart_alpha = 0
 			self.restart_alpha_change = 1
@@ -206,33 +234,14 @@ class Wordle(Game):
 	def update_surface_size(self):
 		self.surface = self.app.get_game_surface(self.bg_color)
 		self.resize_letters()
-		self.SCREENS = self.set_screen_enum()
-
+		self.lables = self.get_wordle_lables()
 
 	def render(self):
 		for letter in self.letters: letter.render()
-		if self.result is GAME_RESULT.WON: self.render_win()
-		elif self.result is GAME_RESULT.LOST: self.render_lost()
+		if self.result is GAME_RESULT.WON: self.render_message('win', 'restart')
+		elif self.result is GAME_RESULT.LOOSE: self.render_message('loose', 'restart')
 		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 
-	def render_win(self):
-		self.surface.blit(self.SCREENS.WON.value, (0,0))
-		self.surface.blit(*self.get_center_message_render(" GAME WON  ", self.post_message_font, LETTER_COLOR, NORMAL_ALPHA))
-		self.display_restart_message()
-	def render_lost(self):
-		self.surface.blit(self.SCREENS.LOST.value, (0,0))
-		self.surface.blit(*self.get_center_message_render(" GAME LOST ", self.post_message_font, LETTER_COLOR, NORMAL_ALPHA))
-		self.display_restart_message()
-
-	def display_restart_message(self):
-		self.surface.blit(*self.get_center_message_render(" SPACE TO RESTART", self.restart_message_font, LETTER_COLOR, self.restart_alpha, h_offset = 60))
-
-	def get_center_message_render(self, message, font, color, alpha, w_offset = 0, h_offset = 0):
-		message_lable_render = font.render(message, True, color)
-		s_width, s_height = self.surface.get_size()
-		message_lable_rect = message_lable_render.get_rect(center = ((s_width // 2) + w_offset, (s_height// 2) + h_offset))
-		message_lable_render.set_alpha(alpha)
-		return message_lable_render, message_lable_rect
 	
 	def restart_game(self):
 		for letter in self.letters: letter.reset()
@@ -301,7 +310,7 @@ class Wordle(Game):
 
 		if correct_letters == WORD_SIZE: self.result = GAME_RESULT.WON
 		if self.current_word_index == TRYS - 1\
-			and correct_letters != WORD_SIZE: self.result = GAME_RESULT.LOST
+			and correct_letters != WORD_SIZE: self.result = GAME_RESULT.LOOSE
 
 		self.current_word_index += 1
 		self.current_letter_index = 0
