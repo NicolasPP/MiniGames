@@ -165,6 +165,7 @@ class Wordle(Game):
 	def result(self): return self._result
 	# -----------
 
+
 	# --Setters--
 	@result.setter
 	def result(self, new_result):
@@ -172,11 +173,53 @@ class Wordle(Game):
 		self.invalidate_letters_state()
 	# -----------
 
+
 	# --Deleters--
 	@result.deleter
 	def result(sefl): del self._result
-	# ------------	
+	# ------------
 
+
+	# --Render--
+	def render(self):
+		for letter in self.letters: letter.render()
+		if self.result is GAME_RESULT.WON: self.render_message('win', 'restart')
+		elif self.result is GAME_RESULT.LOOSE: self.render_message('loose', 'restart')
+		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
+	
+	def render_message(self, *lable_ids):
+		for l_id in lable_ids:
+			lable = self.lables[l_id]['lable']
+			lable_surface  = self.lables[l_id]['surface']
+			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
+			self.surface.blit(*lable.get_lable_blit())
+	# ----------
+
+
+	# --Update--
+	def update(self, dt):
+		for letter in self.letters: letter.update(dt)
+		if self.result is not GAME_RESULT.UNDEFINED: self.update_restart_alpha(dt)
+	
+	def update_restart_alpha(self, dt):
+		self.restart_alpha +=  (ALPHA_CHANGE * dt * self.restart_alpha_change)
+		self.lables['restart']['lable'].alpha = self.restart_alpha
+		if self.restart_alpha <= 0:
+			self.restart_alpha = 0
+			self.restart_alpha_change = 1
+
+		if self.restart_alpha >= 255:
+			self.restart_alpha = 255
+			self.restart_alpha_change = -1
+	
+	def update_surface_size(self):
+		self.surface = self.app.get_game_surface(self.bg_color)
+		self.resize_letters()
+		self.lables = self.get_wordle_lables()
+	# ----------
+
+
+	# --Helpers--
 	def get_wordle_lables(self):
 		s_width, s_height = self.surface.get_size()
 		center = s_width // 2, s_height // 2
@@ -200,54 +243,28 @@ class Wordle(Game):
 				'surface' : False,
 				}
 		}
-
-	def render_message(self, *lable_ids):
-		for l_id in lable_ids:
-			lable = self.lables[l_id]['lable']
-			lable_surface  = self.lables[l_id]['surface']
-			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
-			self.surface.blit(*lable.get_lable_blit())
-
-
-
-		
-
-
-	def update(self, dt):
-		for letter in self.letters: letter.update(dt)
-		if self.result is not GAME_RESULT.UNDEFINED: self.update_restart_alpha(dt)
-
-
-	def update_restart_alpha(self, dt):
-		self.restart_alpha +=  (ALPHA_CHANGE * dt * self.restart_alpha_change)
-		self.lables['restart']['lable'].alpha = self.restart_alpha
-		if self.restart_alpha <= 0:
-			self.restart_alpha = 0
-			self.restart_alpha_change = 1
-
-		if self.restart_alpha >= 255:
-			self.restart_alpha = 255
-			self.restart_alpha_change = -1
-
-	def update_surface_size(self):
-		self.surface = self.app.get_game_surface(self.bg_color)
-		self.resize_letters()
-		self.lables = self.get_wordle_lables()
-
-	def render(self):
-		for letter in self.letters: letter.render()
-		if self.result is GAME_RESULT.WON: self.render_message('win', 'restart')
-		elif self.result is GAME_RESULT.LOOSE: self.render_message('loose', 'restart')
-		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
-
 	
+	def get_first_letter_pos(self):
+		board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
+		s_width = self.surface.get_width()
+		return round(s_width / 2) - round(board_size / 2), acfg.PADDING
+	
+	def get_board_word(self):
+		result = ''
+		current_word = self.words[self.current_word_index]
+		for letter in current_word: result += letter.value
+		return result
+	# -----------
+
+
+	# --Game Logic--
 	def restart_game(self):
 		for letter in self.letters: letter.reset()
 		self.result = GAME_RESULT.UNDEFINED
 		self.game_word = self.word_bank.get_random_word()
 		self.current_letter_index = 0
 		self.current_word_index = 0
-
+	
 	def create_board(self):
 		self.words = []
 		self.letters = []
@@ -260,30 +277,24 @@ class Wordle(Game):
 				word.append(letter)
 				self.letters.append(letter)
 			self.words.append(word)
-
+	
 	def invalidate_letters_state(self):
 		for letter in self.letters: letter.state = letter.state
-
+	
 	def resize_letters(self):
 		x, y = self.get_first_letter_pos()
 		for t in range(TRYS):
 			for l in range(WORD_SIZE):
 				new_rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
 				self.words[t][l].rect = new_rect
-
-	def get_first_letter_pos(self):
-		board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
-		s_width = self.surface.get_width()
-		return round(s_width / 2) - round(board_size / 2), acfg.PADDING
-
+	
 	def add_letter_value(self, letter_value):
 		if self.current_letter_index == (WORD_SIZE): return
 		current_letter = self.words[self.current_word_index][self.current_letter_index]
 		self.current_letter_index += 1
 		current_letter.state = LSTATE.FILLED
 		current_letter.value = letter_value
-		
-
+	
 	def remove_letter_value(self):
 		if self.current_letter_index == 0: return
 		self.current_letter_index -= 1
@@ -291,7 +302,7 @@ class Wordle(Game):
 		
 		current_letter.state = LSTATE.BLANK
 		current_letter.value = ''
-
+	
 	def check_current_board_word(self):
 		correct_letters = 0
 		game_word = self.game_word
@@ -312,13 +323,10 @@ class Wordle(Game):
 
 		self.current_word_index += 1
 		self.current_letter_index = 0
+	# --------------
 
-	def get_board_word(self):
-		result = ''
-		current_word = self.words[self.current_word_index]
-		for letter in current_word: result += letter.value
-		return result
 
+	# --Player Input--
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if self.result == GAME_RESULT.UNDEFINED:
@@ -352,3 +360,4 @@ class Wordle(Game):
 				if event.key == pygame.K_z: self.add_letter_value('z')
 			else:
 				if event.key == pygame.K_SPACE: self.restart_game()
+	# ----------------
