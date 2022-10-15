@@ -6,7 +6,6 @@ from GUI.lable import Lable
 from games.game import Game
 import data.data_manager as Data_Man
 
-import enchant
 import unidecode
 import pickle
 import pygame
