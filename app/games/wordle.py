@@ -156,8 +156,6 @@ class Wordle(Game):
 		self.create_board()
 		self.game_word = self.word_bank.get_random_word()
 		self._result = GAME_RESULT.UNDEFINED
-		self.post_message_font = pygame.font.Font(None, 50)
-		self.restart_message_font = pygame.font.Font(None, 30)
 		self.restart_alpha = 255
 		self.restart_alpha_change = -1
 		self.lables = self.get_wordle_lables()
