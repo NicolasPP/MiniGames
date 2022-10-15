@@ -1,4 +1,3 @@
-
 import config.app_config as acfg
 from config.games_config import *
 
