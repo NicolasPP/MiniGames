@@ -3,7 +3,6 @@ from config.app_config import *
 
 
 '''
-TODO: make class for serializing data
 TODO: make system where only the selected game is instanciated
 TODO: make sidebar be able to scroll, take any amount of buttons
 TODO: Games to add in the future
@@ -13,6 +12,8 @@ TODO: Games to add in the future
 		- kakuro
 		- boids flocking
 		- level generation (maybe)
+		- chess
+		- galton board (HARD)
 '''
 
 
