@@ -6,7 +6,6 @@ from GUI.lable import Lable
 from games.game import Game
 import data.data_manager as Data_Man
 
-import unidecode
 import pickle
 import pygame
 from enum import Enum
@@ -290,7 +289,7 @@ class Wordle(Game):
 
 	def check_current_board_word(self):
 		correct_letters = 0
-		game_word = unidecode.unidecode(self.game_word)
+		game_word = self.game_word
 		if self.current_letter_index != WORD_SIZE: return
 		if not self.word_bank.is_guess_valid(self.get_board_word()): return
 		update_letter_state = {}
