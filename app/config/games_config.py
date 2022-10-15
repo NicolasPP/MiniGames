@@ -46,7 +46,7 @@ OUTLINE_ALPHA = 50
 NORMAL_ALPHA = 255
 POST_GAME_ALPHA = 100
 WORD_SIZE = 5
-WORD_FILE = 'app/data/game_data/wordle_data/word_data'
+WORD_FILE = 'app/data/game_data/wordle_data/words'
 TRYS = 6
 #-------------------
 

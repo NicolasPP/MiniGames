@@ -19,39 +19,9 @@ TODO : add animation for when user makes a guess. make new state color fade in
 TODO : reduce the amount of suggested words
 TODO : show word when loose
 TODO : store only one list of used_words
-TODO : maybe remove pt language too many workarounds.
-TODO : find new 5 letter words file - https://github.com/dwyl/english-words
-       python example - https://github.com/dwyl/english-words/blob/master/read_english_dictionary.py
-TODO : when reading new words file use a generator so the data will be stored in memory.
-	   while still being able to process them
-	   - https://youtu.be/0L3qFHiRC_I?t=401
 '''
-
-'''
-	Pickle data format - only two languages -
-	{
-		'pt_BR' : {
-			language : ""
-			words : []
-			used_words : []
-
-		},
-		'en_US' : {
-			language : ""
-			words : []
-			used_words : []
-
-		}
-
-	}
-'''
-
-PT = 'pt_BR'
-ENG = 'en_US'
-
 class GAMELANG(Enum):
-	ENG = enchant.Dict(ENG)
-	PT = enchant.Dict(PT)
+	ENG = 'english'
 class LSTATE(Enum):
 	BLANK = BLANK_COLOR
 	FILLED = FILLED_COLOR
@@ -67,56 +37,28 @@ class GAME_RESULT(Enum):
 class Word_Bank:
 
 	def __init__(self, lang):
-		self.language = lang
-		self.lang_tag = self.get_language_tag()
-		self.load_data()
-		print(self.used_words)
+		self.language = lang.value
+		self.data = Data_Man.get_data(WORD_FILE)
+		self.words = 'words'
+		self.used_words = 'used_words'
 
 	def get_random_word(self):
-		word = choice(self.words)
-		while word in self.used_words: word = choice(self.words)
-		self.used_words.append(word)
-		self.write_data()
+		word = choice(list(self.available_words()))
+		self.add_used_word(word)
+		Data_Man.write_data(WORD_FILE, self.data)
 		print(word)
 		return word
 
-	def get_language_tag(self):
-		if self.language is GAMELANG.ENG: return ENG
-		elif self.language is GAMELANG.PT: return PT
+	def available_words(self):
+		for word in self.data[self.language][self.words]:
+			if not word in self.data[self.language][self.used_words]: yield word
 
-	def write_data(self):
-		file = open(WORD_FILE, 'wb')
-		self.data[self.lang_tag]['used_words'] = self.used_words
-		pickle.dump(self.data, file)
-		file.close()
+	def add_used_word(self, word):
+		self.data[self.language][self.used_words].append(word)
 
-	def load_data(self):
-		file = open(WORD_FILE, 'rb')
-		self.data = pickle.load(file)
-		self.words = self.data[self.lang_tag]['words']
-		self.used_words = self.data[self.lang_tag]['used_words']
-		file.close()
 
 	def is_guess_valid(self, word):
-		if self.language is GAMELANG.ENG: return self.check_eng(word)
-		elif self.language is GAMELANG.PT: return self.check_pt(word)
-
-	def check_pt(self, word):
-		'''
-		checking pt word is valid without any
-		accents. We get a list of surggested words
-		and see if if its in there
-		'''
-		valid = False
-		suggestions = self.language.value.suggest(word)
-		for sgt in suggestions:
-			if unidecode.unidecode(sgt) == word:
-				valid = self.language.value.check(sgt)
-		return valid
-
-	def check_eng(self, word): 
-		if word in self.words: return True
-		return self.language.value.check(word)
+		return word in self.data[self.language][self.words]
 
 class Letter:
 	def __init__(self, wordle_game, rect, index, r, c):
