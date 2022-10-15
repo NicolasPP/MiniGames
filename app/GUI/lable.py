@@ -17,9 +17,3 @@ class Lable:
 		if self.r_topleft: message_rect = message_render.get_rect(topleft = self.pos)
 		message_render.set_alpha(self.alpha)
 		return message_render, message_rect
-
-
-'''
-TODO: replace all text rendering with Lable object
-Wordle - get_center_message_render -> render message in the center of the screen
-'''
