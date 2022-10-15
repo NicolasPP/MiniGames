@@ -1,13 +1,17 @@
-import pygame
+
 import config.app_config as acfg
 from config.games_config import *
+
 from GUI.lable import Lable
 from games.game import Game
-from enum import Enum
-from random import choice
+import data.data_manager as Data_Man
+
 import enchant
 import unidecode
 import pickle
+import pygame
+from enum import Enum
+from random import choice
 
 '''
 TODO : display message when user tries to guess a word that does not exist
@@ -27,15 +31,15 @@ TODO : when reading new words file use a generator so the data will be stored in
 	Pickle data format - only two languages -
 	{
 		'pt_BR' : {
-			language :
-			words :
-			used_words :
+			language : ""
+			words : []
+			used_words : []
 
 		},
 		'en_US' : {
-			language :
-			words :
-			used_words :
+			language : ""
+			words : []
+			used_words : []
 
 		}
 
@@ -48,18 +52,17 @@ ENG = 'en_US'
 class GAMELANG(Enum):
 	ENG = enchant.Dict(ENG)
 	PT = enchant.Dict(PT)
-
 class LSTATE(Enum):
 	BLANK = BLANK_COLOR
 	FILLED = FILLED_COLOR
 	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
 	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
 	NOT_PRESENT = NOT_PRESENT_COLOR
-
 class GAME_RESULT(Enum):
 	WON = 1
 	LOST = 2
 	UNDEFINED = 3
+
 
 class Word_Bank:
 
@@ -110,11 +113,10 @@ class Word_Bank:
 			if unidecode.unidecode(sgt) == word:
 				valid = self.language.value.check(sgt)
 		return valid
+
 	def check_eng(self, word): 
 		if word in self.words: return True
 		return self.language.value.check(word)
-
-
 
 class Letter:
 	def __init__(self, wordle_game, rect, index, r, c):
