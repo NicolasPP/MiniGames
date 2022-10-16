@@ -9,8 +9,6 @@ from utils.time import Time_Man
 '''
 TODO : clean display functions with fonts
 TODO : change pause and death screen to say press space
-TODO : change update function so its always moving, then it uses
-	   dt_wait to wait a certain amount of time before mooving again
 TODO : change self.paused, self.snake.isalive,
 TODO: implement 
 		self.screens = Enum(
@@ -31,13 +29,6 @@ class DIRECTION(Enum):
 		x, y = direction.value
 		return x * -1, y * -1
 
-
-	'''
-	x = DIRECTION
-	2 * x # __rmul__
-	x * 2 # __mul__
-
-	'''	
 	def __mul__(self, other):
 		x1, y1 = self.value
 		x2 = y2 = 1
@@ -53,7 +44,6 @@ class DIRECTION(Enum):
 		if isinstance(other, tuple): x1, y1 = other
 		else: x1 = y1 = other
 		return x1 * x2 , y1 * y2
-
 
 	def assert_opperation_types(self, other):
 		assert isinstance(other, (tuple, int, float))
