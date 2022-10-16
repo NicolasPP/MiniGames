@@ -33,8 +33,8 @@ class Button:
 		self.font = pygame.font.Font(None, LABLE_FONT_SIZE)
 
 		self.switch_button_styles = {
-			True : (place_holder,()),
-			False: (place_holder,())
+			True : (no_style,()),
+			False: (no_style,())
 		}
 
 		self.surface = self.get_button_surface()
@@ -80,7 +80,6 @@ class Button:
 		if self.on_click: self.on_click(*kwargs)
 
 
-def place_holder():
-	pass
+def no_style(): pass
 
 
