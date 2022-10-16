@@ -1,6 +1,5 @@
 import pygame
 from config.app_config import *
-import config.games_config as gcfg
 from GUI.button import Button, Button_Type
 class Sidebar:
 	def __init__(self, width, height, parent, alpha = 1, bg_color = BG_COLOR):
@@ -25,6 +24,7 @@ class Sidebar:
 
 	def get_dimensions(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
+	
 	def parse_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN: self.check_comp_collision()
 
@@ -38,19 +38,28 @@ class Sidebar:
 		return s
 	def get_sidebar_game_offset(self):
 		return (PADDING * 4) + BUTTON_W, PADDING
-	def add_sidebar_content(self):
+	
+
+	def add_settings(self):
 		quit = Button((PADDING, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = quit_game, lable = "Quit", offset = self.topleft, show_lable= False,)
 		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = fullscreen, lable = "Fullscreen", offset = self.topleft, show_lable= False, button_type = Button_Type.SWITCH)
-		back = Button((PADDING, (PADDING * 2) + BUTTON_H), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)	
-		snake = Button((PADDING , (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True, font_color = FONT_COLOR)
-		tictactoe = Button((PADDING , (PADDING * 6) + (BUTTON_H * 3)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
-		wordle = Button((PADDING , (PADDING * 7) + (BUTTON_H * 4)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
 		quit.style(style_quit, quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
 		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
 		full_screen.update_style()
-		return [snake, tictactoe, wordle, quit, back, full_screen]
+		return [quit, full_screen]
 
+	def add_scrollable_content(self):
+		back = Button((PADDING, (PADDING * 2) + BUTTON_H), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Menu", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)	
+		snake = Button((PADDING , (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game,lable = "Snake", offset = self.topleft, show_lable = True, font_color = FONT_COLOR)
+		tictactoe = Button((PADDING , (PADDING * 6) + (BUTTON_H * 3)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Tictactoe", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
+		wordle = Button((PADDING , (PADDING * 7) + (BUTTON_H * 4)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, lable = "Wordle", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
+		return [snake, tictactoe, wordle, back]
+
+
+	def add_sidebar_content(self):
+		return self.add_settings() + self.add_scrollable_content()
+	
 
 # GUI BUTTON LOGIC
 

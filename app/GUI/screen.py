@@ -1,6 +1,4 @@
 import pygame
-## TODO make the surface static maybe
-## or we could just call pygame.display.get_surface() everytime we need it
 
 ## when we resize the screen we delete the current surface and get a new one of different size
 ## this could cause a problem when passing surface as a parameter in class definitions

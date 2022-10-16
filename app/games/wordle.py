@@ -23,6 +23,11 @@ class LSTATE(Enum):
 	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
 	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
 	NOT_PRESENT = NOT_PRESENT_COLOR
+
+	def __eq__(self, state):
+		if isinstance(state, LSTATE): return self.name == state.name
+		return False
+
 class GAME_RESULT(Enum):
 	WON = 1
 	LOOSE = 2
@@ -87,7 +92,7 @@ class Letter:
 		self._state = new_state
 		self.bg_color = new_state.value
 		self.set_card_style()
-		if self.state is not LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
+		if self.state != LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.LOOSE: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.lable = self.get_value_lable()
@@ -126,7 +131,7 @@ class Letter:
 
 	def set_card_style(self):
 		self.card_bg_surface.fill(self.bg_color)
-		if self.state is LSTATE.BLANK: self.draw_card_outline() 
+		if self.state == LSTATE.BLANK: self.draw_card_outline() 
 	
 	def get_value_lable(self):
 		s_width, s_height = self.card_bg_surface.get_size()

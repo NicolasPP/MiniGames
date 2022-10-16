@@ -9,15 +9,7 @@ from utils.time import Time_Man
 '''
 TODO : clean display functions with fonts
 TODO : change pause and death screen to say press space
-TODO : change update function so its always moving, then it uses
-	   dt_wait to wait a certain amount of time before mooving again
 TODO : change self.paused, self.snake.isalive,
-TODO : change direction input to enum class
-		class DIRECTION(Enum):
-			UP = (0, -1)
-			DOWN = (0 ,1)
-			RIGHT = (1,0)
-			LEFT = (-1, 0)
 TODO: implement 
 		self.screens = Enum(
 			"SCREENS",
@@ -27,76 +19,120 @@ TODO: implement
 			])
 '''
 
+class DIRECTION(Enum):
+	UP = (0, -1)
+	DOWN = (0 ,1)
+	RIGHT = (1,0)
+	LEFT = (-1, 0)
+
+	def inverse(direction):
+		x, y = direction.value
+		return x * -1, y * -1
+
+	def __mul__(self, other):
+		x1, y1 = self.value
+		x2 = y2 = 1
+		self.assert_opperation_types(other)
+		if isinstance(other, tuple): x2, y2 = other
+		else: x2 = y2 = other
+		return x1 * x2 , y1 * y2
+
+	def __rmul__(self, other):
+		x1 = y1 = 1
+		x2, y2 = self.value
+		self.assert_opperation_types(other)
+		if isinstance(other, tuple): x1, y1 = other
+		else: x1 = y1 = other
+		return x1 * x2 , y1 * y2
+
+	def assert_opperation_types(self, other):
+		assert isinstance(other, (tuple, int, float))
+		if isinstance(other, tuple):
+			assert len(other) == 2
+			for i in other: assert isinstance(i, (int, float))
+			return 
 
 class SNAKE:
 	def __init__(self, snake_game):
 		self.snake_game = snake_game
-		self.rect = self.get_mid_cell()
+		self.rect = snake_game.get_mid_cell()
 		self.rect.width -= 1
 		self.rect.height -= 1
 		self.size = 0
 		self.body = []
-		self.direction_input = {
-			"UP" : (0, -1),
-			"DOWN" : (0 ,1),
-			"RIGHT" : (1,0),
-			"LEFT" : (-1, 0)
-		}
 		self.color = SNAKE_COLOR
 		self.timer = Time_Man()
-		self.direction = choice(list(self.direction_input.values()))
-		self.speed = S_CELL_SIZE * 10
-		self.move_distance = 0
-		self.x = self.rect.x
-		self.y = self.rect.y
+		self._direction = choice(list(DIRECTION))
+		self.distance_to_move = 0
+		self._pos = pygame.math.Vector2(self.rect.topleft)
+		self.speed = S_CELL_SIZE / (TIME_TO_COVER_CELL / 1000)
 		self.alive = True
 
+
+	@property
+	def direction(self): return self._direction
+	@property
+	def pos(self): return self._pos
+
+	@direction.setter
+	def direction(self, new_direction):
+		assert isinstance(new_direction, DIRECTION)
+		if new_direction is self._direction: return
+		if new_direction.value == self.direction.inverse(): return
+		self._direction = new_direction
+	@pos.setter
+	def pos(self, new_pos): 
+		self._pos = new_pos
+		x, y = new_pos
+		self.rect.x, self.rect.y = round(x), round(y)
+
+	@direction.deleter
+	def direction(self): del self._direction
+	@pos.deleter
+	def pos(self): del self._pos
 
 	def render(self):
 		for bdy in self.body: self.snake_game.surface.blit(self.snake_game.get_rect_surface(bdy, self.color), bdy.topleft)
 		self.snake_game.surface.blit(self.snake_game.get_rect_surface(self.rect, self.color), self.rect.topleft)
 
 	def update(self, dt):# snake not bound to the board
-		self.check_collision()
+		self.body_collision()
+		self.wall_collision()
+		self.food_collision()
 		self.set_move_distance(dt)
 		self.move(dt)
 
-
 	def set_move_distance(self, dt):
-		if self.timer.dt_wait(dt, SNAKE_MOVE_FREQ):
-			self.move_distance += S_CELL_SIZE
+		if self.timer.dt_wait(dt, SNAKE_MOVE_FREQ + TIME_TO_COVER_CELL):
+			self.distance_to_move += S_CELL_SIZE
 			prev_rec = self.rect.copy()
 			self.add(prev_rec)
+	
 	def move(self, dt):
-		direc_x, direc_y = self.direction
-		if self.move_distance <= 0: return
+		if self.distance_to_move <= 0: return
 		dist = self.speed * dt
-		if self.move_distance - (self.speed * dt) < 0: dist += (self.move_distance - (self.speed * dt))
-		self.x += (dist) * direc_x
-		self.y += (dist) * direc_y
-		self.move_distance -= (dist)
-		self.rect.x = round(self.x)
-		self.rect.y = round(self.y)
-
+		if self.distance_to_move - dist < 0: dist += (self.distance_to_move - dist)
+		self.pos = self.pos + (self.direction * dist)
+		self.distance_to_move -= dist
+		
 	def add(self, rect):
 		self.body.append(rect)
 		body_size = len(self.body)
 		if body_size > self.size: self.body = self.body[1:body_size]
 
-	def check_collision(self):
-		self.body_collision()
-		self.wall_collision()
-		self.food_collision()
+	
 	def body_collision(self):
 		p1, p2 = self.get_collision_points()
 		for bdy in self.body:
 			if bdy.collidepoint(p1) or bdy.collidepoint(p2):
 				self.die()
+	
 	def wall_collision(self):
 		width, height = self.snake_game.surface.get_size()
 		p1, p2 = self.get_collision_points()
 		if p1[0] >= width or p1[0] <= 0 \
 			or p1[1] >= height or p1[1] <= 0: self.die()
+	
 	def food_collision(self):
 		collided = []
 		for food in self.snake_game.foods:
@@ -108,7 +144,7 @@ class SNAKE:
 
 	def get_collision_points(self):
 		h_offset = S_CELL_SIZE // 2
-		direc_x, direc_y = self.direction
+		direc_x, direc_y = self.direction.value
 		center_x, center_y = self.rect.center
 		center_head_x = center_x + (direc_x * h_offset)
 		center_head_y = center_y + (direc_y * h_offset)
@@ -126,19 +162,6 @@ class SNAKE:
 		return tuple(p1), tuple(p2)
 
 	def die(self): self.alive = False
-
-	def set_direction(self, new_direction):
-		if self.direction_input[new_direction] == self.direction: return
-		if self.direction_input[new_direction] == self.get_inverse_direction(): return
-		self.direction = self.direction_input[new_direction]
-	def get_inverse_direction(self):
-		x, y = self.direction
-		return x * -1, y * -1
-
-	def get_mid_cell(self):
-		row_num = len(self.snake_game.grid)
-		col_num = len(self.snake_game.grid[0])
-		return self.snake_game.grid[row_num // 2][col_num // 2].copy()
 
 class Snake(Game):
 	def __init__(self, app):
@@ -187,11 +210,11 @@ class Snake(Game):
 			self.p_alpha_change = -1
 
 	def get_rect_surface(self, rect, color):
-		food_surface = pygame.Surface(rect.size)
-		food_surface.fill(color)
-		if self.paused: food_surface.set_alpha(PAUSE_ALPHA)
-		else: food_surface.set_alpha(255)
-		return food_surface
+		rect_surface = pygame.Surface(rect.size)
+		rect_surface.fill(color)
+		if self.paused: rect_surface.set_alpha(PAUSE_ALPHA)
+		else: rect_surface.set_alpha(255)
+		return rect_surface
 
 
 	def display_paused(self):
@@ -239,6 +262,7 @@ class Snake(Game):
 		restart_lable_rect = restart_lable_render.get_rect(topleft = ((s_width // 2) - (restart_lable_rect.width // 2), (s_height // 2) - (restart_lable_rect.height // 2) + 50))
 		restart_lable_render.set_alpha(self.p_message_alpha)
 		self.surface.blit(restart_lable_render, restart_lable_rect)
+	
 	def restart(self):
 		self.score = 0
 		self.foods = []
@@ -264,6 +288,14 @@ class Snake(Game):
 			while not self.is_valid_food_pos(food): food =choice(self.cells)
 			self.foods.append(food)
 
+
+
+	def get_mid_cell(self):
+		row_num = len(self.grid)
+		col_num = len(self.grid[0])
+		return self.grid[row_num // 2][col_num // 2].copy()
+
+
 	def is_valid_food_pos(self, food):
 		return food not in self.snake.body and \
 					food not in self.foods
@@ -271,10 +303,10 @@ class Snake(Game):
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE: self.toggle_pause()
-			if event.key == pygame.K_UP or event.key == pygame.K_w: self.snake.set_direction("UP")
-			if event.key == pygame.K_DOWN or event.key == pygame.K_s: self.snake.set_direction("DOWN")
-			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.set_direction("RIGHT")
-			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.set_direction("LEFT")
+			if event.key == pygame.K_UP or event.key == pygame.K_w: self.snake.direction = DIRECTION.UP
+			if event.key == pygame.K_DOWN or event.key == pygame.K_s: self.snake.direction = DIRECTION.DOWN
+			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.direction = DIRECTION.RIGHT
+			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.direction = DIRECTION.LEFT
 			if event.key == pygame.K_SPACE and not self.snake.alive: self.restart()
 
 

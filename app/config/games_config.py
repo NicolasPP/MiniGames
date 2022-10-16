@@ -26,13 +26,14 @@ SCORE_FONT_SIZE = 40
 FOOD_SPAWN_DELAY = 5000
 SNAKE_MOVE_FREQ = 250
 ALPHA_CHANGE = 700
+TIME_TO_COVER_CELL = 150
 #-------------------
 
 
 #------ WORDLE ------
 LETTER_OUTLINE_COLOR = color_palette3[3]#rgb(231, 171, 121)
 BLANK_COLOR = color_palette2[0]#rgb(44, 54, 57)
-FILLED_COLOR = color_palette2[0]
+FILLED_COLOR = color_palette2[0]#rgb(44, 54, 57)
 PRESENT_OUT_OF_PLACE_COLOR = (181, 159, 59) #rgb(181, 159, 59)
 PRESENT_IN_PLACE_COLOR = (83, 141, 78) #rgb(83, 141, 78)
 NOT_PRESENT_COLOR = (58, 58, 60) #rgb(58, 58, 60)
