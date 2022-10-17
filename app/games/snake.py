@@ -1,23 +1,11 @@
 from config.games_config import *
 from games.game import Game
+from GUI.lable import Lable
 import pygame
 from random import choice
 from enum import Enum
 from utils.time import Time_Man
 
-
-'''
-TODO : clean display functions with fonts
-TODO : change pause and death screen to say press space
-TODO : change self.paused, self.snake.isalive,
-TODO: implement 
-		self.screens = Enum(
-			"SCREENS",
-			[
-				("PAUSE",app.get_game_surface(PAUSE_COLOR, alpha = PAUSE_ALPHA)),
-				("DEATH",app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA))
-			])
-'''
 
 class DIRECTION(Enum):
 	UP = (0, -1)
@@ -139,6 +127,7 @@ class SNAKE:
 			if food.colliderect(self.rect):
 				self.size += 1
 				self.snake_game.score += 1
+				self.snake_game.lables['score']['lable'].message = f'{self.snake_game.score}'
 				collided.append(food)
 		for food in collided: self.snake_game.foods.remove(food)
 
@@ -161,14 +150,13 @@ class SNAKE:
 
 		return tuple(p1), tuple(p2)
 
-	def die(self): self.alive = False
+	def die(self): 
+		self.alive = False
+		self.snake_game.lables['final_score']['lable'].message = f'{self.snake_game.score}'
 
 class Snake(Game):
 	def __init__(self, app):
 		super().__init__(app)
-		self.pause_font = pygame.font.Font(None, PAUSE_FONT_SIZE)
-		self.score_font = pygame.font.Font(None, SCORE_FONT_SIZE)
-		self.final_score_font = pygame.font.Font(None, 30)
 		self.grid = []
 		self.cells = []
 		self.foods = []
@@ -178,27 +166,67 @@ class Snake(Game):
 		self.score = 0
 		self.p_message_alpha = 255
 		self.p_alpha_change = -1
-	
+		self.lables = self.get_lables()
+		
+
 
 	def update(self, dt):
-		if self.paused or not self.snake.alive: self.update_pause_alpha(dt)
+		if self.paused or not self.snake.alive: self.update_alpha(dt)
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
 				self.spawn_food(dt)
 
 	def render(self):
-		if self.paused: self.display_paused()
+		if self.paused: self.render_message('paused')
 		if self.snake.alive:
 			for food in self.foods: self.surface.blit(self.get_rect_surface(food, FOOD_COLOR), food.topleft)
 			self.snake.render()
-			self.dispaly_score()
+			self.render_message('score')
 		
-		if not self.snake.alive: self.display_loose_screen()
+		if not self.snake.alive: self.render_message('final_score', 'unpause')
 
 		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 
-	def update_pause_alpha(self, dt):
+	def render_message(self, *lable_ids):
+		for l_id in lable_ids:
+			lable = self.lables[l_id]['lable']
+			lable_surface  = self.lables[l_id]['surface']
+			if lable_surface :
+				self.surface.blit(lable_surface, (0,0))
+			self.surface.blit(*lable.get_lable_blit())
+
+	def get_lables(self):
+		s_width, s_height = self.surface.get_size()
+		center = s_width // 2, s_height // 2
+		score_pos = s_width - 30, 30
+		unpause_pos = center[0] , center[1] + 60
+		paused_surface = self.app.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
+		death_surface = self.app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
+		return{
+			'paused' : 
+				{
+				'lable' : Lable(center, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,self.p_message_alpha),
+				'surface' : paused_surface,
+				},
+			'unpause' : 
+				{
+				'lable' : Lable(unpause_pos, " SPACE ", 30 , SCORE_COLOR, self.p_message_alpha),
+				'surface' : paused_surface,
+				},
+			'score' : 
+				{
+				'lable' : Lable(score_pos, f'{self.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA),
+				'surface' : False,
+				},
+			'final_score' :
+				{
+				'lable' : Lable(center, f'{self.score}', SCORE_FONT_SIZE, SCORE_COLOR, LOOSE_ALPHA),
+				'surface' : death_surface
+				}
+		}
+
+	def update_alpha(self, dt):
 		self.p_message_alpha +=  (ALPHA_CHANGE * dt * self.p_alpha_change)
 
 		if self.p_message_alpha <= 0:
@@ -209,6 +237,9 @@ class Snake(Game):
 			self.p_message_alpha = 255
 			self.p_alpha_change = -1
 
+		self.lables['paused']['lable'].alpha = self.p_message_alpha
+		self.lables['unpause']['lable'].alpha = self.p_message_alpha
+
 	def get_rect_surface(self, rect, color):
 		rect_surface = pygame.Surface(rect.size)
 		rect_surface.fill(color)
@@ -216,52 +247,9 @@ class Snake(Game):
 		else: rect_surface.set_alpha(255)
 		return rect_surface
 
-
-	def display_paused(self):
-		paused_surface = self.app.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
-		self.surface.blit(paused_surface, (0,0))
-		self.render_pause_message()
-
-
-	def render_pause_message(self):
-		pause_lable_render = self.pause_font.render("PAUSED", True, SCORE_COLOR)
-		s_width, s_height = self.surface.get_size()
-		pause_lable_rect = pause_lable_render.get_rect(topleft = (0, 0))
-		pause_lable_rect = pause_lable_render.get_rect(topleft = ((s_width // 2) - (pause_lable_rect.width // 2), (s_height // 2) - (pause_lable_rect.height // 2)))
-		pause_lable_render.set_alpha(self.p_message_alpha)
-		self.surface.blit(pause_lable_render, pause_lable_rect)
-
 	def toggle_pause(self): 
 		if self.snake.alive: self.paused = not self.paused
-
-	def dispaly_score(self):
-		score_lable_render = self.score_font.render(f"{self.score}", True, SCORE_COLOR)
-		s_width, s_height = self.surface.get_size()
-		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
-		score_lable_rect = score_lable_render.get_rect(center = ((s_width) - score_lable_rect.width * 2, score_lable_rect.width * 2))
-		if self.paused : score_lable_render.set_alpha(PAUSE_ALPHA)
-		self.surface.blit(score_lable_render, score_lable_rect)
-
-	def display_final_score(self):
-		score_lable_render = self.final_score_font.render(f"[{self.score}]", True, SCORE_COLOR)
-		s_width, s_height = self.surface.get_size()
-		score_lable_rect = score_lable_render.get_rect(topleft = (0, 0))
-		score_lable_rect = score_lable_render.get_rect(topleft = ((s_width // 2) - (score_lable_rect.width // 2), (s_height // 2) - (score_lable_rect.height // 2)))
-		self.surface.blit(score_lable_render, score_lable_rect)
-
-	def display_loose_screen(self):
-		death_surface = self.app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
-		self.surface.blit(death_surface, (0,0))
-		self.display_final_score()
-		self.display_restart()
-
-	def display_restart(self):
-		restart_lable_render = self.final_score_font.render(f"SPACE", True, SCORE_COLOR)
-		s_width, s_height = self.surface.get_size()
-		restart_lable_rect = restart_lable_render.get_rect(topleft = (0, 0))
-		restart_lable_rect = restart_lable_render.get_rect(topleft = ((s_width // 2) - (restart_lable_rect.width // 2), (s_height // 2) - (restart_lable_rect.height // 2) + 50))
-		restart_lable_render.set_alpha(self.p_message_alpha)
-		self.surface.blit(restart_lable_render, restart_lable_rect)
+		self.lables['score']['lable'].alpha = PAUSE_ALPHA if self.paused else NORMAL_ALPHA
 	
 	def restart(self):
 		self.score = 0
@@ -308,7 +296,3 @@ class Snake(Game):
 			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.direction = DIRECTION.RIGHT
 			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.direction = DIRECTION.LEFT
 			if event.key == pygame.K_SPACE and not self.snake.alive: self.restart()
-
-
-
-
