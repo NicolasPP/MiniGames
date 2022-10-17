@@ -16,10 +16,6 @@ TODO: Games to add in the future
 		- level generation (maybe)
 		- chess
 		- galton board (HARD)
-TODO: BIG refactor, clean up all classes, remove functions from class.
-	  - Game []
-	  	- wordle []
-	  	- snake []
 '''
 
 
