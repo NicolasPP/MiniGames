@@ -56,15 +56,15 @@ class SNAKE:
 		self.speed = S_CELL_SIZE / (TIME_TO_COVER_CELL / 1000)
 		self.alive = True
 
-	# --Getters--
+	# -- Getters --
 	@property
 	def direction(self): return self._direction
 	@property
 	def pos(self): return self._pos
-	# -----------
+	# -------------
 
 
-	# --Setters--
+	# -- Setters --
 	@direction.setter
 	def direction(self, new_direction):
 		assert isinstance(new_direction, DIRECTION)
@@ -76,30 +76,30 @@ class SNAKE:
 		self._pos = new_pos
 		x, y = new_pos
 		self.rect.x, self.rect.y = round(x), round(y)
-	# -----------
+	# -------------
 
 
-	# --Deleters--
+	# -- Deleters --
 	@direction.deleter
 	def direction(self): del self._direction
 	@pos.deleter
 	def pos(self): del self._pos
-	# ------------
+	# --------------
 
-	# --Render--
+	# -- Render --
 	def render(self):
 		for bdy in self.body: self.snake_game.surface.blit(get_rect_surface(self.snake_game, bdy, self.color), bdy.topleft)
 		self.snake_game.surface.blit(get_rect_surface(self.snake_game, self.rect, self.color), self.rect.topleft)
-	# ----------
+	# ------------
 
-	# --Update--
+	# -- Update --
 	def update(self, dt):
 		self.body_collision()
 		self.wall_collision()
 		self.food_collision()
 		self.set_move_distance(dt)
 		self.move(dt)
-	# ----------
+	# ------------
 	
 
 	# -- Collision Detection --
@@ -167,7 +167,7 @@ class Snake(Game):
 		self.lables = get_lables(self)
 		
 
-	# --Render--
+	# -- Render --
 	def render(self):
 		if self.paused: self.render_message('paused')
 		if self.snake.alive:
@@ -186,10 +186,10 @@ class Snake(Game):
 			if lable_surface :
 				self.surface.blit(lable_surface, (0,0))
 			self.surface.blit(*lable.get_lable_blit())
-	# ----------
+	# ------------
 
 
-	# --Update--
+	# -- Update --
 	def update(self, dt):
 		if self.paused or not self.snake.alive: self.update_alpha(dt)
 		else:
@@ -214,10 +214,10 @@ class Snake(Game):
 	def update_surface_size(self):
 		self.surface =  self.app.get_game_surface(self.bg_color)
 		create_grid(self)
-	# ----------
+	# ------------
 
 
-	# --Player Input--
+	# -- Player Input --
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if event.key == pygame.K_SPACE: toggle_pause(self)
@@ -226,7 +226,7 @@ class Snake(Game):
 			if event.key == pygame.K_RIGHT or event.key == pygame.K_d: self.snake.direction = DIRECTION.RIGHT
 			if event.key == pygame.K_LEFT or event.key == pygame.K_a: self.snake.direction = DIRECTION.LEFT
 			if event.key == pygame.K_SPACE and not self.snake.alive: restart(self)
-	# ----------------
+	# ------------------
 
 
 # -- SNAKE helpers --
@@ -322,6 +322,3 @@ def is_valid_food_pos(snake_game, food):
 	return food not in snake_game.snake.body and \
 				food not in snake_game.foods
 # ------------------------
-
-
-
