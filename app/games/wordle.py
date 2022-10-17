@@ -100,7 +100,7 @@ class Letter:
 	@value.setter
 	def value(self, new_value):
 		self._value = new_value
-		self.lable = self.get_value_lable()
+		self.lable.message = new_value
 		self.draw_value()
 	# -----------
  
@@ -137,13 +137,6 @@ class Letter:
 		s_width, s_height = self.card_bg_surface.get_size()
 		pos = (self.rect.width // 2, self.rect.height // 2)
 		return Lable(pos, self.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA)
-
-
-	def get_value_render(self):
-		value_lable_render = self.font.render(self.value.upper(), True, LETTER_COLOR)
-		s_width, s_height = self.card_bg_surface.get_size()
-		value_lable_rect = value_lable_render.get_rect(center = (self.rect.width // 2, self.rect.height // 2))
-		return value_lable_render, value_lable_rect
 
 	def reset(self):
 		self.value = ''
