@@ -213,6 +213,7 @@ class Snake(Game):
 	
 	def update_surface_size(self):
 		self.surface =  self.app.get_game_surface(self.bg_color)
+		self.lables = get_lables(self)
 		create_grid(self)
 	# ------------
 

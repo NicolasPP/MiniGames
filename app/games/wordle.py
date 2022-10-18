@@ -202,7 +202,7 @@ class Wordle(Game):
 		self.lables = get_wordle_lables(self)
 
 	def update_letters_size(self):
-		x, y = get_first_letter_pos(wordle_game)
+		x, y = get_first_letter_pos(self)
 		for t in range(TRYS):
 			for l in range(WORD_SIZE):
 				new_rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
