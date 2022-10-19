@@ -25,7 +25,6 @@ def get_data(file_name):
 
 
 def write_data(file_name, data):
-
 	file = open(get_file_path(file_name), 'wb') # wb - w = write b = bytemode
 	pickle.dump(data, file) 
 	file.close()
