@@ -16,8 +16,6 @@ TODO: Games to add in the future
 		- level generation (maybe)
 		- chess
 		- galton board (HARD)
-TODO: remove game_data folder. have wordle_data in data folder
-	  add assets folder in data
 TODO: find logo online for application, add to assets folder
 	  update dist.sh scrpit to generate executable with the
 	  logo
