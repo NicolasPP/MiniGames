@@ -17,6 +17,7 @@ Wordle data dict fortmat
 def get_file_path(relative_path):
 	'''Get absolute path to resource'''
 	bundle_dir = getattr(sys, '_MEIPASS', os.path.abspath(os.path.dirname(__file__)))
+	if not (getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS')): bundle_dir = bundle_dir[:len(bundle_dir) - 4]
 	return os.path.join(bundle_dir, relative_path)
 
 
