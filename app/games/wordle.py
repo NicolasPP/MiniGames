@@ -157,7 +157,7 @@ class Letter:
 
 class Wordle(Game):
 	def __init__(self, app):
-		if WORDLE_DEBUG_MODE: print('WORDLE_DEBUG_MODE is TRUE -------------- FIX IT --------------')
+		if WORDLE_DEBUG_MODE: print('WORDLE_DEBUG_MODE is TRUE -------------- REMOVE BEFORE UPDATING DIST --------------')
 		super().__init__(app)
 		self.current_letter_index = 0
 		self.current_word_index = 0
