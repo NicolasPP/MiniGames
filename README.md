@@ -13,5 +13,5 @@ pip install -r requirements.txt
 run app/main.py
 
 # Source for Wordle Words
-english - https://github.com/dwyl/english-words
+english - https://github.com/dwyl/english-words \
 potuguese - https://www.ime.usp.br/~pf/dicios/index.html
