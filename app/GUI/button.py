@@ -1,6 +1,8 @@
 import pygame
 from enum import Enum
 from config.app_config import *
+import config.games_config as gcfg
+from GUI.lable import Lable
 
 class Button_Type(Enum):
 	SWITCH = 1
@@ -12,7 +14,7 @@ class Button:
 	 			width,\
 	 			height,\
 	 			color,\
-	 			lable = "",\
+	 			message = "",\
 	 			on_click = False,\
 	 			alpha = 1,\
 	 			offset = (0,0),\
@@ -25,31 +27,25 @@ class Button:
 		self.rect = pygame.Rect((topleft[0] + offset[0], topleft[1] + offset[1]), (width, height))
 		self.color = color
 		self.alpha = alpha
-		self.lable = lable
+		self.message = message
 		self.on_click = on_click
 		self.type = button_type
 		self.active = False
 		self.font_color = font_color
-		self.font = pygame.font.Font(None, LABLE_FONT_SIZE)
+		self.surface = get_button_surface(self)
+		self.lable = get_lable(self)
+		
 
 		self.switch_button_styles = {
 			True : (no_style,()),
 			False: (no_style,())
 		}
 
-		self.surface = self.get_button_surface()
+		
 
 
 	def render(self, parent_surface):
 		parent_surface.blit(self.surface, self.topleft)
-
-	def render_lable(self, surface):
-		lable_render = self.font.render(self.lable, True, self.font_color)
-		lable_rect = lable_render.get_rect(topleft = (0, 0))
-		width_diff = self.width - lable_rect.width
-		height_diff = self.height - lable_rect.height
-		lable_rect = lable_render.get_rect(topleft = (width_diff // 2, height_diff // 2))
-		surface.blit(lable_render, lable_rect)
 
 	def style(self, func, *kwargs):
 		func(*kwargs)
@@ -67,11 +63,7 @@ class Button:
 		func(*kwargs)
 
 
-	def get_button_surface(self):
-		s =  pygame.Surface((self.width, self.height))
-		s.fill(self.color)
-		if self.show_lable: self.render_lable(s)
-		return s
+	
 
 	def click(self, *kwargs):
 		if self.type == Button_Type.SWITCH:
@@ -82,4 +74,13 @@ class Button:
 
 def no_style(): pass
 
+def get_lable(button):
+	pos = button.width // 2, button.height // 2
+	lable = Lable(pos, button.message, LABLE_FONT_SIZE, button.font_color, gcfg.NORMAL_ALPHA)
+	if button.show_lable: button.surface.blit(*lable.get_lable_blit())
+	return lable
 
+def get_button_surface(button):
+		s = pygame.Surface((button.width, button.height))
+		s.fill(button.color)
+		return s
