@@ -30,7 +30,7 @@ class Sidebar:
 
 	def check_comp_collision(self):
 		for comp in self.components:
-			if comp.rect.collidepoint(pygame.mouse.get_pos()): comp.click(self.parent, comp)
+			if comp.is_clicked(pygame.mouse.get_pos()): comp.click(self.parent, comp)
 
 	def get_sidebar_surface(self):
 		s = pygame.Surface((self.width, self.height))
@@ -41,8 +41,12 @@ class Sidebar:
 	
 
 	def add_settings(self):
-		quit = Button((PADDING, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = quit_game, message = "Quit", offset = self.topleft, show_lable= False,)
-		full_screen = Button(((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING), (BUTTON_W - PADDING) // 2, BUTTON_H, BG_COLOR, on_click = fullscreen, message = "Fullscreen", offset = self.topleft, show_lable= False, button_type = Button_Type.SWITCH)
+		quit_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
+		full_screen_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
+		quit_pos = (PADDING, PADDING)
+		full_screen_pos =((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING)
+		quit = Button(quit_pos, quit_size, BG_COLOR, message = "Quit", offset = self.topleft, on_click = quit_game, show_lable= False)
+		full_screen = Button(full_screen_pos, full_screen_size, BG_COLOR, message = "Fullscreen", offset = self.topleft, on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
 		quit.style(style_quit, quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
 		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
@@ -50,10 +54,16 @@ class Sidebar:
 		return [quit, full_screen]
 
 	def add_scrollable_content(self):
-		back = Button((PADDING, (PADDING * 2) + BUTTON_H), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, message = "Menu", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)	
-		snake = Button((PADDING , (PADDING * 5) + (BUTTON_H * 2)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game,message = "Snake", offset = self.topleft, show_lable = True, font_color = FONT_COLOR)
-		tictactoe = Button((PADDING , (PADDING * 6) + (BUTTON_H * 3)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, message = "Tictactoe", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
-		wordle = Button((PADDING , (PADDING * 7) + (BUTTON_H * 4)), BUTTON_W, BUTTON_H, BUTTON_COLOR, on_click = set_game, message = "Wordle", offset = self.topleft, show_lable= True, font_color = FONT_COLOR)
+		offset_w, offset_h = self.topleft
+		button_size = (BUTTON_W, BUTTON_H)
+		back_pos = (PADDING, (PADDING * 2) + BUTTON_H)
+		snake_pos = (PADDING, (PADDING * 5) + (BUTTON_H * 2))
+		tictactoe_pos = (PADDING, (PADDING * 6) + (BUTTON_H * 3))
+		wordle_pos = (PADDING, (PADDING * 7) + (BUTTON_H * 4))
+		back = Button(back_pos, button_size, BUTTON_COLOR, message = "Menu", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)	
+		snake = Button(snake_pos, button_size, BUTTON_COLOR, message = "Snake", offset = self.topleft, on_click = set_game, show_lable = True, font_color = FONT_COLOR)
+		tictactoe = Button(tictactoe_pos, button_size, BUTTON_COLOR, message = "Tictactoe", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		wordle = Button(wordle_pos, button_size, BUTTON_COLOR, message = "Wordle", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		return [snake, tictactoe, wordle, back]
 
 
@@ -74,8 +84,8 @@ def quit_game(parent, comp):
 	parent.quit_game()
 
 def style_quit(button):
-	pygame.draw.line(button.surface, "Red", (5, 5), (button.width - 5, button.height - 5), 4)
-	pygame.draw.line(button.surface, "Red", (button.width - 5, 5), (5, button.height - 5), 4)
+	pygame.draw.line(button.surface, "Red", (5, 5), (button.rect.width - 5, button.rect.height - 5), 4)
+	pygame.draw.line(button.surface, "Red", (button.rect.width - 5, 5), (5, button.rect.height - 5), 4)
 
 def fullscreen_active_style(button):
 	rects = [
@@ -83,14 +93,14 @@ def fullscreen_active_style(button):
 		pygame.Rect((FS_RECT_WIDTH - FS_RECT_HEIGHT, 0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 		pygame.Rect((0, FS_RECT_WIDTH - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 		#topright
-		pygame.Rect((button.width - FS_RECT_WIDTH, 0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
-		pygame.Rect((button.width - FS_RECT_WIDTH, FS_RECT_WIDTH - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, 0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, FS_RECT_WIDTH - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 		#bottomleft
-		pygame.Rect((0, button.height - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((FS_RECT_WIDTH - FS_RECT_HEIGHT, button.height - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((0, button.rect.height - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((FS_RECT_WIDTH - FS_RECT_HEIGHT, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 		#bottomright
-		pygame.Rect((button.width - FS_RECT_WIDTH, button.height - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((button.width - FS_RECT_WIDTH, button.height - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 	]
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 
@@ -100,14 +110,14 @@ def fullscreen_inactive_style(button):
 		pygame.Rect((0,0), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 		pygame.Rect((0,0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 		#topright
-		pygame.Rect((button.width - FS_RECT_WIDTH, 0), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((button.width - FS_RECT_HEIGHT, 0), (FS_RECT_HEIGHT , FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, 0), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - FS_RECT_HEIGHT, 0), (FS_RECT_HEIGHT , FS_RECT_WIDTH)),
 		#bottomleft
-		pygame.Rect((0, button.height-FS_RECT_WIDTH), (FS_RECT_HEIGHT,FS_RECT_WIDTH)),
-		pygame.Rect((0, button.height-FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((0, button.rect.h-FS_RECT_WIDTH), (FS_RECT_HEIGHT,FS_RECT_WIDTH)),
+		pygame.Rect((0, button.rect.h-FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 		#bottomright
-		pygame.Rect((button.width - FS_RECT_HEIGHT, button.height - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
-		pygame.Rect((button.width - FS_RECT_WIDTH, button.height - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - FS_RECT_HEIGHT, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 	]
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 

@@ -10,42 +10,39 @@ class Button_Type(Enum):
 
 class Button:
 	def __init__(self,\
-	 			topleft,\
-	 			width,\
-	 			height,\
+	 			pos,\
+	 			size,\
 	 			color,\
 	 			message = "",\
+	 			offset = (0,0),\
 	 			on_click = False,\
 	 			alpha = 1,\
-	 			offset = (0,0),\
 	 			show_lable = False,\
 	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
-		self.show_lable = show_lable
-		self.topleft = topleft
-		self.width, self.height  = width, height
-		self.rect = pygame.Rect((topleft[0] + offset[0], topleft[1] + offset[1]), (width, height))
+		self.rect = pygame.Rect(pos, size)
+		self.collide_rect = pygame.Rect(apply_offset(pos, offset), size)
 		self.color = color
-		self.alpha = alpha
 		self.message = message
 		self.on_click = on_click
+		self.alpha = alpha
+		self.show_lable = show_lable
+		self.font_color = font_color
 		self.type = button_type
 		self.active = False
-		self.font_color = font_color
 		self.surface = get_button_surface(self)
 		self.lable = get_lable(self)
-		
-
 		self.switch_button_styles = {
 			True : (no_style,()),
 			False: (no_style,())
 		}
 
 		
-
+	def is_clicked(self, mouse_pos):
+		return self.collide_rect.collidepoint(mouse_pos)
 
 	def render(self, parent_surface):
-		parent_surface.blit(self.surface, self.topleft)
+		parent_surface.blit(self.surface, self.rect.topleft)
 
 	def style(self, func, *kwargs):
 		func(*kwargs)
@@ -75,12 +72,17 @@ class Button:
 def no_style(): pass
 
 def get_lable(button):
-	pos = button.width // 2, button.height // 2
+	pos = button.rect.w // 2, button.rect.h // 2
 	lable = Lable(pos, button.message, LABLE_FONT_SIZE, button.font_color, gcfg.NORMAL_ALPHA)
 	if button.show_lable: button.surface.blit(*lable.get_lable_blit())
 	return lable
 
 def get_button_surface(button):
-		s = pygame.Surface((button.width, button.height))
+		s = pygame.Surface((button.rect.w, button.rect.h))
 		s.fill(button.color)
 		return s
+
+def apply_offset(pos, offset):
+	w, h = pos
+	off_w, off_h = offset
+	return w + off_w, h + off_h
