@@ -10,13 +10,33 @@ import pygame
 from enum import Enum
 from random import choice
 
+
 '''
 TODO : display message when user tries to guess a word that does not exist
 TODO : add animation for when user makes a guess. make new state color fade in
+TODO : add option to pick language in wordle
 TODO : show word when loose
 '''
+
+
+'''
+WORDLE_DEBUG_MODE - when True,  - will not overwrite words data with
+							   new used_words data, because everytime I run 
+							   it picks a word and adds it to used_words. 
+							   When testing used_words can fill up quickly.
+							    - word choosen will be printed in the 
+							    console. for ease of testing
+
+
+'''
+WORDLE_DEBUG_MODE = True
+
+
+
 class GAMELANG(Enum):
 	ENG = 'english'
+	PT = 'portuguese'
+
 class LSTATE(Enum):
 	BLANK = BLANK_COLOR
 	FILLED = FILLED_COLOR
@@ -27,6 +47,7 @@ class LSTATE(Enum):
 	def __eq__(self, state):
 		if isinstance(state, LSTATE): return self.name == state.name
 		return False
+
 class GAME_RESULT(Enum):
 	WON = 1
 	LOOSE = 2
@@ -43,9 +64,10 @@ class Word_Bank:
 
 	def get_random_word(self):
 		word = choice(list(self.available_words()))
-		self.add_used_word(word)
-		Data_Man.write_data(WORD_FILE, self.data)
-		print(word)
+		if WORDLE_DEBUG_MODE:
+			self.add_used_word(word)
+			print(word)
+		else: Data_Man.write_data(WORD_FILE, self.data)
 		return word
 
 	def available_words(self):
@@ -59,6 +81,9 @@ class Word_Bank:
 	def is_guess_valid(self, word):
 		return word in self.data[self.language][self.words]
 
+	def empty_used_words(self, *languages):
+		for lang in languages: self.data[lang.value][self.used_words] = []
+		Data_Man.write_data(WORD_FILE, self.data)
 
 class Letter:
 	def __init__(self, wordle_game, rect, index, r, c):
@@ -135,7 +160,7 @@ class Wordle(Game):
 		super().__init__(app)
 		self.current_letter_index = 0
 		self.current_word_index = 0
-		self.word_bank = Word_Bank(GAMELANG.ENG)
+		self.word_bank = Word_Bank(GAMELANG.PT)
 		self.words = []
 		self.letters = []
 		create_board(self)
