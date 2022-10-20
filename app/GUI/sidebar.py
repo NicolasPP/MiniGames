@@ -65,7 +65,9 @@ class Sidebar:
 			if event.button == MOUSECLICK.LEFT: 	    self.check_comp_collision()
 			if event.button == MOUSECLICK.SCROLL_UP :   self.scroll_offset = self.scroll_speed
 			if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
-			
+	
+	def is_hovering(self):
+		return self.surface.get_rect().collidepoint(pygame.mouse.get_pos())
 
 	def check_comp_collision(self):
 		for comp in self.get_components():

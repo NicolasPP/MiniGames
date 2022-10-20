@@ -85,7 +85,8 @@ class MiniGameApp:
 		
 	# Game events Parser 
 	def parse_event(self, event):
-		self.sidebar.parse_event(event)
+
+		if self.sidebar.is_hovering(): self.sidebar.parse_event(event)
 		self.games[self.current_game].parse_event(event)
 	
 	def quit_game(self):
