@@ -59,7 +59,9 @@ class Button:
 		kwargs = self.switch_button_styles[self.active][1]
 		func(*kwargs)
 
-
+	def update_pos(self, pos_change):
+		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
+		self.collide_rect.topleft = tuple(pygame.math.Vector2(self.collide_rect.topleft) + pos_change)
 	
 
 	def click(self, *kwargs):

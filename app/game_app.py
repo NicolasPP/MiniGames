@@ -10,6 +10,7 @@ from config.app_config import *
 import config.games_config as gcfg
 from enum import Enum
 
+
 class MiniGameApp:
 	def __init__(self, s_width, s_height, full_screen):
 		pygame.init()
