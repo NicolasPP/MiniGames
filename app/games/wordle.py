@@ -240,36 +240,11 @@ class Wordle(Game):
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if self.result == GAME_RESULT.UNDEFINED:
-				if event.key == pygame.K_BACKSPACE: remove_letter_value(self) # delete
-				if event.key == pygame.K_RETURN: check_current_board_word(self) # enter
-				if event.key == pygame.K_a: add_letter_value(self, 'a')
-				if event.key == pygame.K_b: add_letter_value(self, 'b')
-				if event.key == pygame.K_c: add_letter_value(self, 'c')
-				if event.key == pygame.K_d: add_letter_value(self, 'd')
-				if event.key == pygame.K_e: add_letter_value(self, 'e')
-				if event.key == pygame.K_f: add_letter_value(self, 'f')
-				if event.key == pygame.K_g: add_letter_value(self, 'g')
-				if event.key == pygame.K_h: add_letter_value(self, 'h')
-				if event.key == pygame.K_i: add_letter_value(self, 'i')
-				if event.key == pygame.K_j: add_letter_value(self, 'j')
-				if event.key == pygame.K_k: add_letter_value(self, 'k')
-				if event.key == pygame.K_l: add_letter_value(self, 'l')
-				if event.key == pygame.K_m: add_letter_value(self, 'm')
-				if event.key == pygame.K_n: add_letter_value(self, 'n')
-				if event.key == pygame.K_o: add_letter_value(self, 'o')
-				if event.key == pygame.K_p: add_letter_value(self, 'p')
-				if event.key == pygame.K_q: add_letter_value(self, 'q')
-				if event.key == pygame.K_r: add_letter_value(self, 'r')
-				if event.key == pygame.K_s: add_letter_value(self, 's')
-				if event.key == pygame.K_t: add_letter_value(self, 't')
-				if event.key == pygame.K_u: add_letter_value(self, 'u')
-				if event.key == pygame.K_v: add_letter_value(self, 'v')
-				if event.key == pygame.K_w: add_letter_value(self, 'w')
-				if event.key == pygame.K_x: add_letter_value(self, 'x')
-				if event.key == pygame.K_y: add_letter_value(self, 'y')
-				if event.key == pygame.K_z: add_letter_value(self, 'z')
+				if self.user_input[pygame.K_BACKSPACE]: remove_letter_value(self) # delete
+				elif self.user_input[pygame.K_RETURN]: 	check_current_board_word(self) # enter
+				else : add_letter_value(self, pygame.key.name(event.key))
 			else:
-				if event.key == pygame.K_SPACE: restart_game(self)
+				if self.user_input[pygame.K_SPACE]: restart_game(self)
 	# ------------------
 
 
@@ -347,6 +322,7 @@ def create_board(wordle_game):
 def invalidate_letters_state(wordle_game):
 	for letter in wordle_game.letters: letter.state = letter.state
 def add_letter_value(wordle_game, letter_value):
+		if not letter_value in ALPHABET: return 
 		if wordle_game.current_letter_index == (WORD_SIZE): return
 		current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
 		wordle_game.current_letter_index += 1
