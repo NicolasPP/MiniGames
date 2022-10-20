@@ -9,6 +9,7 @@ LOOSE_COLOR = color_palette2[3] #rgb(220, 215, 201)
 
 PAUSE_ALPHA = 15 # 0 is fully transparent and 255 fully opaque.
 LOOSE_ALPHA = 150
+ALPHABET = 'abcdefghijklmnopqrstuvwxyz'
 #----------------------
 
 
