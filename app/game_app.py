@@ -5,7 +5,7 @@ from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
 from GUI.sidebar import Sidebar
-from GUI.main_menu import Main_menu
+from games.main_menu import Main_menu
 from config.app_config import *
 import config.games_config as gcfg
 from enum import Enum
@@ -72,7 +72,7 @@ class MiniGameApp:
 		return gs_width, gs_height
 
 	def get_gs_position(self):
-		return self.sidebar.width + (PADDING * 2), PADDING
+		return self.sidebar.rect.width + (PADDING * 2), PADDING
 
 	def set_delta_time(self):
 		self.delta_time = time.time() - self.prev_time

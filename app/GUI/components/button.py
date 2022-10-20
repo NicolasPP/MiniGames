@@ -12,20 +12,19 @@ class Button_Type(Enum):
 
 class Button(Component):
 	def __init__(self,\
+				parent,
 	 			pos,\
 	 			size,\
 	 			color,\
 	 			message = "",\
-	 			offset = (0,0),\
 	 			on_click = False,\
-	 			alpha = 1,\
+	 			alpha = gcfg.NORMAL_ALPHA,\
 	 			show_lable = False,\
 	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
-		super().__init__()
-		self.rect = pygame.Rect(pos, size)
-		self.collide_rect = pygame.Rect(apply_offset(pos, offset), size)
-		self.color = color
+		super().__init__(parent, pos, size, alpha, color)
+		self.collide_rect = pygame.Rect(apply_offset(pos, self.offset), size)
+		self.surface = get_button_surface(self)
 		self.message = message
 		self.on_click = on_click
 		self.alpha = alpha
@@ -33,7 +32,6 @@ class Button(Component):
 		self.font_color = font_color
 		self.type = button_type
 		self.active = False
-		self.surface = get_button_surface(self)
 		self.lable = get_lable(self)
 		self.switch_button_styles = {
 			True : (no_style,()),
@@ -44,8 +42,6 @@ class Button(Component):
 	def is_clicked(self, mouse_pos):
 		return self.collide_rect.collidepoint(mouse_pos)
 
-	def render(self, parent_surface):
-		parent_surface.blit(self.surface, self.rect.topleft)
 
 	def style(self, func, *kwargs):
 		func(*kwargs)
@@ -78,13 +74,14 @@ def no_style(): pass
 
 def get_lable(button):
 	pos = button.rect.w // 2, button.rect.h // 2
-	lable = Lable(pos, button.message, LABLE_FONT_SIZE, button.font_color, gcfg.NORMAL_ALPHA)
-	if button.show_lable: button.surface.blit(*lable.get_lable_blit())
+	lable = Lable(button, pos, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha)
+	if button.show_lable: lable.render()
 	return lable
 
 def get_button_surface(button):
 		s = pygame.Surface((button.rect.w, button.rect.h))
 		s.fill(button.color)
+		# s.set_alpha(button.alpha)
 		return s
 
 def apply_offset(pos, offset):
