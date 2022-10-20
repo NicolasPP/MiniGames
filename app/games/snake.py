@@ -1,6 +1,6 @@
 from config.games_config import *
 from games.game import Game
-from GUI.lable import Lable
+from GUI.components.lable import Lable
 import pygame
 from random import choice
 from enum import Enum

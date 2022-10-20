@@ -1,6 +1,6 @@
 import pygame
 from config.app_config import *
-from GUI.button import Button, Button_Type
+from GUI.components.button import Button, Button_Type
 
 class MOUSECLICK:
 	LEFT = 1

@@ -2,13 +2,15 @@ import pygame
 from enum import Enum
 from config.app_config import *
 import config.games_config as gcfg
-from GUI.lable import Lable
+from GUI.components.lable import Lable
+from GUI.components.component import Component
+
 
 class Button_Type(Enum):
 	SWITCH = 1
 	PRESS = 2
 
-class Button:
+class Button(Component):
 	def __init__(self,\
 	 			pos,\
 	 			size,\
@@ -20,6 +22,7 @@ class Button:
 	 			show_lable = False,\
 	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
+		super().__init__()
 		self.rect = pygame.Rect(pos, size)
 		self.collide_rect = pygame.Rect(apply_offset(pos, offset), size)
 		self.color = color

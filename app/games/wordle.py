@@ -1,7 +1,7 @@
 import config.app_config as acfg
 from config.games_config import *
 
-from GUI.lable import Lable
+from GUI.components.lable import Lable
 from games.game import Game
 import data.data_manager as Data_Man
 

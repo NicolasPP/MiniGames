@@ -1,8 +1,11 @@
 import pygame
+from GUI.components.component import Component
 
 
-class Lable:
+
+class Lable(Component):
 	def __init__(self, pos, message, font_size, color, alpha, font = False, r_topleft = False ):
+		super().__init__()
 		self.pos = pos
 		self._message = message
 		self.font = font if font else pygame.font.Font(None, font_size)
