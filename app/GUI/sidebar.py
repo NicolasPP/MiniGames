@@ -17,19 +17,28 @@ class Sidebar:
 		self.rect = pygame.Rect((PADDING, PADDING), self.get_size())
 		self.alpha = alpha
 		self.bg_color = bg_color
-		self.setting_container = Container(self, (0,0), 'black', LAYOUT_PLANE.HORIZONTAL, padding = Padding(PADDING, 0, PADDING, PADDING, PADDING))
+		# self.containers = get_containers(self)
+		self.setting_container = get_setting_container(self)
 		self.surface = self.get_sidebar_surface()
-		self.fixed_components = self.add_settings()
 		self.scrollable_components = self.add_scrollable_content()
 		self._scroll_offset = pygame.math.Vector2(0,0)
 		self.scroll_speed = pygame.math.Vector2(0,10)
+		self._mouse_pos = pygame.mouse.get_pos()
 
 
 
 
 	@property
 	def scroll_offset(self): return self._scroll_offset
+	@property
+	def mouse_pos(self):
+		mp = pygame.math.Vector2(pygame.mouse.get_pos())
+		os = pygame.math.Vector2(self.rect.topleft)
 
+		return tuple(mp - os)
+	
+	@mouse_pos.setter
+	def mouse_pos(self, new_mouse_pos): self._mouse_pos = new_mouse_pos
 
 	@scroll_offset.setter
 	def scroll_offset(self, new_scroll_offset):
@@ -46,13 +55,15 @@ class Sidebar:
 	@scroll_offset.deleter
 	def scroll_offset(self): del self._scroll_offset
 
+	@mouse_pos.deleter
+	def mouse_pos(self): del self._mouse_pos
 
 	def get_components(self): 
 		return self.scrollable_components + self.setting_container.components
 
 	def render(self, parent_surface):
 		self.surface.fill(self.bg_color)
-		for comp in self.get_components(): comp.render()
+		# for comp in self.get_components(): comp.render()
 		self.setting_container.render()
 
 		parent_surface.blit(self.surface, self.rect.topleft)
@@ -68,50 +79,25 @@ class Sidebar:
 	
 	def parse_event(self, event):
 		if event.type == pygame.MOUSEBUTTONDOWN:
-			if event.button == MOUSECLICK.LEFT: 	    self.check_comp_collision()
+			if event.button == MOUSECLICK.LEFT: 	    self.check_comp_collision(self.setting_container)
 			# if event.button == MOUSECLICK.SCROLL_UP :   self.scroll_offset = self.scroll_speed
 			# if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
 	
 	def is_hovering(self):
 		return self.surface.get_rect().collidepoint(pygame.mouse.get_pos())
 
-	def check_comp_collision(self):
-		for comp in self.get_components():
-			if comp.is_clicked(pygame.mouse.get_pos()): comp.click(self.parent, comp)
+	def check_comp_collision(self, container):
+		for comp in container.components:
+			if isinstance(comp, Container):
+				self.check_comp_collision(comp)
+			else: 
+				if comp.is_clicked(self.mouse_pos):
+					comp.click(self.parent, comp)
 
 	def get_sidebar_surface(self):
 		surface = pygame.Surface(self.rect.size)
 		surface.fill(self.bg_color)
 		return surface
-
-	# def add_settings(self):
-	# 	button_size = (BUTTON_W, BUTTON_H)
-	# 	menu_pos = (PADDING, (PADDING * 2) + BUTTON_H)
-	# 	quit_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-	# 	full_screen_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-	# 	quit_pos = (PADDING, PADDING)
-	# 	full_screen_pos =((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING)
-	# 	quit = Button(self, quit_pos, quit_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-	# 	full_screen = Button(self, full_screen_pos, full_screen_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
-	# 	menu = Button(self, menu_pos, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)	
-	# 	quit.style(style_quit, quit)
-	# 	full_screen.set_active_style(fullscreen_active_style, full_screen)
-	# 	full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
-	# 	full_screen.update_style()
-	# 	return [quit, full_screen, menu]
-
-	def add_settings(self):
-		quit_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		full_screen_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		quit = Button(self, quit_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-		full_screen = Button(self, full_screen_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
-		quit.style(style_quit, quit)
-		full_screen.set_active_style(fullscreen_active_style, full_screen)
-		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
-		full_screen.update_style()
-		self.setting_container.add_component(quit)
-		self.setting_container.add_component(full_screen)
-		return []
 
 	def add_scrollable_content(self):
 		offset_w, offset_h = self.rect.topleft
@@ -124,12 +110,33 @@ class Sidebar:
 		snake = Button(self, button_size, BUTTON_COLOR, pos = snake_pos, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tictactoe = Button(self, button_size, BUTTON_COLOR, pos = tictactoe_pos, message = "Tictactoe", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle = Button(self, button_size, BUTTON_COLOR, pos = wordle_pos, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		return [snake, tictactoe, wordle]
+		return [snake, tictactoe, wordle]	
 
 
-	def add_sidebar_content(self):
-		return self.add_settings() + self.add_scrollable_content()
+
+def get_setting_container(sidebar):
+	settings = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, pos = (0,0), padding = Padding(0, 10, 10, 10, 10))
+	c1 = Container(settings, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(10,0,10,10,10))
 	
+	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
+	button_size = BUTTON_W, BUTTON_H
+
+	quit = Button(c1, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+	full_screen = Button(c1, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
+	menu = Button(settings, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+	quit.style(style_quit, quit)
+	full_screen.set_active_style(fullscreen_active_style, full_screen)
+	full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
+	full_screen.update_style()
+
+
+	c1.add_component(quit)
+	c1.add_component(full_screen)
+	settings.add_component(c1)
+	settings.add_component(menu)
+
+	return settings
+
 
 # GUI BUTTON LOGIC
 
@@ -181,4 +188,12 @@ def fullscreen_inactive_style(button):
 	]
 
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
+
+
+
+
+
+
+
+
 

@@ -23,7 +23,7 @@ class Button(Component):
 	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
 		super().__init__(parent, pos, size, alpha, color)
-		self.collide_rect = pygame.Rect(apply_offset(pos, self.offset), size)
+		# self.collide_rect = pygame.Rect(apply_offset(pos, self.offset), size)
 		self.surface = get_button_surface(self)
 		self.message = message
 		self.on_click = on_click
@@ -37,11 +37,6 @@ class Button(Component):
 			True : (no_style,()),
 			False: (no_style,())
 		}
-
-		
-	def is_clicked(self, mouse_pos):
-		return self.collide_rect.collidepoint(mouse_pos)
-
 
 	def style(self, func, *kwargs):
 		func(*kwargs)
@@ -58,9 +53,11 @@ class Button(Component):
 		kwargs = self.switch_button_styles[self.active][1]
 		func(*kwargs)
 
+	def render(self, set_alpha = False):
+		self.parent.surface.blit(*self.get_surface_blit(set_alpha = set_alpha))
+
 	def update_pos(self, pos_change):
 		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
-		self.collide_rect.topleft = tuple(pygame.math.Vector2(self.collide_rect.topleft) + pos_change)
 	
 
 	def click(self, *kwargs):
@@ -87,4 +84,4 @@ def get_button_surface(button):
 def apply_offset(pos, offset):
 	w, h = pos
 	off_w, off_h = offset
-	return w + off_w, h + off_h
+	return w - off_w, h - off_h
