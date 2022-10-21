@@ -59,9 +59,7 @@ class Container(Component):
 	
 	def render(self, set_alpha = False):
 		for comp in self.components: comp.render()
-		self.parent.surface.blit(*self.get_surface_blit(set_alpha))
-
-		
+		self.parent.surface.blit(*self.get_surface_blit(set_alpha))		
 
 	def process_components(self, width, height):
 		for comp in self.components:

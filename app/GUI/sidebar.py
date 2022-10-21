@@ -24,6 +24,7 @@ class Sidebar:
 		self._scroll_offset = pygame.math.Vector2(0,0)
 		self.scroll_speed = pygame.math.Vector2(0,10)
 		self._mouse_pos = pygame.mouse.get_pos()
+		self.root_container = self.setting_container
 
 
 
@@ -32,10 +33,11 @@ class Sidebar:
 	def scroll_offset(self): return self._scroll_offset
 	@property
 	def mouse_pos(self):
-		mp = pygame.math.Vector2(pygame.mouse.get_pos())
-		os = pygame.math.Vector2(self.rect.topleft)
-
-		return tuple(mp - os)
+		mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
+		sidebar_offset = pygame.math.Vector2(self.rect.topleft)
+		root_offset = pygame.math.Vector2(self.root_container.rect.topleft)
+		offset = sidebar_offset + root_offset
+		return tuple(mouse_pos - offset)
 	
 	@mouse_pos.setter
 	def mouse_pos(self, new_mouse_pos): self._mouse_pos = new_mouse_pos
@@ -84,13 +86,13 @@ class Sidebar:
 			# if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
 	
 	def is_hovering(self):
-		return self.surface.get_rect().collidepoint(pygame.mouse.get_pos())
+		return self.surface.get_rect().collidepoint(self.mouse_pos)	
 
 	def check_comp_collision(self, container):
 		for comp in container.components:
 			if isinstance(comp, Container):
 				self.check_comp_collision(comp)
-			else: 
+			else:
 				if comp.is_clicked(self.mouse_pos):
 					comp.click(self.parent, comp)
 
