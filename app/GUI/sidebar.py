@@ -1,6 +1,8 @@
 import pygame
 from config.app_config import *
 from GUI.components.button import Button, Button_Type
+from GUI.components.containers import Container, LAYOUT_PLANE
+
 
 class MOUSECLICK:
 	LEFT = 1
@@ -20,6 +22,8 @@ class Sidebar:
 		self.scrollable_components = self.add_scrollable_content()
 		self._scroll_offset = pygame.math.Vector2(0,0)
 		self.scroll_speed = pygame.math.Vector2(0,10)
+		a = Container(self, (0,0), 'black', LAYOUT_PLANE.HORIZONTAL)
+
 
 
 

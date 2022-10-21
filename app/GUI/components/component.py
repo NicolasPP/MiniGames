@@ -8,7 +8,7 @@ class Component:
 		self.color = color
 		self.offset = parent.rect.topleft
 		self.surface = pygame.Surface(size)
-
+	
 	def update_pos(self, pos_change): 
 		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
 

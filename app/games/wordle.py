@@ -1,6 +1,5 @@
 import config.app_config as acfg
 from config.games_config import *
-from GUI.components.containers import Container, LAYOUT_PLANE
 
 from GUI.components.lable import Lable
 from games.game import Game
@@ -173,7 +172,6 @@ class Wordle(Game):
 		self.restart_alpha = 255
 		self.restart_alpha_change = -1
 		self.lables = get_wordle_lables(self)
-		a = Container(self, (0,0), (10,10), 255, 'black', LAYOUT_PLANE.HORIZONTAL)
 
 	# -- Getters --
 	@property
