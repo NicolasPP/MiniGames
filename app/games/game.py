@@ -46,3 +46,9 @@ class Game:
 
 	def render(self): self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
 	def update_surface_size(self): self.surface = self.app.get_game_surface(self.bg_color)
+	def render_message(self, *lable_ids):
+		for l_id in lable_ids:
+			lable = self.lables[l_id]['lable']
+			lable_surface  = self.lables[l_id]['surface']
+			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
+			lable.render(set_alpha = True)

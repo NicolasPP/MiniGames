@@ -178,14 +178,6 @@ class Snake(Game):
 		if not self.snake.alive: self.render_message('final_score', 'unpause')
 
 		self.app.screen.surface.blit(self.surface, self.rect)
-	
-	def render_message(self, *lable_ids):
-		for l_id in lable_ids:
-			lable = self.lables[l_id]['lable']
-			lable_surface  = self.lables[l_id]['surface']
-			if lable_surface :
-				self.surface.blit(lable_surface, (0,0))
-			lable.render(set_alpha = True)
 	# ------------
 
 

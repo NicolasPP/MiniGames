@@ -1,6 +1,6 @@
 import config.app_config as acfg
 from config.games_config import *
-from GUI.components.containers.vertical_container import Vertical_Container
+from GUI.components.containers import Container, LAYOUT_PLANE
 
 from GUI.components.lable import Lable
 from games.game import Game
@@ -173,7 +173,7 @@ class Wordle(Game):
 		self.restart_alpha = 255
 		self.restart_alpha_change = -1
 		self.lables = get_wordle_lables(self)
-		a = Vertical_Container(self, (0,0), (10,10), 255, 'black')
+		a = Container(self, (0,0), (10,10), 255, 'black', LAYOUT_PLANE.HORIZONTAL)
 
 	# -- Getters --
 	@property
@@ -201,13 +201,6 @@ class Wordle(Game):
 		if self.result is GAME_RESULT.WON: self.render_message('win', 'restart')
 		elif self.result is GAME_RESULT.LOOSE: self.render_message('loose', 'restart')
 		self.app.screen.surface.blit(self.surface, self.rect)
-	
-	def render_message(self, *lable_ids):
-		for l_id in lable_ids:
-			lable = self.lables[l_id]['lable']
-			lable_surface  = self.lables[l_id]['surface']
-			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
-			lable.render(set_alpha = True)
 	# ------------
 
 
