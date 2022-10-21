@@ -1,5 +1,6 @@
 import pygame
 
+
 class Component:
 	def __init__(self, parent, pos, size, alpha, color):
 		self.parent = parent
@@ -11,8 +12,9 @@ class Component:
 		self.surface = pygame.Surface(size)
 		
 
-	def update_pos(self, pos_change): 
+	def update_pos(self, pos_change):
 		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
+		
 
 	def set_size(self, size):
 		pos = self.rect.x , self.rect.y

@@ -37,7 +37,7 @@ class Sidebar:
 		sidebar_offset = pygame.math.Vector2(self.rect.topleft)
 		root_offset = pygame.math.Vector2(self.root_container.rect.topleft)
 		offset = sidebar_offset + root_offset
-		return tuple(mouse_pos - offset)
+		return tuple(mouse_pos - sidebar_offset)
 	
 	@mouse_pos.setter
 	def mouse_pos(self, new_mouse_pos): self._mouse_pos = new_mouse_pos
@@ -89,12 +89,7 @@ class Sidebar:
 		return self.surface.get_rect().collidepoint(self.mouse_pos)	
 
 	def check_comp_collision(self, container):
-		for comp in container.components:
-			if isinstance(comp, Container):
-				self.check_comp_collision(comp)
-			else:
-				if comp.is_clicked(self.mouse_pos):
-					comp.click(self.parent, comp)
+		container.container_click(self.mouse_pos, self.parent)
 
 	def get_sidebar_surface(self):
 		surface = pygame.Surface(self.rect.size)
@@ -117,8 +112,8 @@ class Sidebar:
 
 
 def get_setting_container(sidebar):
-	settings = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, pos = (0,0), padding = Padding(0, 10, 10, 10, 10))
-	c1 = Container(settings, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(10,0,10,10,10))
+	settings = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True, pos = (0,0), padding = Padding())
+	c1 = Container(settings, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(bottom = 0))
 	
 	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
 	button_size = BUTTON_W, BUTTON_H
@@ -134,9 +129,13 @@ def get_setting_container(sidebar):
 
 	c1.add_component(quit)
 	c1.add_component(full_screen)
+
 	settings.add_component(c1)
+
 	settings.add_component(menu)
 
+
+	print(quit.rect)
 	return settings
 
 
