@@ -15,8 +15,7 @@ class Game:
 
 		self._surface = app.get_game_surface(self.bg_color)
 		self.rect = self.surface.get_rect(topleft = app.get_gs_position())
-		self.sidebar_offset = self.app.sidebar.get_sidebar_game_offset()
-		
+				
 		self.paused = True
 		self._user_input = pygame.key.get_pressed()
 

@@ -13,9 +13,9 @@ class Button_Type(Enum):
 class Button(Component):
 	def __init__(self,\
 				parent,
-	 			pos,\
 	 			size,\
 	 			color,\
+	 			pos = (0, 0),\
 	 			message = "",\
 	 			on_click = False,\
 	 			alpha = gcfg.NORMAL_ALPHA,\
