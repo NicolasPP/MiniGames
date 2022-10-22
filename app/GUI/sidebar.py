@@ -51,8 +51,8 @@ class Sidebar:
 		return surface
 
 def get_root_container(sidebar):
-	root = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True, pos = (0,0), padding = Padding(spacing = PADDING * 2))
-	settings = Container(root, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(bottom = 0))
+	root = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True)
+	settings = Container(root, BG_COLOR, LAYOUT_PLANE.HORIZONTAL)
 	game_selection = get_game_selection_container(sidebar, root)
 	
 	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
@@ -73,10 +73,11 @@ def get_root_container(sidebar):
 	root.add_component(settings)
 	root.add_component(menu)
 	root.add_component(game_selection)
+
 	return root
 
 def get_game_selection_container(sidebar, parent):
-	game_selection = Scrollable_Container(parent, BG_COLOR, LAYOUT_PLANE.VERTICAL, size = sidebar.get_size())
+	game_selection = Scrollable_Container(parent, BG_COLOR, LAYOUT_PLANE.VERTICAL, padding = Padding(top = 0), size = sidebar.get_size())
 		
 	button_size = (BUTTON_W, BUTTON_H)
 	
@@ -98,6 +99,7 @@ def set_game(parent, comp):
 	parent.current_game = comp.message
 
 def fullscreen(parent, comp):
+	print('fullscreen')
 	parent.toggle_fullscreen()
 
 def quit_game(parent, comp):

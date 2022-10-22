@@ -75,7 +75,7 @@ def get_lable(button):
 	return lable
 
 def get_button_surface(button):
-		s = pygame.Surface((button.rect.w, button.rect.h))
-		s.fill(button.color)
-		s.set_alpha(button.alpha)
-		return s
+	s = pygame.Surface((button.rect.w, button.rect.h))
+	s.fill(button.color)
+	s.set_alpha(button.alpha)
+	return s
