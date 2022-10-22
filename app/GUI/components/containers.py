@@ -128,18 +128,12 @@ class Container(Component):
 		width += component.rect.width
 		if self.components[-1]!= component: 
 			width += self.padding.spacing
-			if isinstance(component, Container):
-				if self.plane is component.plane: width -= component.padding.bottom
-				else: width -= component.padding.spacing 
 		return width, height
 
 	def vertical_process(self, component, width, height): 
 		height += component.rect.height
 		if self.components[-1]!= component:
-			height += self.padding.spacing
-			if isinstance(component, Container):
-				if self.plane is component.plane: height -= component.padding.left
-				else: height -= component.padding.spacing 
+			height += self.padding.spacing 
 		return width, height
 
 	def parse_event(self, event, root_parent):
@@ -163,33 +157,29 @@ class Scrollable_Container(Container):
 				 padding = Padding()):
 		super().__init__(parent, color, plane, pos, size, alpha, root, padding)
 		self.scroll_speed = pygame.math.Vector2(0,10)
-		self._scroll_offset = pygame.math.Vector2(0,0)
 
-	@property
-	def scroll_offset(self): return self._scroll_offset
-
-	@scroll_offset.setter
-	def scroll_offset(self, new_scroll_offset):
-		last_comp = self.components[-1]
-		first_comp = self.components[0]
-		offset = Container.get_container_offset(self)
-		last_pos = pygame.math.Vector2(last_comp.rect.bottomleft)  + new_scroll_offset
-		first_pos = pygame.math.Vector2(first_comp.rect.topleft)  + new_scroll_offset
+	def move_up(self):
 		self.surface.fill(self.color)
-		if last_pos.y  <= self.rect.height and first_pos.y >= 0:
-			self._scroll_offset = self._scroll_offset + new_scroll_offset
-			for comp in self.components: comp.update_pos(new_scroll_offset)
+		last_comp_pos = self.components[-1].rect.bottom
+		if last_comp_pos + self.rect.y <= self.rect.bottom : return
+		for comp in self.components: comp.update_pos(self.scroll_speed * -1)
+		
 
-	@scroll_offset.deleter
-	def scroll_offset(self): del self._scroll_offset
+	def move_down(self):
+		self.surface.fill(self.color)
+		first_comp_pos = self.components[0].rect.y
+		if first_comp_pos >= 0: return
+		for comp in self.components: comp.update_pos(self.scroll_speed)
+
+
 
 	def parse_event(self, event, root_parent):
 		mouse_pos= pygame.math.Vector2(root_parent.mouse_pos)
 		offset = Container.get_container_offset(self)
 		app = root_parent.parent
 		if event.type == pygame.MOUSEBUTTONDOWN and self.is_clicked(mouse_pos - offset):
-			if event.button == MOUSECLICK.SCROLL_UP :   self.scroll_offset = self.scroll_speed
-			if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
+			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()#self.scroll_offset = self.scroll_speed
+			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()#self.scroll_offset = self.scroll_speed * -1
 		self.container_click(root_parent.mouse_pos, event, root_parent.parent)
 
 def get_largest_height(components):

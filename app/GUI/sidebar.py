@@ -35,6 +35,7 @@ class Sidebar:
 	def update_surface_size(self):
 		self.rect.size = self.get_size()
 		self.surface = self.get_sidebar_surface()
+		self.root_container = get_root_container(self)
 
 	def get_size(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
@@ -51,8 +52,9 @@ class Sidebar:
 		return surface
 
 def get_root_container(sidebar):
-	root = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True)
-	settings = Container(root, BG_COLOR, LAYOUT_PLANE.HORIZONTAL)
+	root = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True, padding = Padding(spacing = PADDING * 2) )
+	game_menu = settings = Container(root, BG_COLOR, LAYOUT_PLANE.VERTICAL, padding = Padding(0,0,0,0,PADDING))
+	settings = Container(game_menu, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(0,0,0,0,PADDING))
 	game_selection = get_game_selection_container(sidebar, root)
 	
 	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
@@ -61,9 +63,9 @@ def get_root_container(sidebar):
 
 	quit = Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
 	full_screen = Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
-	menu = Button(root, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+	menu = Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 	
-	quit.style(style_quit, quit)
+	style_quit(quit)
 	full_screen.set_active_style(fullscreen_active_style, full_screen)
 	full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
 	full_screen.update_style()
@@ -71,8 +73,11 @@ def get_root_container(sidebar):
 	settings.add_component(quit)
 	settings.add_component(full_screen)
 
-	root.add_component(settings)
-	root.add_component(menu)
+	game_menu.add_component(settings)
+	game_menu.add_component(menu)
+
+
+	root.add_component(game_menu)
 	root.add_component(game_selection)
 
 	return root

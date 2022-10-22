@@ -37,9 +37,6 @@ class Button(Component):
 			False: (no_style,())
 		}
 
-	def style(self, func, *kwargs):
-		func(*kwargs)
-
 	def set_active_style(self, func, *kwargs):
 		self.switch_button_styles[True] = func, kwargs
 
@@ -48,8 +45,7 @@ class Button(Component):
 
 	def update_style(self):
 		self.surface.fill(self.color)
-		func = self.switch_button_styles[self.active][0]
-		kwargs = self.switch_button_styles[self.active][1]
+		func, kwargs = self.switch_button_styles[self.active]
 		func(*kwargs)
 
 	def render(self, set_alpha = False):
