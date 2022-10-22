@@ -11,6 +11,9 @@ TODO : fix padding logic
 	   make nicer looking
 TODO : move process logic where we update padding depending on orientation
 	   to padding class
+TODO : container_click function will recognise a click and call click() on all its children 
+	   this will break when adding lables to Containers. Either add isinstance check to see if its a button
+	   or add click() to component class
 '''
 class MOUSECLICK:
 	LEFT = 1
