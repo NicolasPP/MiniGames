@@ -293,6 +293,7 @@ def toggle_pause(snake_game):
 def restart(snake_game):
 	snake_game.score = 0
 	snake_game.foods = []
+	snake_game.lables = get_lables(snake_game)
 	del snake_game.snake
 	snake_game.snake = SNAKE(snake_game)
 
