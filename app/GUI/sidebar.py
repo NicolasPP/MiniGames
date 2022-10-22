@@ -1,119 +1,102 @@
 import pygame
 from config.app_config import *
 from GUI.components.button import Button, Button_Type
-
-class MOUSECLICK:
-	LEFT = 1
-	MIDDLE = 2
-	RIGHT = 3
-	SCROLL_UP = 4
-	SCROLL_DOWN = 5
+from GUI.components.containers import Container, Scrollable_Container, LAYOUT_PLANE, Padding
 
 class Sidebar:
 	def __init__(self, width, height, parent, alpha = 1, bg_color = BG_COLOR):
 		self.parent = parent
-		self.width, self.height = self.get_dimensions()
-		self.topleft = (PADDING,PADDING)
+		self.rect = pygame.Rect((PADDING, PADDING), self.get_size())
 		self.alpha = alpha
 		self.bg_color = bg_color
+		self.root_container = get_root_container(self)
 		self.surface = self.get_sidebar_surface()
-		self.fixed_components = self.add_settings()
-		self.scrollable_components = self.add_scrollable_content()
-		# self.components = self.add_sidebar_content()
-		self._scroll_offset = pygame.math.Vector2(0,0)
-		self.scroll_speed = pygame.math.Vector2(0,10)
-
-
+		self._mouse_pos = pygame.mouse.get_pos()
 
 	@property
-	def scroll_offset(self): return self._scroll_offset
+	def mouse_pos(self):
+		mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
+		sidebar_offset = pygame.math.Vector2(self.rect.topleft)
+		return tuple(mouse_pos - sidebar_offset)
+	
+	@mouse_pos.setter
+	def mouse_pos(self, new_mouse_pos): self._mouse_pos = new_mouse_pos
 
-	@scroll_offset.setter
-	def scroll_offset(self, new_scroll_offset):
-		self.scrollable_components.sort(key = lambda x : x.rect.y)
-		self.fixed_components.sort(key = lambda x : x.rect.y)
-		last_comp = self.scrollable_components[-1]
-		first_comp = self.scrollable_components[0] 
-		last_pos = pygame.math.Vector2(last_comp.rect.bottomleft)  + new_scroll_offset
-		first_pos = pygame.math.Vector2(first_comp.rect.topleft)  + new_scroll_offset
-		if last_pos.y  <= self.height - PADDING and first_pos.y >= self.fixed_components[-1].rect.bottom + (PADDING * 3):
-			self._scroll_offset = self._scroll_offset + new_scroll_offset
-			for comp in self.scrollable_components: comp.update_pos(new_scroll_offset)
-
-	@scroll_offset.deleter
-	def scroll_offset(self): del self._scroll_offset
-
-	def get_components(self): return self.scrollable_components + self.fixed_components
+	@mouse_pos.deleter
+	def mouse_pos(self): del self._mouse_pos
 
 	def render(self, parent_surface):
 		self.surface.fill(self.bg_color)
-		for comp in self.get_components(): comp.render(self.surface)
-		parent_surface.blit(self.surface, self.topleft)
-
+		self.root_container.render()
+		parent_surface.blit(self.surface, self.rect.topleft)
 
 	def update(self, dt): pass
 
 	def update_surface_size(self):
-		self.width, self.height = self.get_dimensions()
+		self.rect.size = self.get_size()
 		self.surface = self.get_sidebar_surface()
+		self.root_container = get_root_container(self)
 
-	def get_dimensions(self):
+	def get_size(self):
 		return (PADDING * 2) + BUTTON_W, self.parent.screen.current_height - (PADDING * 2)
 	
 	def parse_event(self, event):
-		if event.type == pygame.MOUSEBUTTONDOWN:
-			if event.button == MOUSECLICK.LEFT: 	    self.check_comp_collision()
-			if event.button == MOUSECLICK.SCROLL_UP :   self.scroll_offset = self.scroll_speed
-			if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
-	
-	def is_hovering(self):
-		return self.surface.get_rect().collidepoint(pygame.mouse.get_pos())
+		self.root_container.parse_event(event, self)
 
-	def check_comp_collision(self):
-		for comp in self.get_components():
-			if comp.is_clicked(pygame.mouse.get_pos()): comp.click(self.parent, comp)
+	def is_hovering(self):
+		return self.surface.get_rect().collidepoint(self.mouse_pos)
 
 	def get_sidebar_surface(self):
-		s = pygame.Surface((self.width, self.height))
-		s.fill(self.bg_color)
-		return s
-	def get_sidebar_game_offset(self):
-		return (PADDING * 4) + BUTTON_W, PADDING
+		surface = pygame.Surface(self.rect.size)
+		surface.fill(self.bg_color)
+		return surface
+
+def get_root_container(sidebar):
+	root = Container(sidebar, BG_COLOR, LAYOUT_PLANE.VERTICAL, root = True, padding = Padding(spacing = PADDING * 2) )
+	game_menu = settings = Container(root, BG_COLOR, LAYOUT_PLANE.VERTICAL, padding = Padding(0,0,0,0,PADDING))
+	settings = Container(game_menu, BG_COLOR, LAYOUT_PLANE.HORIZONTAL, padding = Padding(0,0,0,0,PADDING))
+	game_selection = get_game_selection_container(sidebar, root)
 	
-
-	def add_settings(self):
-		button_size = (BUTTON_W, BUTTON_H)
-		menu_pos = (PADDING, (PADDING * 2) + BUTTON_H)
-		quit_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		full_screen_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		quit_pos = (PADDING, PADDING)
-		full_screen_pos =((PADDING * 2) + (BUTTON_W - PADDING) // 2, PADDING)
-		quit = Button(quit_pos, quit_size, BG_COLOR, message = "Quit", offset = self.topleft, on_click = quit_game, show_lable= False)
-		full_screen = Button(full_screen_pos, full_screen_size, BG_COLOR, message = "Fullscreen", offset = self.topleft, on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
-		menu = Button(menu_pos, button_size, BUTTON_COLOR, message = "Menu", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)	
-		quit.style(style_quit, quit)
-		full_screen.set_active_style(fullscreen_active_style, full_screen)
-		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
-		full_screen.update_style()
-		return [quit, full_screen, menu]
-
-	def add_scrollable_content(self):
-		offset_w, offset_h = self.topleft
-		button_size = (BUTTON_W, BUTTON_H)
-		
-		snake_pos = (PADDING, (PADDING * 5) + (BUTTON_H * 2))
-		tictactoe_pos = (PADDING, (PADDING * 6) + (BUTTON_H * 3))
-		wordle_pos = (PADDING, (PADDING * 7) + (BUTTON_H * 4))
-		
-		snake = Button(snake_pos, button_size, BUTTON_COLOR, message = "Snake", offset = self.topleft, on_click = set_game, show_lable = True, font_color = FONT_COLOR)
-		tictactoe = Button(tictactoe_pos, button_size, BUTTON_COLOR, message = "Tictactoe", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		wordle = Button(wordle_pos, button_size, BUTTON_COLOR, message = "Wordle", offset = self.topleft, on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		return [snake, tictactoe, wordle]
+	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
+	button_size = BUTTON_W, BUTTON_H
 
 
-	def add_sidebar_content(self):
-		return self.add_settings() + self.add_scrollable_content()
+	quit = Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+	full_screen = Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
+	menu = Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 	
+	style_quit(quit)
+	full_screen.set_active_style(fullscreen_active_style, full_screen)
+	full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
+	full_screen.update_style()
+
+	settings.add_component(quit)
+	settings.add_component(full_screen)
+
+	game_menu.add_component(settings)
+	game_menu.add_component(menu)
+
+
+	root.add_component(game_menu)
+	root.add_component(game_selection)
+
+	return root
+
+def get_game_selection_container(sidebar, parent):
+	game_selection = Scrollable_Container(parent, BG_COLOR, LAYOUT_PLANE.VERTICAL, padding = Padding(top = 0), size = sidebar.get_size())
+		
+	button_size = (BUTTON_W, BUTTON_H)
+	
+	snake = Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
+	tictactoe = Button(game_selection, button_size, BUTTON_COLOR, message = "Tictactoe", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+	wordle = Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+
+	game_selection.add_component(snake)
+	game_selection.add_component(wordle)
+	game_selection.add_component(tictactoe)
+
+	return game_selection
+
 
 # GUI BUTTON LOGIC
 
@@ -122,6 +105,7 @@ def set_game(parent, comp):
 	parent.current_game = comp.message
 
 def fullscreen(parent, comp):
+	print('fullscreen')
 	parent.toggle_fullscreen()
 
 def quit_game(parent, comp):

@@ -16,6 +16,7 @@ TODO: Games to add in the future
 		- level generation (maybe)
 		- chess
 		- galton board (HARD)
+		- tetris
 TODO: find logo online for application, add to assets folder
 	  update dist.sh scrpit to generate executable with the
 	  logo

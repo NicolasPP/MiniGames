@@ -177,15 +177,7 @@ class Snake(Game):
 		
 		if not self.snake.alive: self.render_message('final_score', 'unpause')
 
-		self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
-	
-	def render_message(self, *lable_ids):
-		for l_id in lable_ids:
-			lable = self.lables[l_id]['lable']
-			lable_surface  = self.lables[l_id]['surface']
-			if lable_surface :
-				self.surface.blit(lable_surface, (0,0))
-			self.surface.blit(*lable.get_lable_blit())
+		self.app.screen.surface.blit(self.surface, self.rect)
 	# ------------
 
 
@@ -267,22 +259,22 @@ def get_lables(snake_game):
 	return{
 		'paused' : 
 			{
-			'lable' : Lable(center, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,snake_game.p_message_alpha),
+			'lable' : Lable(snake_game, center, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,snake_game.p_message_alpha),
 			'surface' : paused_surface,
 			},
 		'unpause' : 
 			{
-			'lable' : Lable(unpause_pos, " SPACE ", 30 , SCORE_COLOR, snake_game.p_message_alpha),
+			'lable' : Lable(snake_game, unpause_pos, " SPACE ", 30 , SCORE_COLOR, snake_game.p_message_alpha),
 			'surface' : paused_surface,
 			},
 		'score' : 
 			{
-			'lable' : Lable(score_pos, f'{snake_game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA),
+			'lable' : Lable(snake_game, score_pos, f'{snake_game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA),
 			'surface' : False,
 			},
 		'final_score' :
 			{
-			'lable' : Lable(center, f'{snake_game.score}', SCORE_FONT_SIZE, SCORE_COLOR, LOOSE_ALPHA),
+			'lable' : Lable(snake_game, center, f'{snake_game.score}', SCORE_FONT_SIZE, SCORE_COLOR, LOOSE_ALPHA),
 			'surface' : death_surface
 			}
 	}
@@ -301,6 +293,7 @@ def toggle_pause(snake_game):
 def restart(snake_game):
 	snake_game.score = 0
 	snake_game.foods = []
+	snake_game.lables = get_lables(snake_game)
 	del snake_game.snake
 	snake_game.snake = SNAKE(snake_game)
 
