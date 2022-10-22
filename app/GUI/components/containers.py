@@ -9,6 +9,8 @@ from dataclasses import dataclass
 '''
 TODO : fix padding logic
 	   make nicer looking
+TODO : move process logic where we update padding depending on orientation
+	   to padding class
 '''
 class MOUSECLICK:
 	LEFT = 1
