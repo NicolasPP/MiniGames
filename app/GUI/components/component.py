@@ -8,13 +8,13 @@ class Component:
 		self.processed = False
 		self.rect = pygame.Rect(pos, size)
 		self.color = color
-		self.offset = parent.rect.topleft
 		self.surface = pygame.Surface(size)
+		self.surface.fill(self.color)
 		
 
 	def update_pos(self, pos_change):
 		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
-		
+
 
 	def set_size(self, size):
 		pos = self.rect.x , self.rect.y

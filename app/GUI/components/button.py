@@ -23,7 +23,6 @@ class Button(Component):
 	 			font_color = "Black",\
 	 			button_type = Button_Type.PRESS):
 		super().__init__(parent, pos, size, alpha, color)
-		# self.collide_rect = pygame.Rect(apply_offset(pos, self.offset), size)
 		self.surface = get_button_surface(self)
 		self.message = message
 		self.on_click = on_click
@@ -78,10 +77,5 @@ def get_lable(button):
 def get_button_surface(button):
 		s = pygame.Surface((button.rect.w, button.rect.h))
 		s.fill(button.color)
-		# s.set_alpha(button.alpha)
+		s.set_alpha(button.alpha)
 		return s
-
-def apply_offset(pos, offset):
-	w, h = pos
-	off_w, off_h = offset
-	return w - off_w, h - off_h

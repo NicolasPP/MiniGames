@@ -10,6 +10,12 @@ from dataclasses import dataclass
 TODO : fix padding logic
 	   make nicer looking
 '''
+class MOUSECLICK:
+	LEFT = 1
+	MIDDLE = 2
+	RIGHT = 3
+	SCROLL_UP = 4
+	SCROLL_DOWN = 5
 
 class LAYOUT_PLANE(Enum):
 	HORIZONTAL = 0
@@ -33,6 +39,7 @@ class Padding:
 	
 
 class Container(Component):
+
 	@staticmethod
 	def get_container_offset(container):
 		if container.root: return pygame.math.Vector2(container.rect.topleft)
@@ -52,6 +59,7 @@ class Container(Component):
 		self.padding = padding
 		self.components = []
 		self.root = root
+		self.fixed_size = False if size == (0,0) else True
 		self.process = {
 		LAYOUT_PLANE.VERTICAL : self.vertical_process,
 		LAYOUT_PLANE.HORIZONTAL : self.horizontal_process
@@ -59,7 +67,6 @@ class Container(Component):
 
 	def add_component(self, component):
 		self.components.append(component)
-		
 		
 		height = 0
 		width = 0
@@ -69,29 +76,25 @@ class Container(Component):
 		if isinstance(component, Container):
 			height -= component.padding.top
 			width -= component.padding.left
-
-		# print(width, height, '  left, top')
 		#------------------	
 		width, height = self.process_components(width, height)
-		# print(width, height, '  process')
 		#------------------
 		height += self.padding.bottom
 		width += self.padding.right
 		if isinstance(component, Container):
 			height -= component.padding.bottom
 			width -= component.padding.right
-		# print(width, height, '  right, bottom ')
 		#------------------
-		self.set_size((width, height))
-		# self.processed = True
+		if not self.fixed_size: self.set_size((width, height))
+
 
 	def container_click(self, mouse_pos, app):
 		for comp in self.components:
 			if isinstance(comp, Container): comp.container_click(mouse_pos, app)
 			else:
-				m = pygame.math.Vector2(mouse_pos)
+				mouse_p = pygame.math.Vector2(mouse_pos)
 				offset = Container.get_container_offset(self)
-				if comp.is_clicked(m - offset):
+				if comp.is_clicked(mouse_p - offset):
 					comp.click(app, comp)
 	
 	def render(self, set_alpha = False):
@@ -105,7 +108,7 @@ class Container(Component):
 				comp.processed = True
 			
 			width, height = self.process[self.plane](comp, width, height)
-		width, height = self.set_fixed_dimension(width, height)
+		if not self.fixed_size: width, height = self.set_fixed_dimension(width, height)
 		return width, height
 
 	def set_fixed_dimension(self, width, height):
@@ -132,10 +135,54 @@ class Container(Component):
 				else: height -= component.padding.spacing 
 		return width, height
 
+	def parse_event(self, event, root_parent):
+		mouse_pos = root_parent.mouse_pos
+		app = root_parent.parent
+		for comp in self.components:
+			if isinstance(comp, Container): comp.parse_event(event, root_parent)
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if event.button == MOUSECLICK.LEFT: self.container_click(mouse_pos, app)
+
 
 class Scrollable_Container(Container):
-	def __init__(self, parent, pos, color, plane):
-		super().__init__(parent, pos, size, alpha, color, plane)
+	def __init__(self, 
+				 parent,\
+				 color,\
+				 plane,\
+				 pos = (0,0),\
+				 size = (0,0),\
+				 alpha = gcfg.NORMAL_ALPHA,\
+				 root = False,\
+				 padding = Padding()):
+		super().__init__(parent, color, plane, pos, size, alpha, root, padding)
+		self.scroll_speed = pygame.math.Vector2(0,10)
+		self._scroll_offset = pygame.math.Vector2(0,0)
+
+	@property
+	def scroll_offset(self): return self._scroll_offset
+
+	@scroll_offset.setter
+	def scroll_offset(self, new_scroll_offset):
+		self.scrollable_components.sort(key = lambda x : x.rect.y)
+		self.fixed_components.sort(key = lambda x : x.rect.y)
+		last_comp = self.scrollable_components[-1]
+		first_comp = self.scrollable_components[0] 
+		last_pos = pygame.math.Vector2(last_comp.rect.bottomleft)  + new_scroll_offset
+		first_pos = pygame.math.Vector2(first_comp.rect.topleft)  + new_scroll_offset
+		if last_pos.y  <= self.rect.height - PADDING and first_pos.y >= self.fixed_components[-1].rect.bottom + (PADDING * 3):
+			self._scroll_offset = self._scroll_offset + new_scroll_offset
+			for comp in self.scrollable_components: comp.update_pos(new_scroll_offset)
+
+	@scroll_offset.deleter
+	def scroll_offset(self): del self._scroll_offset
+
+	def parse_event(self, event, root_parent):
+		mouse_pos= pygame.math.Vector2(root_parent.mouse_pos)
+		offset = Container.get_container_offset(self)
+		if event.type == pygame.MOUSEBUTTONDOWN and self.is_clicked(mouse_pos - offset):
+			if event.button == MOUSECLICK.SCROLL_UP :   print('scroll_up')
+			if event.button == MOUSECLICK.SCROLL_DOWN : print('scroll down')
 
 
 def get_largest_height(components):
