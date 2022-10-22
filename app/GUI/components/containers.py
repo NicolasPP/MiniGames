@@ -15,6 +15,7 @@ TODO : container_click function will recognise a click and call click() on all i
 	   this will break when adding lables to Containers. Either add isinstance check to see if its a button
 	   or add click() to component class
 '''
+
 class MOUSECLICK:
 	LEFT = 1
 	MIDDLE = 2
@@ -98,7 +99,6 @@ class Container(Component):
 		if event.button != MOUSECLICK.LEFT: return
 		for comp in self.components:
 			if isinstance(comp, Container): continue
-			# print(comp.message)
 			mouse_p = pygame.math.Vector2(mouse_pos)
 			offset = Container.get_container_offset(self)
 			if comp.is_clicked(mouse_p - offset):
@@ -112,8 +112,9 @@ class Container(Component):
 		for comp in self.components:
 			if not comp.processed:
 				comp.update_pos(pygame.math.Vector2(width, height))
+				if isinstance(comp, Scrollable_Container):
+					comp.rect.height = comp.rect.height - comp.rect.top
 				comp.processed = True
-			
 			width, height = self.process[self.plane](comp, width, height)
 		if not self.fixed_size: width, height = self.set_fixed_dimension(width, height)
 		return width, height
@@ -130,7 +131,6 @@ class Container(Component):
 			if isinstance(component, Container):
 				if self.plane is component.plane: width -= component.padding.bottom
 				else: width -= component.padding.spacing 
-
 		return width, height
 
 	def vertical_process(self, component, width, height): 
@@ -148,7 +148,6 @@ class Container(Component):
 		for comp in self.components:
 			if isinstance(comp, Container):
 				comp.parse_event(event, root_parent)
-
 		self.container_click(mouse_pos, event, app)
 
 
@@ -171,15 +170,15 @@ class Scrollable_Container(Container):
 
 	@scroll_offset.setter
 	def scroll_offset(self, new_scroll_offset):
-		self.scrollable_components.sort(key = lambda x : x.rect.y)
-		self.fixed_components.sort(key = lambda x : x.rect.y)
-		last_comp = self.scrollable_components[-1]
-		first_comp = self.scrollable_components[0] 
+		last_comp = self.components[-1]
+		first_comp = self.components[0]
+		offset = Container.get_container_offset(self)
 		last_pos = pygame.math.Vector2(last_comp.rect.bottomleft)  + new_scroll_offset
 		first_pos = pygame.math.Vector2(first_comp.rect.topleft)  + new_scroll_offset
-		if last_pos.y  <= self.rect.height - PADDING and first_pos.y >= self.fixed_components[-1].rect.bottom + (PADDING * 3):
+		self.surface.fill(self.color)
+		if last_pos.y  <= self.rect.height and first_pos.y >= 0:
 			self._scroll_offset = self._scroll_offset + new_scroll_offset
-			for comp in self.scrollable_components: comp.update_pos(new_scroll_offset)
+			for comp in self.components: comp.update_pos(new_scroll_offset)
 
 	@scroll_offset.deleter
 	def scroll_offset(self): del self._scroll_offset
@@ -189,8 +188,8 @@ class Scrollable_Container(Container):
 		offset = Container.get_container_offset(self)
 		app = root_parent.parent
 		if event.type == pygame.MOUSEBUTTONDOWN and self.is_clicked(mouse_pos - offset):
-			if event.button == MOUSECLICK.SCROLL_UP :   print('scroll_up')
-			if event.button == MOUSECLICK.SCROLL_DOWN : print('scroll down')
+			if event.button == MOUSECLICK.SCROLL_UP :   self.scroll_offset = self.scroll_speed
+			if event.button == MOUSECLICK.SCROLL_DOWN : self.scroll_offset = self.scroll_speed * -1
 		self.container_click(root_parent.mouse_pos, event, root_parent.parent)
 
 def get_largest_height(components):

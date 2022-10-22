@@ -58,6 +58,7 @@ def get_root_container(sidebar):
 	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
 	button_size = BUTTON_W, BUTTON_H
 
+
 	quit = Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
 	full_screen = Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
 	menu = Button(root, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
