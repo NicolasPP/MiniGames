@@ -1,4 +1,4 @@
-from game_app import MiniGameApp
+from game_app import Minigames
 from config.app_config import *
 
 
@@ -23,4 +23,4 @@ TODO: find logo online for application, add to assets folder
 '''
 
 
-if __name__ == '__main__': MiniGameApp(S_WIDTH, S_HEIGHT, FULLSCREEN).run()
+if __name__ == '__main__': Minigames(S_WIDTH, S_HEIGHT, FULLSCREEN).run()
