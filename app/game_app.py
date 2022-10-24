@@ -1,7 +1,6 @@
 import pygame, sys, time
 
 from GUI.screen import Screen
-from games.game import Game
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
@@ -11,6 +10,7 @@ from config.app_config import *
 import config.games_config as gcfg
 from enum import Enum
 from typing import Type
+from games.game import Game
 
 class RES1610:
     MEDIUM = 960, 600
