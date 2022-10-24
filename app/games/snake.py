@@ -56,35 +56,38 @@ class SNAKE:
 		self.speed = S_CELL_SIZE / (TIME_TO_COVER_CELL / 1000)
 		self.alive = True
 
-	# -- Getters --
+	# -- Direction --
 	@property
 	def direction(self): return self._direction
-	@property
-	def pos(self): return self._pos
-	# -------------
 
-
-	# -- Setters --
 	@direction.setter
 	def direction(self, new_direction):
 		assert isinstance(new_direction, DIRECTION)
 		if new_direction is self._direction: return
 		if new_direction.value == self.direction.inverse(): return
 		self._direction = new_direction
+
+	@direction.deleter
+	def direction(self): del self._direction
+	
+	# -------------
+
+
+	# -- Pos --
+	@property
+	def pos(self): return self._pos
+
+
 	@pos.setter
 	def pos(self, new_pos): 
 		self._pos = new_pos
 		x, y = new_pos
 		self.rect.x, self.rect.y = round(x), round(y)
-	# -------------
 
-
-	# -- Deleters --
-	@direction.deleter
-	def direction(self): del self._direction
 	@pos.deleter
 	def pos(self): del self._pos
-	# --------------
+	# -------------
+
 
 	# -- Render --
 	def render(self):
@@ -204,7 +207,7 @@ class Snake(Game):
 		self.lables['unpause']['lable'].alpha = self.p_message_alpha
 	
 	def update_surface_size(self):
-		self.surface =  self.app.get_game_surface(self.bg_color)
+		self.surface =  self.app.get_game_surface(self.bg_color, NORMAL_ALPHA)
 		self.lables = get_lables(self)
 		create_grid(self)
 	# ------------
@@ -294,6 +297,9 @@ def restart(snake_game):
 	snake_game.score = 0
 	snake_game.foods = []
 	snake_game.lables = get_lables(snake_game)
+	snake_game.cells = []
+	snake_game.grid = []
+	create_grid(snake_game)
 	del snake_game.snake
 	snake_game.snake = SNAKE(snake_game)
 
