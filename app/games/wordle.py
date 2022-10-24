@@ -103,17 +103,11 @@ class Letter:
 
 		self.lable = get_value_lable(self)
   
-	# -- Getters --
+ 	# -- State --
 	@property
 	def state(self): return self._state
-	@property
-	def value(self): return self._value
-	# -------------
- 
-
-	# -- Setters --
 	@state.setter
-	def state(self, new_state):
+	def state(self, new_state) -> None:
 		self._state = new_state
 		self.bg_color = new_state.value
 		set_card_style(self)
@@ -122,19 +116,24 @@ class Letter:
 		if self.wordle_game.result == GAME_RESULT.LOOSE: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.lable = get_value_lable(self)
 		self.render_value()
+	
+	@state.deleter
+	def state(self): del self._state
+	# -------------
+ 
+
+	# -- Value --
+	@property
+	def value(self): return self._value
+
 	@value.setter
 	def value(self, new_value):
 		self._value = new_value
 		self.lable.message = new_value
 		self.render_value()
-	# -------------
- 
 
-	# -- Deleters --
 	@value.deleter
 	def value(self): del self._value
-	@state.deleter
-	def state(self): del self._state
 	# --------------
 	
 
@@ -218,7 +217,7 @@ class Wordle(Game):
 			self.restart_alpha_change = -1
 	
 	def update_surface_size(self):
-		self.surface = self.app.get_game_surface(self.bg_color)
+		self.surface = self.get_game_surface(self.bg_color)
 		self.update_letters_size()
 		self.lables = get_wordle_lables(self)
 
@@ -235,11 +234,11 @@ class Wordle(Game):
 	def parse_event(self, event):
 		if event.type == pygame.KEYDOWN:
 			if self.result == GAME_RESULT.UNDEFINED:
-				if self.user_input[pygame.K_BACKSPACE]: remove_letter_value(self) # delete
-				elif self.user_input[pygame.K_RETURN]: 	check_current_board_word(self) # enter
+				if pygame.key.get_pressed()[pygame.K_BACKSPACE]: remove_letter_value(self) # delete
+				elif pygame.key.get_pressed()[pygame.K_RETURN]: 	check_current_board_word(self) # enter
 				else : add_letter_value(self, pygame.key.name(event.key))
 			else:
-				if self.user_input[pygame.K_SPACE]: restart_game(self)
+				if pygame.key.get_pressed()[pygame.K_SPACE]: restart_game(self)
 	# ------------------
 
 
@@ -263,8 +262,8 @@ def get_wordle_lables(wordle_game):
 		s_width, s_height = wordle_game.surface.get_size()
 		center = s_width // 2, s_height // 2
 		restart_pos = center[0] , center[1] + 60
-		win_surface = wordle_game.app.get_game_surface(PRESENT_IN_PLACE_COLOR, alpha = POST_GAME_ALPHA)
-		loose_surface = wordle_game.app.get_game_surface(LOOSE_COLOR, alpha = POST_GAME_ALPHA)
+		win_surface = wordle_game.get_game_surface(PRESENT_IN_PLACE_COLOR, alpha = POST_GAME_ALPHA)
+		loose_surface = wordle_game.get_game_surface(LOOSE_COLOR, alpha = POST_GAME_ALPHA)
 		return {
 			'win' : 
 				{
@@ -284,72 +283,69 @@ def get_wordle_lables(wordle_game):
 		}
 
 def get_first_letter_pos(wordle_game):
-		board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
-		s_width = wordle_game.surface.get_width()
-		return round(s_width / 2) - round(board_size / 2), acfg.PADDING
+	board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
+	s_width = wordle_game.surface.get_width()
+	return round(s_width / 2) - round(board_size / 2), acfg.PADDING
 
 def get_board_word(wordle_game):
-		result = ''
-		current_word = wordle_game.words[wordle_game.current_word_index]
-		for letter in current_word: result += letter.value
-		return result
+	result = ''
+	current_word = wordle_game.words[wordle_game.current_word_index]
+	for letter in current_word: result += letter.value
+	return result
 
 def restart_game(wordle_game):
-		for letter in wordle_game.letters: reset(letter)
-		wordle_game.result = GAME_RESULT.UNDEFINED
-		wordle_game.game_word = wordle_game.word_bank.get_random_word()
-		wordle_game.current_letter_index = 0
-		wordle_game.current_word_index = 0
+	for letter in wordle_game.letters: reset(letter)
+	wordle_game.result = GAME_RESULT.UNDEFINED
+	wordle_game.game_word = wordle_game.word_bank.get_random_word()
+	wordle_game.current_letter_index = 0
+	wordle_game.current_word_index = 0
 
 def create_board(wordle_game):
-		wordle_game.words = []
-		wordle_game.letters = []
-		x, y = get_first_letter_pos(wordle_game)
-		for t in range(TRYS):
-			word = []
-			for l in range(WORD_SIZE):
-				rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
-				letter = Letter(wordle_game, rect, len(wordle_game.letters), t, l)
-				word.append(letter)
-				wordle_game.letters.append(letter)
-			wordle_game.words.append(word)
+	wordle_game.words = []
+	wordle_game.letters = []
+	x, y = get_first_letter_pos(wordle_game)
+	for t in range(TRYS):
+		word = []
+		for l in range(WORD_SIZE):
+			rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
+			letter = Letter(wordle_game, rect, len(wordle_game.letters), t, l)
+			word.append(letter)
+			wordle_game.letters.append(letter)
+		wordle_game.words.append(word)
 
 def invalidate_letters_state(wordle_game):
 	for letter in wordle_game.letters: letter.state = letter.state
 def add_letter_value(wordle_game, letter_value):
-		if not letter_value in ALPHABET: return 
-		if wordle_game.current_letter_index == (WORD_SIZE): return
-		current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
-		wordle_game.current_letter_index += 1
-		current_letter.state = LSTATE.FILLED
-		current_letter.value = letter_value
+	if not letter_value in ALPHABET: return 
+	if wordle_game.current_letter_index == (WORD_SIZE): return
+	current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
+	wordle_game.current_letter_index += 1
+	current_letter.state = LSTATE.FILLED
+	current_letter.value = letter_value
 
 def remove_letter_value(wordle_game):
-		if wordle_game.current_letter_index == 0: return
-		wordle_game.current_letter_index -= 1
-		current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
-		
-		current_letter.state = LSTATE.BLANK
-		current_letter.value = ''
+	if wordle_game.current_letter_index == 0: return
+	wordle_game.current_letter_index -= 1
+	current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
+	
+	current_letter.state = LSTATE.BLANK
+	current_letter.value = ''
 
 def check_current_board_word(wordle_game):
-		correct_letters = 0
-		game_word = wordle_game.game_word
-		if wordle_game.current_letter_index != WORD_SIZE: return
-		if not wordle_game.word_bank.is_guess_valid(get_board_word(wordle_game)): return
-		update_letter_state = {}
-
-		for game_word_letter, user_letter in zip(game_word, wordle_game.words[wordle_game.current_word_index]):
-			if game_word_letter == user_letter.value:
-				user_letter.state = LSTATE.PRESENT_IN_PLACE
-				correct_letters += 1
-			elif user_letter.value in game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
-			else: user_letter.state = LSTATE.NOT_PRESENT
-
-		if correct_letters == WORD_SIZE: wordle_game.result = GAME_RESULT.WON
-		if wordle_game.current_word_index == TRYS - 1\
-			and correct_letters != WORD_SIZE: wordle_game.result = GAME_RESULT.LOOSE
-
-		wordle_game.current_word_index += 1
-		wordle_game.current_letter_index = 0
+	correct_letters = 0
+	game_word = wordle_game.game_word
+	if wordle_game.current_letter_index != WORD_SIZE: return
+	if not wordle_game.word_bank.is_guess_valid(get_board_word(wordle_game)): return
+	update_letter_state = {}
+	for game_word_letter, user_letter in zip(game_word, wordle_game.words[wordle_game.current_word_index]):
+		if game_word_letter == user_letter.value:
+			user_letter.state = LSTATE.PRESENT_IN_PLACE
+			correct_letters += 1
+		elif user_letter.value in game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
+		else: user_letter.state = LSTATE.NOT_PRESENT
+	if correct_letters == WORD_SIZE: wordle_game.result = GAME_RESULT.WON
+	if wordle_game.current_word_index == TRYS - 1\
+		and correct_letters != WORD_SIZE: wordle_game.result = GAME_RESULT.LOOSE
+	wordle_game.current_word_index += 1
+	wordle_game.current_letter_index = 0
 # -------------------------
