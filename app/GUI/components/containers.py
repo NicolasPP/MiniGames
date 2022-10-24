@@ -182,6 +182,27 @@ class Scrollable_Container(Container):
 			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()#self.scroll_offset = self.scroll_speed * -1
 		self.container_click(root_parent.mouse_pos, event, root_parent.parent)
 
+class Relative_Container(Container):
+	def __init__(self, 
+				 parent,\
+				 color,\
+				 plane,\
+				 pos = (0,0),\
+				 size = (0,0),\
+				 alpha = gcfg.NORMAL_ALPHA,\
+				 root = False,\
+				 padding = Padding()):
+		super().__init__(parent, color, plane, pos, size, alpha, root, padding)
+
+	def add_component(self, component, pos):
+		component.update_pos(pos)
+		components.append(component)
+
+	def render(self): pass
+
+
+
+
 def get_largest_height(components):
 	components.sort(key = lambda x : x.rect.h)
 	return components[-1].rect.h
