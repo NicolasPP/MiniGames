@@ -1,6 +1,6 @@
 def rgb(r, g, b,): return (r, g, b)
 
-color_palette1 = [
+color_palette1 : list[tuple[int, int, int]]= [
 	rgb(27, 36, 48),
 	rgb(81, 85, 126),
 	rgb(129, 103, 151),
