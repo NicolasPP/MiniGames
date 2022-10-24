@@ -21,7 +21,8 @@ class Button(Component):
 	 			alpha = gcfg.NORMAL_ALPHA,\
 	 			show_lable = False,\
 	 			font_color = "Black",\
-	 			button_type = Button_Type.PRESS):
+	 			button_type = Button_Type.PRESS,\
+	 			active = False):
 		super().__init__(parent, pos, size, alpha, color)
 		self.surface = get_button_surface(self)
 		self.message = message
@@ -30,21 +31,23 @@ class Button(Component):
 		self.show_lable = show_lable
 		self.font_color = font_color
 		self.type = button_type
-		self.active = False
+		self.active = active
 		self.lable = get_lable(self)
 		self.switch_button_styles = {
 			True : (no_style,()),
 			False: (no_style,())
 		}
 
+
 	def set_active_style(self, func, *kwargs):
 		self.switch_button_styles[True] = func, kwargs
+		self.update_style()
 
 	def set_inctive_style(self, func, *kwargs):
 		self.switch_button_styles[False] = func, kwargs
+		self.update_style()
 
 	def update_style(self):
-		self.surface.fill(self.color)
 		func, kwargs = self.switch_button_styles[self.active]
 		func(*kwargs)
 
@@ -58,8 +61,8 @@ class Button(Component):
 	def click(self, *kwargs):
 		if self.type == Button_Type.SWITCH:
 			self.active = not self.active
-			self.update_style()
-		if self.on_click: self.on_click(*kwargs)
+		if self.on_click:
+			self.on_click(*kwargs)
 
 
 def no_style(): pass

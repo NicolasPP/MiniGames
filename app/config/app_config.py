@@ -1,4 +1,7 @@
 from color.color_palettes import *
+
+S_WIDTH = 1280
+S_HEIGHT = 800
 FULLSCREEN = False
 
 

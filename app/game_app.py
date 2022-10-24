@@ -10,6 +10,10 @@ from config.app_config import *
 import config.games_config as gcfg
 from enum import Enum
 
+class RES1610:
+    SMALL = 640, 400
+    MEDIUM = 960, 600
+    LARGE = 1280, 800
 
 class MiniGameApp:
 	def __init__(self, s_width, s_height, full_screen):
@@ -18,7 +22,7 @@ class MiniGameApp:
 		self.prev_time = time.time()
 		self.running = True
 		# initialize main pygame surface
-		self.screen = Screen(s_width, s_height, full_screen, color = APP_BG_COLOR)
+		self.screen = Screen(*RES1610.SMALL, full_screen, color = APP_BG_COLOR)
 		self.screen.display()
 		self.clock = pygame.time.Clock()
 
@@ -39,6 +43,7 @@ class MiniGameApp:
 	def run(self):
 		while self.running:
 			
+			self.screen.surface.fill(self.screen.bg_color)
 			self.set_delta_time()
 			for event in pygame.event.get(): self.parse_event(event)
 
@@ -54,6 +59,7 @@ class MiniGameApp:
 	def render(self):
 		self.games[self.current_game].render()
 		self.sidebar.render(self.screen.surface)
+		self.screen.render()
 
 
 	def get_game_surface(self, color, alpha = False):

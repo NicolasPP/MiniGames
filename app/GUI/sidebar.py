@@ -60,15 +60,14 @@ def get_root_container(sidebar):
 	half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
 	button_size = BUTTON_W, BUTTON_H
 
-
 	quit = Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-	full_screen = Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH)
+	full_screen = Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = sidebar.parent.screen.full_screen)
 	menu = Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 	
 	style_quit(quit)
+
 	full_screen.set_active_style(fullscreen_active_style, full_screen)
 	full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
-	full_screen.update_style()
 
 	settings.add_component(quit)
 	settings.add_component(full_screen)
@@ -129,6 +128,7 @@ def fullscreen_active_style(button):
 		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 	]
+	button.surface.fill(button.color)
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 
 def fullscreen_inactive_style(button):
@@ -146,6 +146,7 @@ def fullscreen_inactive_style(button):
 		pygame.Rect((button.rect.w - FS_RECT_HEIGHT, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
 		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
 	]
+	button.surface.fill(button.color)
 
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 
