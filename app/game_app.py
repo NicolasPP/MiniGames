@@ -1,6 +1,7 @@
 import pygame, sys, time
 
 from GUI.screen import Screen
+from games.game import Game
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
@@ -9,38 +10,43 @@ from games.main_menu import Main_menu
 from config.app_config import *
 import config.games_config as gcfg
 from enum import Enum
+from typing import Type
 
 class RES1610:
-    SMALL = 640, 400
     MEDIUM = 960, 600
     LARGE = 1280, 800
 
-class MiniGameApp:
-	def __init__(self, s_width, s_height, full_screen):
-		pygame.init()
-		self.delta_time = 0
-		self.prev_time = time.time()
-		self.running = True
+
+
+
+class Minigames:
+	def __init__(self, s_width : int, s_height : int, full_screen : bool) -> None:
 		# initialize main pygame surface
-		self.screen = Screen(*RES1610.SMALL, full_screen, color = APP_BG_COLOR)
-		self.screen.display()
-		self.clock = pygame.time.Clock()
+		self.screen : Screen = Screen(*RES1610.MEDIUM, full_screen, color = APP_BG_COLOR)
+		self.running : bool = True
+
+		# time
+		self.clock : pygame.time.Clock =  pygame.time.Clock()
+		self.delta_time : float = 0
+		self.prev_time : float = time.time()
 
 		# GUI elements Rect : function
-		self.sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
+		self.sidebar : Sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
+		
 		#Games
-		self.games = {
+		self.games : dict[str, Game]= {
 			"Menu" : Main_menu(self),
 			"Snake" : Snake(self),
 			"Tictactoe" : Tictactoe(self),
 			"Wordle" : Wordle(self),
 		}
-		self.current_game = "Menu"
+
+		self.current_game : str = "Menu"
 
 
 	# Main Game Functions
 
-	def run(self):
+	def run(self) -> None:
 		while self.running:
 			
 			self.screen.surface.fill(self.screen.bg_color)
@@ -54,51 +60,48 @@ class MiniGameApp:
 
 			pygame.display.update()
 			
-	def update(self, dt): self.games[self.current_game].update(dt)
+	def update(self, dt : float) -> None:
+		self.games[self.current_game].update(dt)
 
-	def render(self):
+	def render(self) -> None:
 		self.games[self.current_game].render()
 		self.sidebar.render(self.screen.surface)
 		self.screen.render()
 
-
-	def get_game_surface(self, color, alpha = False):
-		gs_width, gs_height = self.get_gs_dimension()
-		g_surface = pygame.Surface((gs_width, gs_height))
-		if alpha:
-			g_surface =pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
-			g_surface.set_alpha(alpha)
-		g_surface.fill(color)
-		return g_surface
-	
-	def get_gs_dimension(self):
-		gs_x, gs_y = self.get_gs_position()
-		gs_width = self.screen.current_width - (gs_x + PADDING)
-		gs_height = self.screen.current_height - (gs_y + PADDING)
-		return gs_width, gs_height
-
-	def get_gs_position(self):
-		return self.sidebar.rect.width + (PADDING * 2), PADDING
-
-	def set_delta_time(self):
+	def set_delta_time(self) -> None:
 		self.delta_time = time.time() - self.prev_time
 		self.prev_time = time.time()
 
-	def toggle_fullscreen(self):
+	def toggle_fullscreen(self) -> None:
 		self.screen.toggle_full_screen()
 		self.sidebar.update_surface_size()
 		for name, game in self.games.items(): game.update_surface_size()
 		
 	# Game events Parser 
-	def parse_event(self, event):
+	def parse_event(self, event : pygame.event.Event) -> None:
 
 		if self.sidebar.is_hovering(): self.sidebar.parse_event(event)
 		self.games[self.current_game].parse_event(event)
 	
-	def quit_game(self):
+	def quit_game(self) -> None:
 		self.running = False
 		pygame.quit()
 		sys.exit()
+
+	def get_game_pos(self) -> tuple[int, int]:
+		return self.sidebar.rect.width + (PADDING * 2), PADDING
+
+	def get_game_size(self) -> tuple[int, int]:
+		padding = pygame.math.Vector2(PADDING, PADDING)
+		game_pos = pygame.math.Vector2(self.get_game_pos())
+		screen_size = pygame.math.Vector2(self.screen.get_current_size())
+		size = screen_size - (game_pos + padding) 
+		width, height = int(size.x), int(size.y)
+		return int(width), int(height)
+	
+
+
+
 
 
 
