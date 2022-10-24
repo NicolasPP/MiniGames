@@ -27,6 +27,7 @@ class Screen:
         self.surface = pygame.Surface((window_width, window_height))
 
         self.set_current_dimentions()
+        self.display()
 
 
     @property
