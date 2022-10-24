@@ -1,43 +1,47 @@
-import pygame
-from config.games_config import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game_app import Minigames
 
-'''
-TODO : add mouse_position as a @property, this way the offset can be calculated here and 
-	   sent to all children. rather than each children calculating it.
-	   
-'''
+from config.games_config import *
+import pygame
+from dataclasses import dataclass
+from GUI.containers import Relative_Container
 
 class Game:
-	def __init__(self, app, bg_color = GAME_BG):
+	def __init__(self, 
+				app : Minigames, 
+				bg_color : tuple[int, int, int] = GAME_BG
+				) -> None:
 	
 		self.bg_color = bg_color
 		self.app = app
 
-		self._surface = self.get_game_surface(self.bg_color)
-		self.rect = self.surface.get_rect(topleft = app.get_game_pos())
+		self._surface : pygame.Surface = self.get_game_surface(self.bg_color)
+		self.rect : pygame.rect.Rect = self.surface.get_rect(topleft = app.get_game_pos())
 				
-		self.paused = True
-
-
+		self.paused : bool = True
+		# self.root_container = Relative_Container(self, (0,0), app.get_game_size(), alpha, color)
 
 	@property
-	def surface(self): return self._surface
+	def surface(self) -> pygame.Surface: return self._surface
 
 	@surface.setter
-	def surface(self, new_surface): 
+	def surface(self, new_surface : pygame.Surface) -> None: 
 		self._surface = new_surface
 		self.rect = new_surface.get_rect(topleft = self.app.get_game_pos())
 
 	@surface.deleter
-	def surface(self): del self._surface
+	def surface(self) -> None: del self._surface
 
 
-	def update(self, dt): pass
-	def parse_event(self, event): pass
+	def update(self, dt : float) -> None: pass
+	def parse_event(self, event : pygame.event.Event) -> None: pass
 
-	def render(self): self.app.screen.surface.blit(self.surface, self.app.get_game_pos())
-	def update_surface_size(self): self.surface = self.get_game_surface(self.bg_color)
-	def render_message(self, *lable_ids):
+	def render(self) -> None: 
+		self.app.screen.surface.blit(self.surface, self.app.get_game_pos())
+	def update_surface_size(self) -> None: self.surface = self.get_game_surface(self.bg_color)
+	def render_message(self, *lable_ids : tuple[str]):
 		for l_id in lable_ids:
 			lable = self.lables[l_id]['lable']
 			lable_surface  = self.lables[l_id]['surface']
