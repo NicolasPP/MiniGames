@@ -58,7 +58,7 @@ class Word_Bank:
 
 	def __init__(self, lang):
 		self.language = lang.value
-		self.data = Data_Man.get_data(WORD_FILE)
+		self.data = Data_Man.get_wordle_data(WORD_FILE)
 		self.words = 'words'
 		self.used_words = 'used_words'
 
