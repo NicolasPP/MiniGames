@@ -207,7 +207,7 @@ class Snake(Game):
 		self.lables['unpause']['lable'].alpha = self.p_message_alpha
 	
 	def update_surface_size(self):
-		self.surface =  self.app.get_game_surface(self.bg_color, NORMAL_ALPHA)
+		self.surface = self.get_game_surface(self.bg_color)
 		self.lables = get_lables(self)
 		create_grid(self)
 	# ------------
@@ -257,8 +257,8 @@ def get_lables(snake_game):
 	center = s_width // 2, s_height // 2
 	score_pos = s_width - 30, 30
 	unpause_pos = center[0] , center[1] + 60
-	paused_surface = snake_game.app.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
-	death_surface = snake_game.app.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
+	paused_surface = snake_game.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
+	death_surface = snake_game.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
 	return{
 		'paused' : 
 			{
