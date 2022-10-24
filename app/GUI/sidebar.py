@@ -105,7 +105,6 @@ def set_game(parent, comp):
 	parent.current_game = comp.message
 
 def fullscreen(parent, comp):
-	print('fullscreen')
 	parent.toggle_fullscreen()
 
 def quit_game(parent, comp):
