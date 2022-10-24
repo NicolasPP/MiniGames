@@ -94,7 +94,6 @@ class Letter:
 		
 		self.wordle_game = wordle_game
 		self.card_bg_surface = pygame.Surface(rect.size)
-		self.font = pygame.font.Font(None, LETTER_FONT_SIZE)
 		self.bg_color = LSTATE.BLANK.value
   
 		self._value = ''
