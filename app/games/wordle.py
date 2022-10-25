@@ -216,7 +216,7 @@ class Wordle(Game):
 			self.restart_alpha_change = -1
 	
 	def update_surface_size(self):
-		self.surface = self.get_game_surface(self.bg_color)
+		self.surface = self.get_game_surface(self.color)
 		self.update_letters_size()
 		self.lables = get_wordle_lables(self)
 
@@ -249,7 +249,7 @@ def set_card_style(letter):
 def get_value_lable(letter):
 	s_width, s_height = letter.card_bg_surface.get_size()
 	pos = (letter.rect.width // 2, letter.rect.height // 2)
-	return Lable(letter, letter.card_bg_surface.get_rect().center, letter.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA)
+	return Lable(letter, letter.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA, pos = letter.card_bg_surface.get_rect().center)
 
 def reset(letter):
 	letter.value = ''
@@ -266,17 +266,17 @@ def get_wordle_lables(wordle_game):
 		return {
 			'win' : 
 				{
-				'lable' : Lable(wordle_game, center, " GAME WON  ", 50, LETTER_COLOR,POST_GAME_ALPHA),
+				'lable' : Lable(wordle_game, " GAME WON  ", 50, LETTER_COLOR,POST_GAME_ALPHA, pos =  center),
 				'surface' : win_surface,
 				},
 			'loose' : 
 				{
-				'lable' : Lable(wordle_game, center, " GAME LOST ", 50, LETTER_COLOR,POST_GAME_ALPHA),
+				'lable' : Lable(wordle_game, " GAME LOST ", 50, LETTER_COLOR,POST_GAME_ALPHA, pos =  center),
 				'surface' : loose_surface,
 				},
 			'restart' : 
 				{
-				'lable' : Lable(wordle_game, restart_pos, " SPACE TO RESTART ", 30, LETTER_COLOR,NORMAL_ALPHA),
+				'lable' : Lable(wordle_game, " SPACE TO RESTART ", 30, LETTER_COLOR,NORMAL_ALPHA, pos =  restart_pos),
 				'surface' : False,
 				}
 		}
