@@ -3,13 +3,21 @@ from GUI.components.component import Component
 
 
 class Lable(Component):
-	def __init__(self, parent, pos, message, font_size, color, alpha, r_topleft = False ):
+	def __init__(self, 
+				 parent, 
+				 message, 
+				 font_size, 
+				 color, 
+				 alpha, 
+				 pos = (0,0), 
+				 r_topleft = False):
 		super().__init__(parent, pos, (font_size, font_size), alpha, color)
 		self._message = message
 		self.font = pygame.font.Font(None, font_size)
 		self.r_topleft = r_topleft # default is center
 		self.pos = pos
 		self.update_surface()
+
 		
 
 	@property
