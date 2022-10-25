@@ -7,7 +7,7 @@ PAUSE_COLOR : 	tuple[int, int,int] = (255, 255, 255) #rbg(255, 255, 255)
 SCORE_COLOR : 	tuple[int, int, int] = color_palette3[3] #rgb(231, 171, 121)
 LOOSE_COLOR : 	tuple[int, int, int] = color_palette3[1] #
 
-PAUSE_ALPHA : 	int = 15 # 0 is fully transparent and 255 fully opaque.
+PAUSE_ALPHA : 	int = 30 # 0 is fully transparent and 255 fully opaque.
 LOOSE_ALPHA : 	int = 75
 ALPHABET : 		str = 'abcdefghijklmnopqrstuvwxyz'
 #----------------------
