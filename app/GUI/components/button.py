@@ -69,7 +69,7 @@ def no_style(): pass
 
 def get_lable(button):
 	pos = button.rect.w // 2, button.rect.h // 2
-	lable = Lable(button, pos, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha)
+	lable = Lable(button, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha, pos = pos)
 	if button.show_lable: lable.render()
 	return lable
 
