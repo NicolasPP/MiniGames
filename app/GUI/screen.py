@@ -60,13 +60,11 @@ class Screen:
     def display(self):
         pygame.display.set_mode((self.current_width, self.current_height), pygame.NOFRAME)
         self.surface = pygame.Surface((self.current_width, self.current_height))
-        self.surface.fill(self.bg_color)
 
     def get_current_size(self): return self.current_width, self.current_height
     
     def render(self):
-        content_surface = self.surface      
-        pygame.display.get_surface().blit(content_surface, (0,0))
+        pygame.display.get_surface().blit(self.surface, (0,0))
 
     def toggle_full_screen(self):
         self.full_screen = not self.full_screen
