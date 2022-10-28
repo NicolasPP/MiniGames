@@ -3,10 +3,7 @@ from config.app_config import *
 
 
 '''
-TODO: make new screen class. Being able to pick resolution and aspect ratio
-	  maybe use upscaling
 TODO: make system where only the selected game is instanciated
-TODO: make sidebar be able to scroll, take any amount of buttons
 TODO: Games to add in the future
 		- Game of life
 		- algorithm visualizer

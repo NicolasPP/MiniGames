@@ -117,14 +117,10 @@ class Minigames:
 		self.clock : pygame.time.Clock =  pygame.time.Clock()
 		self.delta_time : float = 0
 		self.prev_time : float = time.time()
-
-
-		# GUI elements
-		self.sidebar : Sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
 		
 		#Games
 
-		self.current_game = 'Menu'
+		self.current_game : str = 'Menu'
 
 
 		self.games : dict[str, Game]= {
