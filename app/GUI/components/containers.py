@@ -1,4 +1,6 @@
 from GUI.components.component import Component
+from GUI.components.lable import Lable
+
 import config.games_config as gcfg
 import config.app_config as acfg
 from enum import Enum
@@ -26,6 +28,7 @@ class MOUSECLICK:
 class LAYOUT_PLANE(Enum):
 	HORIZONTAL = 0
 	VERTICAL = 1
+	RELATIVE  = 2
 
 @dataclass
 class Padding:
@@ -51,60 +54,75 @@ class Container(Component):
 		if container.root: return pygame.math.Vector2(container.rect.topleft)
 		return pygame.math.Vector2(container.rect.topleft) + Container.get_container_offset(container.parent)
 
-	def __init__(self,\
-				 parent,\
-				 color,\
-				 plane,\
-				 pos = (0,0),\
-				 size = (0,0),\
-				 alpha = gcfg.NORMAL_ALPHA,\
-				 root = False,\
+	def __init__(self,
+				 parent,
+				 plane,
+				 color,
+				 pos = (0,0),
+				 size = (0,0),
+				 alpha = gcfg.NORMAL_ALPHA,
+				 root = False,
 				 padding = Padding()): 
 		super().__init__(parent, pos, size, alpha, color)
 		self.plane = plane
 		self.padding = padding
 		self.components = []
 		self.root = root
+		self.conpensate_padding = True
 		self.fixed_size = False if size == (0,0) else True
 		self.process = {
 		LAYOUT_PLANE.VERTICAL : self.vertical_process,
 		LAYOUT_PLANE.HORIZONTAL : self.horizontal_process
 		}
+	def add_game(self, game):
+		last_width = get_largest_width(self.components)
+		game_component = Component(self, (0,0), game.surface.get_rect().size, 255, game.color)
+		self.add_component(game_component)
+		return game_component
 
 	def add_component(self, component):
-		self.components.append(component)
-		
+		self.components.append(component)		
 		height = 0
 		width = 0
 		#------------------
 		height += self.padding.top
 		width += self.padding.left
 		if isinstance(component, Container):
-			height -= component.padding.top
-			width -= component.padding.left
+			if self.conpensate_padding:
+				height -= component.padding.top
+				width -= component.padding.left
 		#------------------	
 		width, height = self.process_components(width, height)
 		#------------------
 		height += self.padding.bottom
 		width += self.padding.right
 		if isinstance(component, Container):
-			height -= component.padding.bottom
-			width -= component.padding.right
+			if self.conpensate_padding:
+				height -= component.padding.bottom
+				width -= component.padding.right
 		#------------------
 		if not self.fixed_size: self.set_size((width, height))
 
+
+	def set_size(self, size):
+		pos = self.rect.x , self.rect.y
+		self.rect = pygame.Rect(pos, size)
+		self.surface = pygame.Surface(size)
+		self.surface.fill(self.color)
 
 	def container_click(self, mouse_pos, event, app):
 		if event.type != pygame.MOUSEBUTTONDOWN: return
 		if event.button != MOUSECLICK.LEFT: return
 		for comp in self.components:
 			if isinstance(comp, Container): continue
+			if isinstance(comp, Lable): continue
 			mouse_p = pygame.math.Vector2(mouse_pos)
 			offset = Container.get_container_offset(self)
-			if comp.is_clicked(mouse_p - offset):
+			if comp.is_hovered(mouse_p - offset):
 				comp.click(app, comp)
-	
+
 	def render(self, set_alpha = False):
+		self.surface.fill(self.color)
 		for comp in self.components: comp.render()
 		self.parent.surface.blit(*self.get_surface_blit(set_alpha))		
 
@@ -112,8 +130,6 @@ class Container(Component):
 		for comp in self.components:
 			if not comp.processed:
 				comp.update_pos(pygame.math.Vector2(width, height))
-				if isinstance(comp, Scrollable_Container):
-					comp.rect.height = comp.rect.height - comp.rect.top
 				comp.processed = True
 			width, height = self.process[self.plane](comp, width, height)
 		if not self.fixed_size: width, height = self.set_fixed_dimension(width, height)
@@ -126,7 +142,7 @@ class Container(Component):
 	
 	def horizontal_process(self, component, width, height): 
 		width += component.rect.width
-		if self.components[-1]!= component: 
+		if self.components[-1]!= component:
 			width += self.padding.spacing
 		return width, height
 
@@ -137,26 +153,25 @@ class Container(Component):
 		return width, height
 
 	def parse_event(self, event, root_parent):
-		mouse_pos = root_parent.mouse_pos
-		app = root_parent.parent
+		mouse_pos = pygame.mouse.get_pos()
 		for comp in self.components:
 			if isinstance(comp, Container):
 				comp.parse_event(event, root_parent)
-		self.container_click(mouse_pos, event, app)
+		self.container_click(mouse_pos, event, root_parent)
 
 
 class Scrollable_Container(Container):
 	def __init__(self, 
-				 parent,\
-				 color,\
-				 plane,\
-				 pos = (0,0),\
-				 size = (0,0),\
-				 alpha = gcfg.NORMAL_ALPHA,\
-				 root = False,\
+				 parent,
+				 plane,
+				 color,
+				 pos = (0,0),
+				 size = (0,0),
+				 alpha = gcfg.NORMAL_ALPHA,
+				 root = False,
 				 padding = Padding()):
-		super().__init__(parent, color, plane, pos, size, alpha, root, padding)
-		self.scroll_speed = pygame.math.Vector2(0,10)
+		super().__init__(parent, plane, color, pos, size, alpha, root, padding)
+
 
 	def move_up(self):
 		self.surface.fill(self.color)
@@ -174,32 +189,35 @@ class Scrollable_Container(Container):
 
 
 	def parse_event(self, event, root_parent):
-		mouse_pos= pygame.math.Vector2(root_parent.mouse_pos)
-		offset = Container.get_container_offset(self)
-		app = root_parent.parent
-		if event.type == pygame.MOUSEBUTTONDOWN and self.is_clicked(mouse_pos - offset):
+		mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
+		offset = pygame.math.Vector2(Container.get_container_offset(self.parent))
+		if event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered(mouse_pos - offset):
 			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()#self.scroll_offset = self.scroll_speed
 			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()#self.scroll_offset = self.scroll_speed * -1
-		self.container_click(root_parent.mouse_pos, event, root_parent.parent)
-
+			self.container_click(pygame.mouse.get_pos(), event, root_parent)
+'''
+NOT GOOD FOR NESTING WITH OTHER CONTAINERS
+'''
 class Relative_Container(Container):
 	def __init__(self, 
-				 parent,\
-				 color,\
-				 plane,\
-				 pos = (0,0),\
-				 size = (0,0),\
-				 alpha = gcfg.NORMAL_ALPHA,\
-				 root = False,\
+				 parent,
+				 size,
+				 color = (-1, -1 ,-1),
+				 pos = (0,0),
+				 alpha = gcfg.NORMAL_ALPHA,
+				 root = False,
 				 padding = Padding()):
-		super().__init__(parent, color, plane, pos, size, alpha, root, padding)
+		
+		super().__init__(parent, LAYOUT_PLANE.RELATIVE,color, pos, size, alpha, root, padding)
 
 	def add_component(self, component, pos):
 		component.update_pos(pos)
-		components.append(component)
+		self.components.append(component)
 
-	def render(self): pass
 
+	def render(self, set_alpha = False):
+		for comp in self.components: comp.render(set_alpha = set_alpha)
+		self.parent.surface.blit(*self.get_surface_blit(set_alpha))	
 
 
 
