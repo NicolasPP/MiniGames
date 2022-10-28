@@ -2,7 +2,8 @@ import config.app_config as acfg
 from config.games_config import *
 
 from GUI.components.lable import Lable
-from games.game import Game
+from GUI.components.containers import Relative_Container
+from games.game import Game, Game_GUI
 import data.data_manager as Data_Man
 
 import pickle
@@ -154,6 +155,61 @@ class Letter:
 		self.card_bg_surface.blit(bg, (round(CARD_OUTLINE_THICKNESS / 2), round(CARD_OUTLINE_THICKNESS / 2)))
 	# ------------
 
+class Wordle_GUI(Game_GUI):
+	def __init__(self, wordle_game):
+		super().__init__(wordle_game)
+		self.populate_GUI()
+	
+	def populate_GUI(self):
+		self.create_containers()
+		self.create_lables()
+		self.populate_containers()
+		
+
+	def create_containers(self):
+		win_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
+		loose_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
+		
+		win_surface = pygame.Surface(pygame.display.get_surface().get_size())
+		win_surface.fill(PRESENT_IN_PLACE_COLOR)
+		loose_surface = pygame.Surface(pygame.display.get_surface().get_size())
+		loose_surface.fill(LOOSE_COLOR)
+
+		win_container.surface = win_surface
+		loose_container.surface = loose_surface
+
+		self.containers['win_container'] = win_container
+		self.containers['loose_container'] = loose_container
+
+	def populate_containers(self):
+		s_width, s_height = pygame.display.get_surface().get_size()
+		center = s_width // 2, s_height // 2
+		restart_pos = center[0] , center[1] + 60
+		
+		win_container = self.containers['win_container'] 
+		loose_container = self.containers['loose_container']
+
+		win_lable = self.lables['win_lable']
+		loose_lable = self.lables['loose_lable']
+		restart_lable = self.lables['restart_lable']
+		play_again_lable = self.lables['play_again_lable']
+
+		win_container.add_component(win_lable, center)
+		win_container.add_component(play_again_lable, restart_pos)
+		loose_container.add_component(loose_lable, center)
+		loose_container.add_component(restart_lable, restart_pos)
+		
+	def create_lables(self):
+		win_lable = Lable(self.game, " GAME WON  ", 50, LETTER_COLOR, NORMAL_ALPHA)
+		loose_lable = Lable(self.game, " GAME LOST ", 50, LETTER_COLOR, NORMAL_ALPHA)
+		restart_lable = Lable(self.game, " SPACE TO RESTART ", 30, LETTER_COLOR, NORMAL_ALPHA)
+		play_again_lable = Lable(self.game, " SPACE TO PLAY AGAIN ", 30, LETTER_COLOR, NORMAL_ALPHA)
+		
+		self.lables['win_lable'] = win_lable
+		self.lables['loose_lable'] = loose_lable
+		self.lables['restart_lable'] = restart_lable
+		self.lables['play_again_lable'] = play_again_lable
+
 
 class Wordle(Game):
 	def __init__(self, app):
@@ -167,9 +223,7 @@ class Wordle(Game):
 		create_board(self)
 		self.game_word = self.word_bank.get_random_word()
 		self._result = GAME_RESULT.UNDEFINED
-		self.restart_alpha = 255
-		self.restart_alpha_change = -1
-		self.lables = get_wordle_lables(self)
+		self.wordle_GUI = Wordle_GUI(self)
 
 	# -- Getters --
 	@property
@@ -194,31 +248,22 @@ class Wordle(Game):
 	# -- Render --
 	def render(self):
 		for letter in self.letters: letter.render()
-		if self.result is GAME_RESULT.WON: self.render_message('win', 'restart')
-		elif self.result is GAME_RESULT.LOOSE: self.render_message('loose', 'restart')
+		if self.result is GAME_RESULT.WON: self.wordle_GUI.containers['win_container'].render(set_alpha = True)
+		elif self.result is GAME_RESULT.LOOSE: self.wordle_GUI.containers['loose_container'].render(set_alpha = True)
 		self.app.screen.surface.blit(self.surface, self.rect)
 	# ------------
 
 
 	# -- Update --
 	def update(self, dt):
-		if self.result is not GAME_RESULT.UNDEFINED: self.update_restart_alpha(dt)
-	
-	def update_restart_alpha(self, dt):
-		self.restart_alpha +=  (ALPHA_CHANGE * dt * self.restart_alpha_change)
-		self.lables['restart']['lable'].alpha = self.restart_alpha
-		if self.restart_alpha <= 0:
-			self.restart_alpha = 0
-			self.restart_alpha_change = 1
+		if self.result is not GAME_RESULT.UNDEFINED:
+			self.wordle_GUI.lables['play_again_lable'].blink(dt)
+			self.wordle_GUI.lables['restart_lable'].blink(dt)
 
-		if self.restart_alpha >= 255:
-			self.restart_alpha = 255
-			self.restart_alpha_change = -1
 	
 	def update_surface_size(self):
 		self.surface = self.get_game_surface(self.color)
 		self.update_letters_size()
-		self.lables = get_wordle_lables(self)
 
 	def update_letters_size(self):
 		x, y = get_first_letter_pos(self)
@@ -247,9 +292,8 @@ def set_card_style(letter):
 	if letter.state == LSTATE.BLANK: letter.render_card_outline() 
 
 def get_value_lable(letter):
-	s_width, s_height = letter.card_bg_surface.get_size()
-	pos = (letter.rect.width // 2, letter.rect.height // 2)
-	return Lable(letter, letter.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA, pos = letter.card_bg_surface.get_rect().center)
+	l = Lable(letter, letter.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA, pos = letter.card_bg_surface.get_rect().center)
+	return l
 
 def reset(letter):
 	letter.value = ''
@@ -257,30 +301,6 @@ def reset(letter):
 # --------------------
 
 # -- wordle game helpers --
-def get_wordle_lables(wordle_game):
-		s_width, s_height = wordle_game.surface.get_size()
-		center = s_width // 2, s_height // 2
-		restart_pos = center[0] , center[1] + 60
-		win_surface = wordle_game.get_game_surface(PRESENT_IN_PLACE_COLOR, alpha = POST_GAME_ALPHA)
-		loose_surface = wordle_game.get_game_surface(LOOSE_COLOR, alpha = POST_GAME_ALPHA)
-		return {
-			'win' : 
-				{
-				'lable' : Lable(wordle_game, " GAME WON  ", 50, LETTER_COLOR,POST_GAME_ALPHA, pos =  center),
-				'surface' : win_surface,
-				},
-			'loose' : 
-				{
-				'lable' : Lable(wordle_game, " GAME LOST ", 50, LETTER_COLOR,POST_GAME_ALPHA, pos =  center),
-				'surface' : loose_surface,
-				},
-			'restart' : 
-				{
-				'lable' : Lable(wordle_game, " SPACE TO RESTART ", 30, LETTER_COLOR,NORMAL_ALPHA, pos =  restart_pos),
-				'surface' : False,
-				}
-		}
-
 def get_first_letter_pos(wordle_game):
 	board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
 	s_width = wordle_game.surface.get_width()

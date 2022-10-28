@@ -1,6 +1,7 @@
 from config.games_config import *
 from games.game import Game
 from GUI.components.lable import Lable
+from GUI.components.containers import Relative_Container
 import pygame
 from random import choice
 from enum import Enum
@@ -124,7 +125,7 @@ class SNAKE:
 			if food.colliderect(self.rect):
 				self.size += 1
 				self.snake_game.score += 1
-				self.snake_game.lables['score']['lable'].message = f'{self.snake_game.score}'
+				self.snake_game.snake_GUI.lables['score_lable'].message = f'{self.snake_game.score}'
 				collided.append(food)
 		for food in collided: self.snake_game.foods.remove(food)
 	# -------------------------
@@ -133,7 +134,7 @@ class SNAKE:
 	# -- Game Logic --
 	def die(self): 
 		self.alive = False
-		self.snake_game.lables['final_score']['lable'].message = f'{self.snake_game.score}'
+		self.snake_game.snake_GUI.lables['final_score_lable'].message = f'{self.snake_game.score}'
 	
 	def move(self, dt):
 		if self.distance_to_move <= 0: return
@@ -155,30 +156,105 @@ class SNAKE:
 	# ----------------
 
 
+class Snake_GUI:
+	def __init__(self, snake_game):
+		self.snake_game = snake_game
+		self.containers = {}
+		self.lables = {}
+		self._surface = snake_game.surface
+		self.populate_GUI()
+
+	@property
+	def surface(self): return self.snake_game.surface
+	@surface.setter
+	def surface(self, new_surface): self._surface = new_surface
+	@surface.deleter
+	def surface(self): del self._surfacex
+	
+	def populate_GUI(self):
+		self.create_containers()
+		self.create_lables()
+		self.populate_containers()
+		
+
+	def create_containers(self):
+		game_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True)
+		paused_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True, alpha = PAUSE_ALPHA)
+		loose_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True, alpha = LOOSE_ALPHA)
+		
+		loose_surface = pygame.Surface(pygame.display.get_surface().get_size())
+		loose_surface.fill(LOOSE_COLOR)
+		paused_surface = pygame.Surface(pygame.display.get_surface().get_size())
+		paused_surface.fill(PAUSE_COLOR)
+		
+		loose_container.surface = loose_surface
+		paused_container.surface = paused_surface
+
+
+		self.containers['game_container'] = game_container
+		self.containers['paused_container'] = paused_container
+		self.containers['loose_container'] = loose_container
+		
+
+	def populate_containers(self):
+		s_width, s_height = pygame.display.get_surface().get_size()
+		center = s_width // 2, s_height // 2
+		score_pos = s_width - 30, 30
+		retry_pos = center[0] , center[1] + 60
+
+		score_lable = self.lables['score_lable']
+		paused_lable = self.lables['paused_lable']
+		retry_lable = self.lables['retry_lable']
+		final_score_lable = self.lables['final_score_lable']
+
+		game_container = self.containers['game_container']
+		paused_container = self.containers['paused_container']
+		loose_container = self.containers['loose_container']
+
+		game_container.add_component(score_lable, score_pos)
+		paused_container.add_component(paused_lable, center)
+		loose_container.add_component(retry_lable, retry_pos)
+		loose_container.add_component(final_score_lable, center)
+
+
+	def create_lables(self):
+		score_lable = Lable(self.snake_game, f'{self.snake_game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA)
+		paused_lable = Lable(self.snake_game, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,NORMAL_ALPHA)
+		retry_lable = Lable(self .snake_game, " SPACE TO RETRY ", 30 , SCORE_COLOR, NORMAL_ALPHA)
+		final_score_lable = Lable(self.snake_game, f'{self.snake_game.score}', SCORE_FONT_SIZE, SCORE_COLOR, NORMAL_ALPHA)
+
+		self.lables['score_lable'] = score_lable
+		self.lables['paused_lable'] = paused_lable	
+		self.lables['retry_lable'] = retry_lable	
+		self.lables['final_score_lable'] = final_score_lable	
+	
+
+
 class Snake(Game):
 	def __init__(self, app):
 		super().__init__(app)
 		self.grid = []
 		self.cells = []
 		self.foods = []
+		self.score = 0
+
+		self.snake_GUI = Snake_GUI(self)
+		self.food_timer = Time_Man()
+		
 		create_grid(self)
 		self.snake = SNAKE(self)
-		self.food_timer = Time_Man()
-		self.score = 0
-		self.p_message_alpha = 255
-		self.p_alpha_change = -1
-		self.lables = get_lables(self)
 		
-
 	# -- Render --
 	def render(self):
-		if self.paused: self.render_message('paused')
 		if self.snake.alive:
 			for food in self.foods: self.surface.blit(get_rect_surface(self, food, FOOD_COLOR), food.topleft)
 			self.snake.render()
-			self.render_message('score')
+			self.snake_GUI.containers['game_container'].render(set_alpha = True)
 		
-		if not self.snake.alive: self.render_message('final_score', 'unpause')
+		if self.paused: self.snake_GUI.containers['paused_container'].render(set_alpha = True)
+
+		
+		if not self.snake.alive: self.snake_GUI.containers['loose_container'].render(set_alpha = True)
 
 		self.app.screen.surface.blit(self.surface, self.rect)
 	# ------------
@@ -186,29 +262,18 @@ class Snake(Game):
 
 	# -- Update --
 	def update(self, dt):
-		if self.paused or not self.snake.alive: self.update_alpha(dt)
+		if self.paused:
+			self.snake_GUI.lables['paused_lable'].blink(dt) 
 		else:
 			if self.snake.alive:
 				self.snake.update(dt)
 				spawn_food(self, dt)
-	
-	def update_alpha(self, dt):
-		self.p_message_alpha +=  (ALPHA_CHANGE * dt * self.p_alpha_change)
+			else: self.snake_GUI.lables['retry_lable'].blink(dt) 
 
-		if self.p_message_alpha <= 0:
-			self.p_message_alpha = 0
-			self.p_alpha_change = 1
-
-		if self.p_message_alpha >= 255:
-			self.p_message_alpha = 255
-			self.p_alpha_change = -1
-
-		self.lables['paused']['lable'].alpha = self.p_message_alpha
-		self.lables['unpause']['lable'].alpha = self.p_message_alpha
 	
 	def update_surface_size(self):
-		self.surface = self.get_game_surface(self.bg_color)
-		self.lables = get_lables(self)
+		self.surface = self.get_game_surface(self.color)
+		self.snake_GUI = Snake_GUI(self)
 		create_grid(self)
 	# ------------
 
@@ -251,52 +316,23 @@ def get_mid_cell(snake_game):
 	row_num = len(snake_game.grid)
 	col_num = len(snake_game.grid[0])
 	return snake_game.grid[row_num // 2][col_num // 2].copy()
-
-def get_lables(snake_game):
-	s_width, s_height = snake_game.surface.get_size()
-	center = s_width // 2, s_height // 2
-	score_pos = s_width - 30, 30
-	unpause_pos = center[0] , center[1] + 60
-	paused_surface = snake_game.get_game_surface(SCORE_COLOR, alpha = PAUSE_ALPHA)
-	death_surface = snake_game.get_game_surface(LOOSE_COLOR, alpha = LOOSE_ALPHA)
-	return{
-		'paused' : 
-			{
-			'lable' : Lable(snake_game, center, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,snake_game.p_message_alpha),
-			'surface' : paused_surface,
-			},
-		'unpause' : 
-			{
-			'lable' : Lable(snake_game, unpause_pos, " SPACE ", 30 , SCORE_COLOR, snake_game.p_message_alpha),
-			'surface' : paused_surface,
-			},
-		'score' : 
-			{
-			'lable' : Lable(snake_game, score_pos, f'{snake_game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA),
-			'surface' : False,
-			},
-		'final_score' :
-			{
-			'lable' : Lable(snake_game, center, f'{snake_game.score}', SCORE_FONT_SIZE, SCORE_COLOR, LOOSE_ALPHA),
-			'surface' : death_surface
-			}
-	}
+	
 
 def get_rect_surface(snake_game, rect, color):
 	rect_surface = pygame.Surface(rect.size)
 	rect_surface.fill(color)
 	if snake_game.paused: rect_surface.set_alpha(PAUSE_ALPHA)
-	else: rect_surface.set_alpha(255)
+	else: rect_surface.set_alpha(NORMAL_ALPHA)
 	return rect_surface
 
 def toggle_pause(snake_game): 
 	if snake_game.snake.alive: snake_game.paused = not snake_game.paused
-	snake_game.lables['score']['lable'].alpha = PAUSE_ALPHA if snake_game.paused else NORMAL_ALPHA
+	snake_game.snake_GUI.lables['score_lable'].alpha = PAUSE_ALPHA if snake_game.paused else NORMAL_ALPHA
 
 def restart(snake_game):
 	snake_game.score = 0
 	snake_game.foods = []
-	snake_game.lables = get_lables(snake_game)
+	snake_game.snake_GUI.lables['score_lable'].update_message()
 	snake_game.cells = []
 	snake_game.grid = []
 	create_grid(snake_game)
