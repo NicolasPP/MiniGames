@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Type
 
 from GUI.screen import Screen
-from GUI.sidebar import Sidebar
 from GUI.components.button import Button, style_quit, fullscreen_inactive_style, fullscreen_active_style, Button_Type
 from GUI.components.containers import Container, Scrollable_Container, LAYOUT_PLANE, Padding
 
