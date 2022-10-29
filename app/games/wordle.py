@@ -35,17 +35,17 @@ WORDLE_DEBUG_MODE = True
 
 
 class GAMELANG(Enum):
-	ENG = 'english'
-	PT = 'portuguese'
+	ENG : str = 'english'
+	PT : str = 'portuguese'
 
 class LSTATE(Enum):
-	BLANK = BLANK_COLOR
-	FILLED = FILLED_COLOR
-	PRESENT_OUT_OF_PLACE = PRESENT_OUT_OF_PLACE_COLOR
-	PRESENT_IN_PLACE = PRESENT_IN_PLACE_COLOR
-	NOT_PRESENT = NOT_PRESENT_COLOR
+	BLANK : tuple[int, int, int] = BLANK_COLOR
+	FILLED : tuple[int, int, int] = FILLED_COLOR
+	PRESENT_OUT_OF_PLACE : tuple[int, int, int] = PRESENT_OUT_OF_PLACE_COLOR
+	PRESENT_IN_PLACE : tuple[int, int, int] = PRESENT_IN_PLACE_COLOR
+	NOT_PRESENT : tuple[int, int, int] = NOT_PRESENT_COLOR
 
-	def __eq__(self, state):
+	def __eq__(self, state : object) -> bool:
 		if isinstance(state, LSTATE): return self.name == state.name
 		return False
 
