@@ -160,6 +160,29 @@ class Container(Component):
 		self.container_click(mouse_pos, event, root_parent)
 
 
+class Linear_Container(Container):
+	def __init__(self,
+				 parent,
+				 plane,
+				 color,
+				 pos = (0,0),
+				 size = (0,0),
+				 alpha = gcfg.NORMAL_ALPHA,
+				 root = False,
+				 padding = Padding()): 
+		super().__init__(parent, plane, color, pos = pos, size = size, alpha = alpha, root = root, padding = padding)
+		self.plane = plane
+		self.padding = padding
+		self.components = []
+		self.root = root
+		self.conpensate_padding = True
+		self.fixed_size = False if size == (0,0) else True
+		self.process = {
+		LAYOUT_PLANE.VERTICAL : self.vertical_process,
+		LAYOUT_PLANE.HORIZONTAL : self.horizontal_process
+		}
+
+
 class Scrollable_Container(Container):
 	def __init__(self, 
 				 parent,
