@@ -6,9 +6,10 @@ if TYPE_CHECKING:
 from config.games_config import *
 import pygame
 from dataclasses import dataclass
-from GUI.components.containers import Container
+from GUI.components.containers import Container, Scrollable_Container, Relative_Container
 from GUI.components.button import Button
 from GUI.components.lable import Lable
+from typing import Union
 
 
 class Game:
@@ -52,10 +53,13 @@ class Game:
 		game_surface.fill(color)
 		return game_surface
 
+
+
+
 class Game_GUI:
 	def __init__(self, game : Game):
 		self.game = game
-		self.containers : dict[str, Container] = {}
+		self.containers : dict[str, Container | Scrollable_Container | Relative_Container] = {}
 		self.lables : dict[str, Lable] = {}
 		self.buttons : dict[str, Button] = {}
 		self._surface =  game.surface
