@@ -6,7 +6,6 @@ import pygame
 from random import choice
 from enum import Enum
 from utils.time import Time_Man
-from typing import Tuple 
 
 
 class DIRECTION(Enum):
