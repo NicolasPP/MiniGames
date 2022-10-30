@@ -256,7 +256,7 @@ class Snake(Game):
 		
 		if not self.snake.alive: self.snake_GUI.containers['loose_container'].render(set_alpha = True)
 
-		self.app.screen.surface.blit(self.surface, self.rect)
+		self.app.surface.blit(self.surface, self.rect)
 	# ------------
 
 

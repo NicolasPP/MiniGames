@@ -2,7 +2,7 @@ import config.app_config as acfg
 from config.games_config import *
 
 from GUI.components.lable import Lable
-from GUI.components.containers import Relative_Container, Container
+from GUI.components.containers import Relative_Container
 from games.game import Game, Game_GUI
 import data.data_manager as Data_Man
 
@@ -251,7 +251,7 @@ class Wordle(Game):
 		for letter in self.letters: letter.render()
 		if self.result is GAME_RESULT.WON: self.wordle_GUI.containers['win_container'].render(set_alpha = True)
 		elif self.result is GAME_RESULT.LOOSE: self.wordle_GUI.containers['loose_container'].render(set_alpha = True)
-		self.app.screen.surface.blit(self.surface, self.rect)
+		self.app.surface.blit(self.surface, self.rect)
 	# ------------
 
 
