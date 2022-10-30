@@ -6,10 +6,10 @@ if TYPE_CHECKING:
 from config.games_config import *
 import pygame
 from dataclasses import dataclass
-from GUI.components.containers import Container, Scrollable_Container, Relative_Container
+from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container
 from GUI.components.button import Button
 from GUI.components.lable import Lable
-from typing import Union
+from typing import Any
 
 
 class Game:
@@ -41,7 +41,7 @@ class Game:
 	def parse_event(self, event : pygame.event.Event) -> None: pass
 
 	def render(self) -> None: 
-		self.app.screen.surface.blit(self.surface, (0,0))
+		self.app.surface.blit(self.surface, (0,0))
 	def update_surface_size(self) -> None: self.surface = self.get_game_surface(self.color)
 
 	def get_game_surface(self, 
@@ -57,9 +57,9 @@ class Game:
 
 
 class Game_GUI:
-	def __init__(self, game : Game):
+	def __init__(self, game : Any):
 		self.game = game
-		self.containers : dict[str, Container | Scrollable_Container | Relative_Container] = {}
+		self.containers : dict[str, Linear_Container | Scrollable_Container | Relative_Container] = {}
 		self.lables : dict[str, Lable] = {}
 		self.buttons : dict[str, Button] = {}
 		self._surface : pygame.Surface =  game.surface
