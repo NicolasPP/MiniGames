@@ -4,9 +4,9 @@ from typing import Type
 
 from GUI.screen import Screen
 from GUI.components.button import Button, style_quit, fullscreen_inactive_style, fullscreen_active_style, Button_Type
-from GUI.components.containers import Container, Scrollable_Container, LAYOUT_PLANE, Padding
+from GUI.components.containers import Linear_Container, Scrollable_Container, LAYOUT_PLANE, Padding
 
-from games.game import Game
+from games.game import Game, Game_GUI
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
@@ -16,32 +16,22 @@ from config.app_config import *
 import config.games_config as gcfg
 
 class RES1610:
-    MEDIUM = 960, 600
-    LARGE = 1280, 800
+    MEDIUM : tuple[int, int] = 960, 600
+    LARGE : tuple[int, int] = 1280, 800
 
 
 
-class Game_GUI:
-	def __init__(self, minigames):
-		self.minigames = minigames
-		self.containers = {}
-		self.buttons = {}
-		self._surface = minigames.screen.surface
+class Minigame_GUI(Game_GUI):
+	def __init__(self, minigames) -> None:
+		super().__init__(minigames)
 		self.populate_GUI()
-
-	@property
-	def surface(self): return self.minigames.screen.surface
-	@surface.setter
-	def surface(self, new_surface): self._surface = new_surface
-	@surface.deleter
-	def surface(self): del self._surfacex
 	
-	def populate_GUI(self):
+	def populate_GUI(self) -> None:
 		self.create_containers()
 		self.create_buttons()
 		self.populate_containers()
 
-	def create_buttons(self):
+	def create_buttons(self) -> None:
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
 		game_selection  = self.containers['game_selection']	
@@ -49,7 +39,7 @@ class Game_GUI:
 		button_size = BUTTON_W, BUTTON_H
 		
 		quit 			= Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-		full_screen 	= Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.minigames.screen.full_screen)
+		full_screen 	= Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
 		menu 			= Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tictactoe 		= Button(game_selection, button_size, BUTTON_COLOR, message = "Tictactoe", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
@@ -67,10 +57,10 @@ class Game_GUI:
 		self.buttons['wordle'] 			= wordle
 
 
-	def create_containers(self):
-		sidebar 		= Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR,padding = Padding(spacing = PADDING * 2), root = True )
-		game_menu 		= Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		settings 		= Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+	def create_containers(self) -> None:
+		sidebar 		= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True )
+		game_menu 		= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		settings 		= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
 		game_selection 	= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(top = 0))
 		self.containers['sidebar'] 			= sidebar
 		self.containers['game_menu'] 		= game_menu
@@ -78,7 +68,7 @@ class Game_GUI:
 		self.containers['game_selection']	= game_selection
 
 
-	def populate_containers(self):
+	def populate_containers(self) -> None:
 		quit  			= self.buttons['quit'] 				
 		full_screen  	= self.buttons['full_screen'] 		
 		menu  			= self.buttons['menu'] 				
@@ -90,19 +80,21 @@ class Game_GUI:
 		settings  		= self.containers['settings'] 		
 		game_selection  = self.containers['game_selection']	
 
-		game_selection.add_component(snake)
-		game_selection.add_component(wordle)
-		game_selection.add_component(tictactoe)
+		if isinstance(game_selection, Scrollable_Container): 
+			game_selection.add_component(snake)
+			game_selection.add_component(wordle)
+			game_selection.add_component(tictactoe)
 
-		settings.add_component(quit)
-		settings.add_component(full_screen)
-
-		game_menu.add_component(settings)
-		game_menu.add_component(menu)
-
-
-		sidebar.add_component(game_menu)
-		sidebar.add_component(game_selection)
+		if isinstance(settings, Linear_Container):
+			settings.add_component(quit)
+			settings.add_component(full_screen)
+		if isinstance(game_menu, Linear_Container):
+			game_menu.add_component(settings)
+			game_menu.add_component(menu)
+	
+		if isinstance(sidebar, Linear_Container):
+			sidebar.add_component(game_menu)
+			sidebar.add_component(game_selection)
 
 
 
@@ -129,7 +121,15 @@ class Minigames:
 			"Wordle" : Wordle(self),
 		}
 
-		self.GUI = Game_GUI(self)
+		self.GUI = Minigame_GUI(self)
+
+	@property
+	def surface(self) -> pygame.Surface: return self.screen.surface
+	@surface.setter
+	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
+	@surface.deleter
+	def surface(self) -> None: del self._surface
+
 
 
 	# Main Game Functions
@@ -164,7 +164,7 @@ class Minigames:
 	def toggle_fullscreen(self) -> None:
 		self.screen.toggle_full_screen()
 		for name, game in self.games.items(): game.update_surface_size()
-		self.GUI = Game_GUI(self)
+		self.GUI = Minigame_GUI(self)
 	
 	def get_current_game(self): 
 		return self.games[self.current_game]
