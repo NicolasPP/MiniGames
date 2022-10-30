@@ -12,7 +12,7 @@ class Component:
 		self.parent = parent
 		self.alpha = alpha
 		self.processed = False
-		self.rect = pygame.Rect(pos, size)
+		self.rect = pygame.rect.Rect(pos, size)
 		self.color = (255, 255, 255) if color == (-1,-1,-1) else color
 		self.surface = pygame.Surface(size)
 		self.show = True
