@@ -20,7 +20,7 @@ class Button(Component):
 	 			pos : tuple[int, int] = (0, 0),
 	 			message : str = "",
 	 			on_click : Callable = nothing,
-	 			alpha : int = gcfg.NORMAL_ALPHA,
+	 			alpha : float = gcfg.NORMAL_ALPHA,
 	 			show_lable : bool = False,
 	 			font_color : tuple[int, int, int] = (0,0,0),
 	 			button_type : Button_Type = Button_Type.PRESS,
@@ -55,10 +55,6 @@ class Button(Component):
 
 	def render(self, set_alpha = False) -> None:
 		self.parent.surface.blit(*self.get_surface_blit(set_alpha = set_alpha))
-
-	def update_pos(self, pos_change : pygame.math.Vector2) ->  None:
-		new_pos = pygame.math.Vector2(self.rect.topleft) + pos_change
-		self.rect.topleft = new_pos.x, new_pos.y
 	
 
 	def click(self, *kwargs : Any) -> None:
@@ -77,7 +73,7 @@ def get_lable(button : Button) -> Lable:
 def get_button_surface(button : Button) -> pygame.Surface:
 	s = pygame.Surface((button.rect.w, button.rect.h))
 	s.fill(button.color)
-	s.set_alpha(button.alpha)
+	s.set_alpha(int(round(button.alpha)))
 	return s
 
 

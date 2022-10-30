@@ -46,10 +46,10 @@ class Game:
 
 	def get_game_surface(self, 
 						color : tuple[int, int, int], 
-						alpha : int = NORMAL_ALPHA
+						alpha : float = NORMAL_ALPHA
 		) -> pygame.Surface:
 		game_surface = pygame.Surface(self.app.screen.get_current_size())
-		game_surface.set_alpha(alpha)
+		game_surface.set_alpha(int(round(alpha)))
 		game_surface.fill(color)
 		return game_surface
 

@@ -9,7 +9,7 @@ class Lable(Component):
 				 message : str, 
 				 font_size : int, 
 				 color : tuple[int, int, int], 
-				 alpha : int, 
+				 alpha : float, 
 				 pos : tuple[int, int] = (0,0), 
 				 r_topleft = False):
 		super().__init__(parent, pos, (font_size, font_size), alpha, color)
