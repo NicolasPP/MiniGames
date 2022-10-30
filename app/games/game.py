@@ -62,16 +62,16 @@ class Game_GUI:
 		self.containers : dict[str, Container | Scrollable_Container | Relative_Container] = {}
 		self.lables : dict[str, Lable] = {}
 		self.buttons : dict[str, Button] = {}
-		self._surface =  game.surface
+		self._surface : pygame.Surface =  game.surface
 
 	@property
-	def surface(self): return self.wordle_game.surface
+	def surface(self) -> pygame.Surface: return self.game.surface
 	@surface.setter
-	def surface(self, new_surface): self._surface = new_surface
+	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
 	@surface.deleter
-	def surface(self): del self._surfacex
+	def surface(self) -> None: del self._surface
 
-	def populate_GUI(self):
+	def populate_GUI(self) ->None:
 		assert "not implemented"
 
 
