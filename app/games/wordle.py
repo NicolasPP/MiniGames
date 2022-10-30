@@ -264,6 +264,7 @@ class Wordle(Game):
 	
 	def update_surface_size(self) -> None:
 		self.surface = self.get_game_surface(self.color)
+		self.wordle_GUI = Wordle_GUI(self)
 		self.update_letters_size()
 
 	def update_letters_size(self) -> None:
