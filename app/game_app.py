@@ -154,7 +154,7 @@ class Minigames:
 	def render(self) -> None:
 		sidebar = self.GUI.containers['sidebar']
 		self.get_current_game().render()
-		if sidebar.is_hovered(pygame.mouse.get_pos()) : sidebar.render()
+		if sidebar.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())): sidebar.render()
 		self.screen.render()
 
 	def set_delta_time(self) -> None:

@@ -36,5 +36,5 @@ class Component:
 		if set_alpha: self.surface.set_alpha(int(round(self.alpha)))
 		return self.surface, self.rect
 
-	def is_hovered(self, mouse_pos : tuple[int, int]) -> bool:
-		return self.rect.collidepoint(mouse_pos)
+	def is_hovered(self, mouse_pos : pygame.math.Vector2) -> bool:
+		return self.rect.collidepoint(mouse_pos.x, mouse_pos.y)
