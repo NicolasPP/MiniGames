@@ -1,6 +1,5 @@
 # MiniGames App
  . Snake \
- . Tictactoe \
  . Wordle 
 
 # Requirements
