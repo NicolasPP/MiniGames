@@ -17,6 +17,7 @@ TODO: Games to add in the future
 TODO: find logo online for application, add to assets folder
 	  update dist.sh scrpit to generate executable with the
 	  logo
+TODO: some things are still not type hinted, most parents or root_parents are just Any
 '''
 
 
