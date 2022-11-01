@@ -2,7 +2,7 @@ from config.games_config import *
 from games.game import Game
 
 
-class Tictactoe(Game):
+class Tetris(Game):
 	def __init__(self, app):
 		super().__init__(app)
 

@@ -11,9 +11,6 @@ TODO : add user's stats
 		- amount of words guessed right
 		- amount og words guessed wrong
 		- little screenshot / smaller version of board of best game (game with smallest amount of moves)
-	- Tictactoe
-		- player One games won
-		- player Two games won
 	- sudoku
 		- games solved
 		- fastest game solved

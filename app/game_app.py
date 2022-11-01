@@ -9,7 +9,7 @@ from GUI.components.containers import Linear_Container, Scrollable_Container, LA
 from games.game import Game, Game_GUI
 from games.snake import Snake
 from games.wordle import Wordle
-from games.tictactoe import Tictactoe
+from games.tetris import Tetris
 from games.main_menu import Main_menu
 
 from config.app_config import *
@@ -42,7 +42,7 @@ class Minigame_GUI(Game_GUI):
 		full_screen 	= Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
 		menu 			= Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
-		tictactoe 		= Button(game_selection, button_size, BUTTON_COLOR, message = "Tictactoe", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		
 		style_quit(quit)
@@ -53,7 +53,7 @@ class Minigame_GUI(Game_GUI):
 		self.buttons['full_screen'] 	= full_screen
 		self.buttons['menu'] 			= menu
 		self.buttons['snake'] 			= snake
-		self.buttons['tictactoe'] 		= tictactoe
+		self.buttons['tetris'] 			= tetris
 		self.buttons['wordle'] 			= wordle
 
 
@@ -73,7 +73,7 @@ class Minigame_GUI(Game_GUI):
 		full_screen  	= self.buttons['full_screen'] 		
 		menu  			= self.buttons['menu'] 				
 		snake  			= self.buttons['snake'] 				
-		tictactoe  		= self.buttons['tictactoe'] 			
+		tetris  		= self.buttons['tetris'] 			
 		wordle  		= self.buttons['wordle'] 				
 		sidebar  		= self.containers['sidebar'] 			
 		game_menu  		= self.containers['game_menu'] 		
@@ -83,7 +83,7 @@ class Minigame_GUI(Game_GUI):
 		if isinstance(game_selection, Scrollable_Container): 
 			game_selection.add_component(snake)
 			game_selection.add_component(wordle)
-			game_selection.add_component(tictactoe)
+			game_selection.add_component(tetris)
 
 		if isinstance(settings, Linear_Container):
 			settings.add_component(quit)
@@ -117,7 +117,7 @@ class Minigames:
 		self.games : dict[str, Game]= {
 			"Menu" : Main_menu(self),
 			"Snake" : Snake(self),
-			"Tictactoe" : Tictactoe(self),
+			"Tetris" : Tetris(self),
 			"Wordle" : Wordle(self),
 		}
 
