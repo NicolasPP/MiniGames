@@ -332,7 +332,7 @@ def toggle_pause(snake_game : Snake) -> None:
 def restart(snake_game : Snake) -> None:
 	snake_game.score = 0
 	snake_game.foods = []
-	snake_game.snake_GUI.lables['score_lable'].update_message()
+	snake_game.snake_GUI.lables['score_lable'].message = str(snake_game.score)
 	snake_game.cells = []
 	snake_game.grid = []
 	create_grid(snake_game)
