@@ -1,106 +1,193 @@
 import pygame, sys, time
+from enum import Enum
+from typing import Type
 
 from GUI.screen import Screen
+from GUI.components.button import Button, style_quit, fullscreen_inactive_style, fullscreen_active_style, Button_Type
+from GUI.components.containers import Linear_Container, Scrollable_Container, LAYOUT_PLANE, Padding
+
+from games.game import Game, Game_GUI
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tictactoe import Tictactoe
-from GUI.sidebar import Sidebar
 from games.main_menu import Main_menu
+
 from config.app_config import *
 import config.games_config as gcfg
-from enum import Enum
 
 class RES1610:
-    SMALL = 640, 400
-    MEDIUM = 960, 600
-    LARGE = 1280, 800
+    MEDIUM : tuple[int, int] = 960, 600
+    LARGE : tuple[int, int] = 1280, 800
 
-class MiniGameApp:
-	def __init__(self, s_width, s_height, full_screen):
-		pygame.init()
-		self.delta_time = 0
-		self.prev_time = time.time()
-		self.running = True
+
+
+class Minigame_GUI(Game_GUI):
+	def __init__(self, minigames) -> None:
+		super().__init__(minigames)
+		self.populate_GUI()
+	
+	def populate_GUI(self) -> None:
+		self.create_containers()
+		self.create_buttons()
+		self.populate_containers()
+
+	def create_buttons(self) -> None:
+		game_menu  		= self.containers['game_menu'] 		
+		settings  		= self.containers['settings'] 		
+		game_selection  = self.containers['game_selection']	
+		half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
+		button_size = BUTTON_W, BUTTON_H
+		
+		quit 			= Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+		full_screen 	= Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
+		menu 			= Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
+		tictactoe 		= Button(game_selection, button_size, BUTTON_COLOR, message = "Tictactoe", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		
+		style_quit(quit)
+		full_screen.set_active_style(fullscreen_active_style, full_screen)
+		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
+		
+		self.buttons['quit'] 			= quit
+		self.buttons['full_screen'] 	= full_screen
+		self.buttons['menu'] 			= menu
+		self.buttons['snake'] 			= snake
+		self.buttons['tictactoe'] 		= tictactoe
+		self.buttons['wordle'] 			= wordle
+
+
+	def create_containers(self) -> None:
+		sidebar 		= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True )
+		game_menu 		= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		settings 		= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		game_selection 	= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(top = 0))
+		self.containers['sidebar'] 			= sidebar
+		self.containers['game_menu'] 		= game_menu
+		self.containers['settings'] 		= settings
+		self.containers['game_selection']	= game_selection
+
+
+	def populate_containers(self) -> None:
+		quit  			= self.buttons['quit'] 				
+		full_screen  	= self.buttons['full_screen'] 		
+		menu  			= self.buttons['menu'] 				
+		snake  			= self.buttons['snake'] 				
+		tictactoe  		= self.buttons['tictactoe'] 			
+		wordle  		= self.buttons['wordle'] 				
+		sidebar  		= self.containers['sidebar'] 			
+		game_menu  		= self.containers['game_menu'] 		
+		settings  		= self.containers['settings'] 		
+		game_selection  = self.containers['game_selection']	
+
+		if isinstance(game_selection, Scrollable_Container): 
+			game_selection.add_component(snake)
+			game_selection.add_component(wordle)
+			game_selection.add_component(tictactoe)
+
+		if isinstance(settings, Linear_Container):
+			settings.add_component(quit)
+			settings.add_component(full_screen)
+		if isinstance(game_menu, Linear_Container):
+			game_menu.add_component(settings)
+			game_menu.add_component(menu)
+	
+		if isinstance(sidebar, Linear_Container):
+			sidebar.add_component(game_menu)
+			sidebar.add_component(game_selection)
+
+
+
+class Minigames:
+	def __init__(self, s_width : int, s_height : int, full_screen : bool) -> None:
 		# initialize main pygame surface
-		self.screen = Screen(*RES1610.SMALL, full_screen, color = APP_BG_COLOR)
-		self.screen.display()
-		self.clock = pygame.time.Clock()
+		self.screen : Screen = Screen(*RES1610.MEDIUM, full_screen, color = APP_BG_COLOR)
+		self.running : bool = True
 
-		# GUI elements Rect : function
-		self.sidebar = Sidebar(self.screen.current_width, self.screen.current_height, self)
+		# time
+		self.clock : pygame.time.Clock =  pygame.time.Clock()
+		self.delta_time : float = 0
+		self.prev_time : float = time.time()
+		
 		#Games
-		self.games = {
+
+		self.current_game : str = 'Menu'
+
+
+		self.games : dict[str, Game]= {
 			"Menu" : Main_menu(self),
 			"Snake" : Snake(self),
 			"Tictactoe" : Tictactoe(self),
 			"Wordle" : Wordle(self),
 		}
-		self.current_game = "Menu"
+
+		self.GUI = Minigame_GUI(self)
+
+	@property
+	def surface(self) -> pygame.Surface: return self.screen.surface
+	@surface.setter
+	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
+	@surface.deleter
+	def surface(self) -> None: del self._surface
+
 
 
 	# Main Game Functions
 
-	def run(self):
+	def run(self) -> None:
 		while self.running:
 			
-			self.screen.surface.fill(self.screen.bg_color)
+			self.get_current_game().surface.fill(self.get_current_game().color)
+
 			self.set_delta_time()
 			for event in pygame.event.get(): self.parse_event(event)
 
-			self.games[self.current_game].surface.fill(self.games[self.current_game].bg_color)
 
 			self.update(self.delta_time)
 			self.render()
 
 			pygame.display.update()
 			
-	def update(self, dt): self.games[self.current_game].update(dt)
+	def update(self, dt : float) -> None:
+		self.get_current_game().update(dt)
 
-	def render(self):
-		self.games[self.current_game].render()
-		self.sidebar.render(self.screen.surface)
+	def render(self) -> None:
+		sidebar = self.GUI.containers['sidebar']
+		self.get_current_game().render()
+		if sidebar.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())): sidebar.render()
 		self.screen.render()
 
-
-	def get_game_surface(self, color, alpha = False):
-		gs_width, gs_height = self.get_gs_dimension()
-		g_surface = pygame.Surface((gs_width, gs_height))
-		if alpha:
-			g_surface =pygame.Surface((gs_width, gs_height), pygame.SRCALPHA)
-			g_surface.set_alpha(alpha)
-		g_surface.fill(color)
-		return g_surface
-	
-	def get_gs_dimension(self):
-		gs_x, gs_y = self.get_gs_position()
-		gs_width = self.screen.current_width - (gs_x + PADDING)
-		gs_height = self.screen.current_height - (gs_y + PADDING)
-		return gs_width, gs_height
-
-	def get_gs_position(self):
-		return self.sidebar.rect.width + (PADDING * 2), PADDING
-
-	def set_delta_time(self):
+	def set_delta_time(self) -> None:
 		self.delta_time = time.time() - self.prev_time
 		self.prev_time = time.time()
 
-	def toggle_fullscreen(self):
+	def toggle_fullscreen(self) -> None:
 		self.screen.toggle_full_screen()
-		self.sidebar.update_surface_size()
 		for name, game in self.games.items(): game.update_surface_size()
-		
-	# Game events Parser 
-	def parse_event(self, event):
-
-		if self.sidebar.is_hovering(): self.sidebar.parse_event(event)
-		self.games[self.current_game].parse_event(event)
+		self.GUI = Minigame_GUI(self)
 	
-	def quit_game(self):
+	def get_current_game(self): 
+		return self.games[self.current_game]
+	
+	# Game events Parser 
+	def parse_event(self, event : pygame.event.Event) -> None:
+
+		self.GUI.containers['sidebar'].parse_event(event, self)
+		self.get_current_game().parse_event(event)
+	
+	def quit_game(self) -> None:
 		self.running = False
 		pygame.quit()
 		sys.exit()
 
+# GUI BUTTON LOGIC
 
+def set_game(parent, comp):
+	if parent.current_game == comp.message: return
+	parent.current_game = comp.message
 
+def fullscreen(parent, comp):
+	parent.toggle_fullscreen()
 
-
+def quit_game(parent, comp):
+	parent.quit_game()

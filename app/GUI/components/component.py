@@ -1,4 +1,5 @@
 import pygame
+from typing import Iterable
 
 
 '''
@@ -8,32 +9,32 @@ TODO : Change render logic of GUI components so that you have a invalidate fucnt
 '''
 
 class Component:
-	def __init__(self, parent, pos, size, alpha, color):
+	def __init__(self, parent, pos : tuple[int, int], size : tuple[int, int], alpha : float, color : tuple[int, int, int]):
 		self.parent = parent
 		self.alpha = alpha
-		self.processed = False
-		self.rect = pygame.Rect(pos, size)
-		self.color = color
-		self.surface = pygame.Surface(size)
-		self.surface.fill(self.color)
+		self.processed : bool = False
+		self.rect  : pygame.rect.Rect = pygame.rect.Rect(pos, size)
+		self.color = (255, 255, 255) if color == (-1,-1,-1) else color
+		self.surface : pygame.Surface | pygame.surface.Surface = pygame.Surface(size)
+		self.show : bool = True
 		
 
-	def update_pos(self, pos_change):
-		self.rect.topleft = tuple(pygame.math.Vector2(self.rect.topleft) + pos_change)
+	def update_pos(self, pos_change : tuple[int, int]) -> None:
+		new_pos = pygame.math.Vector2(self.rect.topleft) + pygame.math.Vector2(pos_change)
+		self.rect.topleft = int(round(new_pos.x)), int(round(new_pos.y))
 
 
-	def set_size(self, size):
-		pos = self.rect.x , self.rect.y
-		self.rect = pygame.Rect(pos, size)
-		self.surface = pygame.Surface(size)
-		self.surface.fill(self.color)
-
-	def render(self, set_alpha = False):
+	def render(self, set_alpha : bool = False) -> None:
+		if not self.show: return
 		self.parent.surface.blit(*self.get_surface_blit(set_alpha = set_alpha))
 
-	def get_surface_blit(self, set_alpha = False):
-		if set_alpha: self.surface.set_alpha(self.alpha)
+	def render_dest(self, dest : pygame.Surface, set_alpha : bool = False):
+		if not self.show: return
+		dest.blit(*self.get_surface_blit(set_alpha))
+
+	def get_surface_blit(self, set_alpha : bool = False) -> tuple[pygame.Surface | pygame.surface.Surface, pygame.rect.Rect]:
+		if set_alpha: self.surface.set_alpha(int(round(self.alpha)))
 		return self.surface, self.rect
 
-	def is_clicked(self, mouse_pos):
-		return self.rect.collidepoint(mouse_pos)
+	def is_hovered(self, mouse_pos : pygame.math.Vector2) -> bool:
+		return self.rect.collidepoint(mouse_pos.x, mouse_pos.y)

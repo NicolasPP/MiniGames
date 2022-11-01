@@ -1,53 +1,79 @@
-import pygame
-from config.games_config import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from game_app import Minigames
 
-'''
-TODO : add mouse_position as a @property, this way the offset can be calculated here and 
-	   sent to all children. rather than each children calculating it.
-	   
-'''
+from config.games_config import *
+import pygame
+from dataclasses import dataclass
+from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container
+from GUI.components.button import Button
+from GUI.components.lable import Lable
+from typing import Any
+
 
 class Game:
-	def __init__(self, app, bg_color = GAME_BG):
-	
-		self.bg_color = bg_color
+	def __init__(self, 
+				app : Minigames, 
+				color : tuple[int, int, int] = GAME_BG
+				) -> None:
+		self.color = color
 		self.app = app
 
-		self._surface = app.get_game_surface(self.bg_color)
-		self.rect = self.surface.get_rect(topleft = app.get_gs_position())
+		self._surface : pygame.Surface = self.get_game_surface(self.color)
+		self.rect : pygame.rect.Rect = self.surface.get_rect(topleft = (0, 0))
 				
-		self.paused = True
-		self._user_input = pygame.key.get_pressed()
-
-
+		self.paused : bool = True
 
 	@property
-	def user_input(self): return pygame.key.get_pressed()
-	@property
-	def surface(self): return self._surface
+	def surface(self) -> pygame.Surface: return self._surface
 
-	@user_input.setter
-	def user_input(self, new_user_input): self._user_input = new_user_input
 	@surface.setter
-	def surface(self, new_surface): 
+	def surface(self, new_surface : pygame.Surface) -> None: 
 		self._surface = new_surface
-		self.rect = new_surface.get_rect(topleft = self.app.get_gs_position())
+		self.rect = new_surface.get_rect(topleft = (0,0))
 
-
-	@user_input.deleter
-	def user_input(self, ): del self._user_input
 	@surface.deleter
-	def surface(self): del self._surface
+	def surface(self) -> None: del self._surface
 
 
-	def update(self, dt): pass
-	def parse_event(self, event): pass
+	def update(self, dt : float) -> None: pass
+	def parse_event(self, event : pygame.event.Event) -> None: pass
 
-	def render(self): self.app.screen.surface.blit(self.surface, self.app.get_gs_position())
-	def update_surface_size(self): self.surface = self.app.get_game_surface(self.bg_color)
-	def render_message(self, *lable_ids):
-		for l_id in lable_ids:
-			lable = self.lables[l_id]['lable']
-			lable_surface  = self.lables[l_id]['surface']
-			if lable_surface : self.surface.blit(lable_surface, (0,0))  	
-			lable.render(set_alpha = True)
+	def render(self) -> None: 
+		self.app.surface.blit(self.surface, (0,0))
+	def update_surface_size(self) -> None: self.surface = self.get_game_surface(self.color)
+
+	def get_game_surface(self, 
+						color : tuple[int, int, int], 
+						alpha : float = NORMAL_ALPHA
+		) -> pygame.Surface:
+		game_surface = pygame.Surface(self.app.screen.get_current_size())
+		game_surface.set_alpha(int(round(alpha)))
+		game_surface.fill(color)
+		return game_surface
+
+
+
+
+class Game_GUI:
+	def __init__(self, game : Any):
+		self.game = game
+		self.containers : dict[str, Linear_Container | Scrollable_Container | Relative_Container] = {}
+		self.lables : dict[str, Lable] = {}
+		self.buttons : dict[str, Button] = {}
+		self._surface : pygame.Surface =  game.surface
+
+	@property
+	def surface(self) -> pygame.Surface: return self.game.surface
+	@surface.setter
+	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
+	@surface.deleter
+	def surface(self) -> None: del self._surface
+
+	def populate_GUI(self) ->None:
+		assert "not implemented"
+
+
+
+
