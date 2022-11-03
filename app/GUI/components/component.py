@@ -11,7 +11,7 @@ TODO : Change render logic of GUI components so that you have a invalidate fucnt
 class Component:
 	def __init__(self, parent, pos : tuple[int, int], size : tuple[int, int], alpha : float, color : tuple[int, int, int]):
 		self.parent = parent
-		self.alpha = alpha
+		self.alpha : float = alpha
 		self.processed : bool = False
 		self.rect  : pygame.rect.Rect = pygame.rect.Rect(pos, size)
 		self.color = (255, 255, 255) if color == (-1,-1,-1) else color

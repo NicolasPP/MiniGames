@@ -108,7 +108,6 @@ class Container(Component):
 		pos = self.rect.x , self.rect.y
 		self.rect = pygame.Rect(pos, size)
 		self.surface = pygame.Surface(size)
-		self.surface.fill(self.color)
 
 	def container_click(self, mouse_pos : tuple[int, int], event : pygame.event.Event, app : Any) -> None:
 		if event.type != pygame.MOUSEBUTTONDOWN: return
@@ -188,15 +187,12 @@ class Scrollable_Container(Container):
 		self.scroll_speed = pygame.math.Vector2(0,10)
 
 	def move_up(self) -> None:
-		self.surface.fill(self.color)
-		last_comp_pos = self.components[-1].rect.bottom
 		if last_comp_pos + self.rect.y <= self.rect.bottom : return
 		speed = self.scroll_speed * -1
 		for comp in self.components: comp.update_pos((int(round(speed.x)), int(round(speed.y))))
 		
 
 	def move_down(self) -> None:
-		self.surface.fill(self.color)
 		first_comp_pos = self.components[0].rect.y
 		if first_comp_pos >= 0: return
 		for comp in self.components: comp.update_pos((int(round(self.scroll_speed.x)), int(round(self.scroll_speed.y))))
@@ -207,8 +203,8 @@ class Scrollable_Container(Container):
 		mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
 		offset = pygame.math.Vector2(self.parent.get_container_offset())
 		if event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered(mouse_pos - offset):
-			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()#self.scroll_offset = self.scroll_speed
-			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()#self.scroll_offset = self.scroll_speed * -1
+			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()
+			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()
 			self.container_click(pygame.mouse.get_pos(), event, root_parent)
 '''
 NOT GOOD FOR NESTING WITH OTHER CONTAINERS
