@@ -174,7 +174,9 @@ class Wordle_GUI(Game_GUI):
 		loose_surface.fill(LOOSE_COLOR)
 
 		win_container.surface = win_surface
+		win_container.show_surface = True
 		loose_container.surface = loose_surface
+		loose_container.show_surface = True
 
 		self.containers['win_container'] = win_container
 		self.containers['loose_container'] = loose_container

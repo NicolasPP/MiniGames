@@ -187,6 +187,7 @@ class Scrollable_Container(Container):
 		self.scroll_speed = pygame.math.Vector2(0,10)
 
 	def move_up(self) -> None:
+		last_comp_pos = self.components[0].rect.y
 		if last_comp_pos + self.rect.y <= self.rect.bottom : return
 		speed = self.scroll_speed * -1
 		for comp in self.components: comp.update_pos((int(round(speed.x)), int(round(speed.y))))
@@ -218,12 +219,13 @@ class Relative_Container(Container):
 				 alpha : float = gcfg.NORMAL_ALPHA,
 				 root : bool = False,
 				 padding : Padding = Padding()):
-		
 		super().__init__(parent, LAYOUT_PLANE.RELATIVE,color, pos, size, alpha, root, padding)
+		self.show_surface = False
 
 	def render(self, set_alpha : bool = False) -> None:
 		for comp in self.components: comp.render(set_alpha = set_alpha)
-		self.parent.surface.blit(*self.get_surface_blit(set_alpha))	
+		if self.show_surface:
+			self.parent.surface.blit(*self.get_surface_blit(set_alpha))	
 
 
 

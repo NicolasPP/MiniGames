@@ -188,7 +188,9 @@ class Snake_GUI:
 		paused_surface.fill(PAUSE_COLOR)
 		
 		loose_container.surface = loose_surface
+		loose_container.show_surface = True
 		paused_container.surface = paused_surface
+		paused_container.show_surface = True
 
 
 		self.containers['game_container'] = game_container
