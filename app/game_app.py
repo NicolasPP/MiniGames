@@ -11,7 +11,7 @@ from GUI.components.button import Button,\
 								 Button_Type,\
 								 collapsed_menu_style,\
 								 expanded_menu_style
-from GUI.components.containers import Linear_Container, Scrollable_Container, LAYOUT_PLANE, Padding
+from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container, LAYOUT_PLANE, Padding
 
 from games.game import Game, Game_GUI
 from games.snake import Snake
@@ -57,7 +57,7 @@ class Minigame_GUI(Game_GUI):
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		collapsed_menu  = Button(self, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), BUTTON_COLOR, message = "Menu", on_click =toggle_sidebar,show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+		collapsed_menu  = Button(self.game, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
 
 		style_quit(quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
@@ -121,8 +121,8 @@ class Minigame_GUI(Game_GUI):
 		self.sidebar_move_distance = self.containers['sidebar'].rect.width
 
 	def render_sidebar(self) -> None:
-		self.containers['sidebar'].render()
-		self.buttons['collapsed_menu'].render()
+		self.containers['sidebar'].render(True)
+		self.buttons['collapsed_menu'].render(True)
 
 	def update_sidebar(self, dt : float) -> None:
 		if self.sidebar_move_distance <= 0: return
@@ -220,6 +220,8 @@ class Minigames:
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			if self.GUI.buttons['collapsed_menu'].is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())):
 				self.GUI.buttons['collapsed_menu'].click(self.GUI, self.GUI.buttons['collapsed_menu'])
+
+		if event.type == pygame.MOUSEMOTION: self.GUI.buttons['collapsed_menu'].on_hover()
 	
 	def quit_game(self) -> None:
 		self.running = False

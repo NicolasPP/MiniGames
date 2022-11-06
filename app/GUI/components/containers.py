@@ -16,9 +16,6 @@ TODO : fix padding logic
 	   make nicer looking
 TODO : move process logic where we update padding depending on orientation
 	   to padding class
-TODO : container_click function will recognise a click and call click() on all its children 
-	   this will break when adding lables to Containers. Either add isinstance check to see if its a button
-	   or add click() to component class
 '''
 
 class MOUSECLICK:
@@ -109,13 +106,13 @@ class Container(Component):
 		self.rect = pygame.Rect(pos, size)
 		self.surface = pygame.Surface(size)
 
-	def container_click(self, mouse_pos : tuple[int, int], event : pygame.event.Event, app : Any) -> None:
+	def container_click(self, event : pygame.event.Event, app : Any) -> None:
 		if event.type != pygame.MOUSEBUTTONDOWN: return
 		if event.button != MOUSECLICK.LEFT: return
 		for comp in self.components:
 			if isinstance(comp, Container): continue
 			if isinstance(comp, Lable): continue
-			mouse_p = pygame.math.Vector2(mouse_pos).elementwise()
+			mouse_p = pygame.math.Vector2(pygame.mouse.get_pos()).elementwise()
 			offset = pygame.math.Vector2(self.get_container_offset())
 			if comp.is_hovered(mouse_p - offset) and \
 				isinstance(comp, Button):
@@ -123,7 +120,7 @@ class Container(Component):
 
 	def render(self, set_alpha : bool = False) -> None:
 		self.surface.fill(self.color)
-		for comp in self.components: comp.render()
+		for comp in self.components: comp.render(set_alpha)
 		self.parent.surface.blit(*self.get_surface_blit(set_alpha))		
 
 	def process_components(self, width : int, height : int) -> tuple[int, int]:
@@ -153,11 +150,11 @@ class Container(Component):
 		return width, height
 
 	def parse_event(self, event : pygame.event.Event, root_parent : Any) -> None:
-		mouse_pos = pygame.mouse.get_pos()
+		offset = self.get_container_offset()
 		for comp in self.components:
-			if isinstance(comp, Container):
-				comp.parse_event(event, root_parent)
-		self.container_click(mouse_pos, event, root_parent)
+			if isinstance(comp, Container): comp.parse_event(event, root_parent)
+			if isinstance(comp, Button): comp.on_hover((offset.x, offset.y))
+		self.container_click(event, root_parent)
 
 
 class Linear_Container(Container):
@@ -202,11 +199,18 @@ class Scrollable_Container(Container):
 
 	def parse_event(self, event : pygame.event.Event, root_parent : Any) -> None:
 		mouse_pos = pygame.math.Vector2(pygame.mouse.get_pos())
-		offset = pygame.math.Vector2(self.parent.get_container_offset())
-		if event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered(mouse_pos - offset):
+		parent_offset = pygame.math.Vector2(self.parent.get_container_offset())
+		offset = self.get_container_offset()
+		for comp in self.components:
+			if isinstance(comp, Container): comp.parse_event(event, root_parent)
+			if isinstance(comp, Button) and \
+				event.type == pygame.MOUSEMOTION:
+				 comp.on_hover((offset.x, offset.y))
+
+		if event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered(mouse_pos - parent_offset):
 			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()
 			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()
-			self.container_click(pygame.mouse.get_pos(), event, root_parent)
+			self.container_click(event, root_parent)
 '''
 NOT GOOD FOR NESTING WITH OTHER CONTAINERS
 '''
