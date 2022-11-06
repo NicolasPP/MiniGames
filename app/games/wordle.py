@@ -165,8 +165,8 @@ class Wordle_GUI(Game_GUI):
 		
 
 	def create_containers(self) -> None:
-		win_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
-		loose_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
+		win_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
+		loose_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
 		
 		win_surface = pygame.Surface(pygame.display.get_surface().get_size())
 		win_surface.fill(PRESENT_IN_PLACE_COLOR)
