@@ -122,10 +122,5 @@ def fullscreen_inactive_style(button : Button) -> None:
 
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 
-def collapsed_menu_style(button : Button):
-	# button.alpha = 30
-	# print(button.surface.get_alpha())
-	print('hey')
-def expanded_menu_style(button : Button):
-	# button.alpha = 30
-	print('oi')
+def collapsed_menu_style(button : Button): pass
+def expanded_menu_style(button : Button): pass
