@@ -31,13 +31,17 @@ class RES1610:
 class Minigame_GUI(Game_GUI):
 	def __init__(self, minigames) -> None:
 		super().__init__(minigames)
-		self.show_sidebar = True
+		self.show_sidebar : bool = True
+		self.sidebar_move_distance : int = 0
+		self.sidebar_move_direction : int = 1
+		self.sidebar_speed = SIDEBAR_SPEED
 		self.populate_GUI()
 	
 	def populate_GUI(self) -> None:
 		self.create_containers()
 		self.create_buttons()
 		self.populate_containers()
+		self.center_sidebar()
 		self.center_collapse_menu()
 
 	def create_buttons(self) -> None:
@@ -53,7 +57,7 @@ class Minigame_GUI(Game_GUI):
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		collapsed_menu  = Button(self, (20, 88), 'red', message = "Menu", on_click =toggle_sidebar,show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+		collapsed_menu  = Button(self, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), BUTTON_COLOR, message = "Menu", on_click =toggle_sidebar,show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
 
 		style_quit(quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
@@ -108,23 +112,32 @@ class Minigame_GUI(Game_GUI):
 		self.buttons['collapsed_menu'].rect.left = self.containers['sidebar'].rect.right
 		self.buttons['collapsed_menu'].rect.centery = self.containers['sidebar'].rect.centery
 
+	def center_sidebar(self) -> None:
+		self.containers['sidebar'].rect.centery = pygame.display.get_surface().get_rect().centery
+
 	def toggle_sidebar(self) -> None:
-
 		self.show_sidebar = not self.show_sidebar
-
-		if self.show_sidebar:
-			self.containers['sidebar'].rect.topleft = 0,0
-		else:
-			self.containers['sidebar'].rect.x -= self.containers['sidebar'].rect.width
-		self.center_collapse_menu()
+		self.sidebar_move_direction = self.sidebar_move_direction * -1
+		self.sidebar_move_distance = self.containers['sidebar'].rect.width
 
 	def render_sidebar(self) -> None:
 		self.containers['sidebar'].render()
 		self.buttons['collapsed_menu'].render()
 
-	def collapse_sidebar(self, dt: float) -> None: pass
-	def expand_sidebar(self, dt: float) -> None: pass
+	def update_sidebar(self, dt : float) -> None:
+		if self.sidebar_move_distance <= 0: return
 
+		dist = dt * self.sidebar_speed
+
+		self.sidebar_move_distance = round(self.sidebar_move_distance - dist)
+		new_xpos = self.containers['sidebar'].rect.left + dist * self.sidebar_move_direction
+
+
+		if new_xpos < self.containers['sidebar'].rect.w * -1: new_xpos = self.containers['sidebar'].rect.w * -1
+		if new_xpos > 0: new_xpos = 0
+
+		self.containers['sidebar'].rect.left = round(new_xpos)
+		self.center_collapse_menu()
 
 
 class Minigames:
@@ -179,12 +192,11 @@ class Minigames:
 			
 	def update(self, dt : float) -> None:
 		self.get_current_game().update(dt)
+		self.GUI.update_sidebar(dt)
 
 	def render(self) -> None:
 		self.get_current_game().render()
 		self.GUI.render_sidebar()
-		# self.GUI.buttons['collapsed_menu'].render()
-		# if sidebar.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())): sidebar.render()
 		self.screen.render()
 
 	def set_delta_time(self) -> None:
