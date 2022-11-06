@@ -16,6 +16,7 @@ class Component:
 		self.color = (255, 255, 255) if color == (-1,-1,-1) else color
 		self.surface : pygame.Surface | pygame.surface.Surface = pygame.Surface(size)
 		self.show : bool = True
+		self.surface.set_alpha(int(round(self.alpha)))
 		
 
 	def update_pos(self, pos_change : tuple[int, int]) -> None:
