@@ -1,5 +1,4 @@
 import pygame
-from typing import Iterable
 
 
 '''

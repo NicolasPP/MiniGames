@@ -3,7 +3,14 @@ from enum import Enum
 from typing import Type
 
 from GUI.screen import Screen
-from GUI.components.button import Button, style_quit, fullscreen_inactive_style, fullscreen_active_style, Button_Type
+
+from GUI.components.button import Button,\
+								 style_quit,\
+								 fullscreen_inactive_style,\
+								 fullscreen_active_style,\
+								 Button_Type,\
+								 collapsed_menu_style,\
+								 expanded_menu_style
 from GUI.components.containers import Linear_Container, Scrollable_Container, LAYOUT_PLANE, Padding
 
 from games.game import Game, Game_GUI
@@ -24,17 +31,19 @@ class RES1610:
 class Minigame_GUI(Game_GUI):
 	def __init__(self, minigames) -> None:
 		super().__init__(minigames)
+		self.show_sidebar = True
 		self.populate_GUI()
 	
 	def populate_GUI(self) -> None:
 		self.create_containers()
 		self.create_buttons()
 		self.populate_containers()
+		self.center_collapse_menu()
 
 	def create_buttons(self) -> None:
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
-		game_selection  = self.containers['game_selection']	
+		game_selection  = self.containers['game_selection']
 		half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
 		button_size = BUTTON_W, BUTTON_H
 		
@@ -44,10 +53,13 @@ class Minigame_GUI(Game_GUI):
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		
+		collapsed_menu  = Button(self, (20, 88), 'red', message = "Menu", on_click =toggle_sidebar,show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+
 		style_quit(quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
-		full_screen.set_inctive_style(fullscreen_inactive_style, full_screen)
+		full_screen.set_inactive_style(fullscreen_inactive_style, full_screen)
+		collapsed_menu.set_active_style(expanded_menu_style, collapsed_menu)
+		collapsed_menu.set_inactive_style(collapsed_menu_style, collapsed_menu)
 		
 		self.buttons['quit'] 			= quit
 		self.buttons['full_screen'] 	= full_screen
@@ -55,13 +67,14 @@ class Minigame_GUI(Game_GUI):
 		self.buttons['snake'] 			= snake
 		self.buttons['tetris'] 			= tetris
 		self.buttons['wordle'] 			= wordle
+		self.buttons['collapsed_menu']  = collapsed_menu
 
 
 	def create_containers(self) -> None:
-		sidebar 		= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True )
-		game_menu 		= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		settings 		= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 	= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(top = 0))
+		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
+		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(top = 0))
 		self.containers['sidebar'] 			= sidebar
 		self.containers['game_menu'] 		= game_menu
 		self.containers['settings'] 		= settings
@@ -74,27 +87,43 @@ class Minigame_GUI(Game_GUI):
 		menu  			= self.buttons['menu'] 				
 		snake  			= self.buttons['snake'] 				
 		tetris  		= self.buttons['tetris'] 			
-		wordle  		= self.buttons['wordle'] 				
+		wordle  		= self.buttons['wordle']
 		sidebar  		= self.containers['sidebar'] 			
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
 		game_selection  = self.containers['game_selection']	
 
-		if isinstance(game_selection, Scrollable_Container): 
-			game_selection.add_component(snake)
-			game_selection.add_component(wordle)
-			game_selection.add_component(tetris)
+		game_selection.add_component(snake)
+		game_selection.add_component(wordle)
+		game_selection.add_component(tetris)
+		settings.add_component(quit)
+		settings.add_component(full_screen)
+		game_menu.add_component(settings)
+		game_menu.add_component(menu)
+		sidebar.add_component(game_menu)
+		sidebar.add_component(game_selection)
 
-		if isinstance(settings, Linear_Container):
-			settings.add_component(quit)
-			settings.add_component(full_screen)
-		if isinstance(game_menu, Linear_Container):
-			game_menu.add_component(settings)
-			game_menu.add_component(menu)
-	
-		if isinstance(sidebar, Linear_Container):
-			sidebar.add_component(game_menu)
-			sidebar.add_component(game_selection)
+
+	def center_collapse_menu(self) -> None:
+		self.buttons['collapsed_menu'].rect.left = self.containers['sidebar'].rect.right
+		self.buttons['collapsed_menu'].rect.centery = self.containers['sidebar'].rect.centery
+
+	def toggle_sidebar(self) -> None:
+
+		self.show_sidebar = not self.show_sidebar
+
+		if self.show_sidebar:
+			self.containers['sidebar'].rect.topleft = 0,0
+		else:
+			self.containers['sidebar'].rect.x -= self.containers['sidebar'].rect.width
+		self.center_collapse_menu()
+
+	def render_sidebar(self) -> None:
+		self.containers['sidebar'].render()
+		self.buttons['collapsed_menu'].render()
+
+	def collapse_sidebar(self, dt: float) -> None: pass
+	def expand_sidebar(self, dt: float) -> None: pass
 
 
 
@@ -121,7 +150,7 @@ class Minigames:
 			"Wordle" : Wordle(self),
 		}
 
-		self.GUI = Minigame_GUI(self)
+		self.GUI : Minigame_GUI = Minigame_GUI(self)
 
 	@property
 	def surface(self) -> pygame.Surface: return self.screen.surface
@@ -152,9 +181,10 @@ class Minigames:
 		self.get_current_game().update(dt)
 
 	def render(self) -> None:
-		sidebar = self.GUI.containers['sidebar']
 		self.get_current_game().render()
-		if sidebar.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())): sidebar.render()
+		self.GUI.render_sidebar()
+		# self.GUI.buttons['collapsed_menu'].render()
+		# if sidebar.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())): sidebar.render()
 		self.screen.render()
 
 	def set_delta_time(self) -> None:
@@ -166,7 +196,7 @@ class Minigames:
 		for name, game in self.games.items(): game.update_surface_size()
 		self.GUI = Minigame_GUI(self)
 	
-	def get_current_game(self): 
+	def get_current_game(self) -> Game: 
 		return self.games[self.current_game]
 	
 	# Game events Parser 
@@ -174,6 +204,10 @@ class Minigames:
 
 		self.GUI.containers['sidebar'].parse_event(event, self)
 		self.get_current_game().parse_event(event)
+
+		if event.type == pygame.MOUSEBUTTONDOWN:
+			if self.GUI.buttons['collapsed_menu'].is_hovered(pygame.math.Vector2(pygame.mouse.get_pos())):
+				self.GUI.buttons['collapsed_menu'].click(self.GUI, self.GUI.buttons['collapsed_menu'])
 	
 	def quit_game(self) -> None:
 		self.running = False
@@ -191,3 +225,6 @@ def fullscreen(parent, comp):
 
 def quit_game(parent, comp):
 	parent.quit_game()
+
+def toggle_sidebar(parent, comp):
+	parent.toggle_sidebar()
