@@ -26,20 +26,21 @@ class Button(Component):
 	 			button_type : Button_Type = Button_Type.PRESS,
 	 			active : bool = False):
 		super().__init__(parent, pos, size, alpha, color)
-		self.surface : pygame.Surface = get_button_surface(self)
+		self.surface.fill(self.color)
 		self.message = message
 		self.on_click = on_click
+		self.show_hover : bool = True
 		self.alpha = alpha
+		self.old_alpha : float = alpha
 		self.show_lable = show_lable
 		self.font_color = font_color
 		self.type = button_type
 		self.active = active
-		self.lable : Lable = get_lable(self)
+		self.lable : Lable = get_lable(self, set_alpha = True)
 		self.switch_button_styles : dict[bool,tuple[Callable, Any]] = {
 			True : (nothing,()),
 			False: (nothing,())
-		}
-
+		} 
 
 	def set_active_style(self, func : Callable, *kwargs : Any) -> None:
 		self.switch_button_styles[True] = func, kwargs
@@ -55,7 +56,6 @@ class Button(Component):
 
 	def render(self, set_alpha = False) -> None:
 		self.parent.surface.blit(*self.get_surface_blit(set_alpha = set_alpha))
-	
 
 	def click(self, *kwargs : Any) -> None:
 		if self.type == Button_Type.SWITCH:
@@ -63,20 +63,21 @@ class Button(Component):
 			self.update_style()
 		self.on_click(*kwargs)
 
+	def on_hover(self, offset : tuple[float, float] = (0,0)) -> None:
+		if not self.show_hover: return
+		if self.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos()) - pygame.math.Vector2(offset)):
+			if self.alpha == HOVER_ALPHA: return
+			self.alpha = HOVER_ALPHA
+			return
+		if self.alpha == gcfg.NORMAL_ALPHA: return
+		self.alpha = self.old_alpha
 
 
-def get_lable(button : Button) -> Lable:
-	pos = button.rect.w // 2, button.rect.h // 2
-	lable = Lable(button, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha, pos = pos)
-	if button.show_lable: lable.render()
+def get_lable(button : Button, set_alpha : bool = False) -> Lable:
+	pos = (button.rect.w // 2) - button.rect.x, (button.rect.h // 2) - button.rect.y
+	lable = Lable(button, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha, pos = button.rect.center)
+	if button.show_lable: lable.render(set_alpha)
 	return lable
-
-def get_button_surface(button : Button) -> pygame.Surface:
-	s = pygame.Surface((button.rect.w, button.rect.h))
-	s.fill(button.color)
-	s.set_alpha(int(round(button.alpha)))
-	return s
-
 
 #### some styles ####
 
@@ -122,6 +123,9 @@ def fullscreen_inactive_style(button : Button) -> None:
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
 
 def collapsed_menu_style(button : Button):
-	button.surface.fill('red')
+	# button.alpha = 30
+	# print(button.surface.get_alpha())
+	print('hey')
 def expanded_menu_style(button : Button):
-	button.surface.fill('green')
+	# button.alpha = 30
+	print('oi')
