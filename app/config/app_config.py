@@ -15,6 +15,7 @@ PADDING : int = 10
 BUTTON_W : int = 80
 BUTTON_H : int = 30
 LABLE_FONT_SIZE : int = 15
+HOVER_ALPHA : float = 200
 
 	# Fullscreen style
 FS_RECT_WIDTH : int = 9
