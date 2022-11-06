@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container
 from GUI.components.button import Button
 from GUI.components.lable import Lable
+from GUI.components.component import Component
 from typing import Any
 
 
@@ -71,8 +72,9 @@ class Game_GUI:
 	@surface.deleter
 	def surface(self) -> None: del self._surface
 
-	def populate_GUI(self) ->None:
-		assert "not implemented"
+	def populate_GUI(self) ->None: assert "not implemented"
+
+	def add_component(self, component : Component): pass
 
 
 

@@ -45,7 +45,7 @@ class Button(Component):
 		self.switch_button_styles[True] = func, kwargs
 		self.update_style()
 
-	def set_inctive_style(self, func : Callable, *kwargs : Any) -> None:
+	def set_inactive_style(self, func : Callable, *kwargs : Any) -> None:
 		self.switch_button_styles[False] = func, kwargs
 		self.update_style()
 
@@ -60,6 +60,7 @@ class Button(Component):
 	def click(self, *kwargs : Any) -> None:
 		if self.type == Button_Type.SWITCH:
 			self.active = not self.active
+			self.update_style()
 		self.on_click(*kwargs)
 
 
@@ -119,3 +120,10 @@ def fullscreen_inactive_style(button : Button) -> None:
 	button.surface.fill(button.color)
 
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
+
+def collapsed_menu_style(button : Button):
+	print('me')
+	button.surface.fill('red')
+def expanded_menu_style(button : Button):
+	print('you')
+	button.surface.fill('green')
