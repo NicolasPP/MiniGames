@@ -1,3 +1,4 @@
+from config.games_config import *
 import pygame
 
 ## when we resize the screen we delete the current surface and get a new one of different size
@@ -60,6 +61,7 @@ class Screen:
     def display(self):
         pygame.display.set_mode((self.current_width, self.current_height), pygame.NOFRAME)
         self.surface = pygame.Surface((self.current_width, self.current_height))
+        self.surface.set_alpha(NORMAL_ALPHA)
 
     def get_current_size(self): return self.current_width, self.current_height
     
