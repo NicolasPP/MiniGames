@@ -57,7 +57,10 @@ class Minigame_GUI(Game_GUI):
 		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		game_of_life 	= Button(game_selection, button_size, BUTTON_COLOR, message = "Game of Life", show_lable = True, font_color = FONT_COLOR)
 		collapsed_menu  = Button(self.game, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+
+
 
 		style_quit(quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
@@ -71,6 +74,7 @@ class Minigame_GUI(Game_GUI):
 		self.buttons['snake'] 			= snake
 		self.buttons['tetris'] 			= tetris
 		self.buttons['wordle'] 			= wordle
+		self.buttons['game_of_life']	= game_of_life
 		self.buttons['collapsed_menu']  = collapsed_menu
 
 
@@ -78,7 +82,7 @@ class Minigame_GUI(Game_GUI):
 		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
 		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
 		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0), size = (BUTTON_W, BUTTON_H * 3 + PADDING * 2))
+		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0), size = (BUTTON_W, BUTTON_H * 3))
 		sidebar.conpensate_padding = False
 		self.containers['sidebar'] 			= sidebar
 		self.containers['game_menu'] 		= game_menu
@@ -93,6 +97,7 @@ class Minigame_GUI(Game_GUI):
 		snake  			= self.buttons['snake'] 				
 		tetris  		= self.buttons['tetris'] 			
 		wordle  		= self.buttons['wordle']
+		game_of_life	= self.buttons['game_of_life']
 		sidebar  		= self.containers['sidebar'] 			
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
@@ -101,6 +106,12 @@ class Minigame_GUI(Game_GUI):
 		game_selection.add_component(snake)
 		game_selection.add_component(wordle)
 		game_selection.add_component(tetris)
+		game_selection.add_component(game_of_life)
+
+		print(tetris.rect)
+		print(game_of_life.rect)
+		print(wordle.rect)
+
 		settings.add_component(quit)
 		settings.add_component(full_screen)
 		game_menu.add_component(settings)

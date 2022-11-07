@@ -184,8 +184,8 @@ class Scrollable_Container(Container):
 		self.scroll_speed = pygame.math.Vector2(0,10)
 
 	def move_up(self) -> None:
-		last_comp_pos = self.components[0].rect.y
-		if last_comp_pos + self.rect.y <= self.rect.bottom : return
+		last_comp = self.components[-1]
+		if last_comp.rect.bottom <= self.rect.height : return
 		speed = self.scroll_speed * -1
 		for comp in self.components: comp.update_pos((int(round(speed.x)), int(round(speed.y))))
 		
@@ -194,7 +194,6 @@ class Scrollable_Container(Container):
 		first_comp_pos = self.components[0].rect.y
 		if first_comp_pos >= 0: return
 		for comp in self.components: comp.update_pos((int(round(self.scroll_speed.x)), int(round(self.scroll_speed.y))))
-
 
 
 	def parse_event(self, event : pygame.event.Event, root_parent : Any) -> None:
@@ -209,7 +208,7 @@ class Scrollable_Container(Container):
 
 		if event.type == pygame.MOUSEBUTTONDOWN and self.is_hovered(mouse_pos - parent_offset):
 			if event.button == MOUSECLICK.SCROLL_UP: self.move_down()
-			if event.button == MOUSECLICK.SCROLL_DOWN : self.move_up()
+			if event.button == MOUSECLICK.SCROLL_DOWN: self.move_up()
 			self.container_click(event, root_parent)
 '''
 NOT GOOD FOR NESTING WITH OTHER CONTAINERS
