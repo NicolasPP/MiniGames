@@ -6,7 +6,7 @@ from GUI.components.lable import Lable
 from GUI.components.component import Component
 from typing import Callable, Any
 
-def nothing() -> None: pass
+def nothing(*kwargs) -> None: pass
 
 class Button_Type(Enum):
 	SWITCH = 1
