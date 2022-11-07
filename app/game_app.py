@@ -78,7 +78,8 @@ class Minigame_GUI(Game_GUI):
 		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
 		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
 		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(top = 0))
+		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0), size = (BUTTON_W, BUTTON_H * 3 + PADDING * 2))
+		sidebar.conpensate_padding = False
 		self.containers['sidebar'] 			= sidebar
 		self.containers['game_menu'] 		= game_menu
 		self.containers['settings'] 		= settings
