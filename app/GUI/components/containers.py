@@ -16,6 +16,8 @@ TODO : fix padding logic
 	   make nicer looking
 TODO : move process logic where we update padding depending on orientation
 	   to padding class
+TODO : make scrollable container move with update(dt) will make the scroll smoother
+TODO : add indicator of where the scrollable container is
 '''
 
 class MOUSECLICK:
