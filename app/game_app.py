@@ -107,11 +107,6 @@ class Minigame_GUI(Game_GUI):
 		game_selection.add_component(wordle)
 		game_selection.add_component(tetris)
 		game_selection.add_component(game_of_life)
-
-		print(tetris.rect)
-		print(game_of_life.rect)
-		print(wordle.rect)
-
 		settings.add_component(quit)
 		settings.add_component(full_screen)
 		game_menu.add_component(settings)
