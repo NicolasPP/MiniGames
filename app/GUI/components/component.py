@@ -1,12 +1,6 @@
 import pygame
 
 
-'''
-TODO : Change render logic of GUI components so that you have a invalidate fucntion for all components
-	   where. when called it cause a rerender of the component.
-	   right now everything is being rendered in every frame of the game
-'''
-
 class Component:
 	def __init__(self, parent, pos : tuple[int, int], size : tuple[int, int], alpha : float, color : tuple[int, int, int]):
 		self.parent = parent

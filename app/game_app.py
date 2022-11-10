@@ -196,6 +196,8 @@ class Minigames:
 			self.render()
 
 			pygame.display.update()
+		pygame.quit()
+		sys.exit()
 			
 	def update(self, dt : float) -> None:
 		self.get_current_game().update(dt)
@@ -232,8 +234,6 @@ class Minigames:
 	
 	def quit_game(self) -> None:
 		self.running = False
-		pygame.quit()
-		sys.exit()
 
 # GUI BUTTON LOGIC
 

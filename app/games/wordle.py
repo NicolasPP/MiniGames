@@ -14,14 +14,6 @@ from random import choice
 
 
 '''
-TODO : display message when user tries to guess a word that does not exist
-TODO : add animation for when user makes a guess. make new state color fade in
-TODO : add option to pick language in wordle
-TODO : show word when loose
-'''
-
-
-'''
 WORDLE_DEBUG_MODE - when True,  - will not overwrite words data with
 							   new used_words data, because everytime I run 
 							   it picks a word and adds it to used_words. 
