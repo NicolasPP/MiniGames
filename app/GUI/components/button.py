@@ -5,6 +5,7 @@ import config.games_config as gcfg
 from GUI.components.lable import Lable
 from GUI.components.component import Component
 from typing import Callable, Any
+import GUI.size as SIZE
 
 def nothing(*kwargs) -> None: pass
 
@@ -75,7 +76,12 @@ class Button(Component):
 
 def get_lable(button : Button, set_alpha : bool = False) -> Lable:
 	pos = (button.rect.w // 2) - button.rect.x, (button.rect.h // 2) - button.rect.y
-	lable = Lable(button, button.message, LABLE_FONT_SIZE, button.font_color, button.alpha, pos = button.rect.center)
+	message_size = SIZE.get(SIZE.Modifier(
+			parent_size = pygame.math.Vector2(button.rect.size),
+			modifier_type = SIZE.MODIFIER.PERCENTAGE,
+			ratio = 60
+		)) 
+	lable = Lable(button, button.message.lower(), SIZE.get_font_size(message_size, button.message.lower()) , button.font_color, button.alpha, pos = button.rect.center)
 	if button.show_lable: lable.render(set_alpha)
 	return lable
 

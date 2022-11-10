@@ -1,6 +1,7 @@
 import pygame
 from enum import Enum
 from dataclasses import dataclass
+from utils.time import timer_func
 
 
 class MODIFIER(Enum):
@@ -20,15 +21,13 @@ def Modifier(*,
 		ratio : float = 0,
 		width_ratio : float = 0,
 		height_ratio : float = 0) -> MOD:
-	msg = '''
-			either width and height ratio must be passed in
-			or ratio must be passed in
-			if both are passed ratio will override the others
-			neither can be 0
-		'''
-	if ratio == 0:
-			print(msg)
-			assert width_ratio != 0 and height_ratio != 0
+	'''
+		either width and height ratio must be passed in
+		or ratio must be passed in
+		if both are passed ratio will override the others
+		neither can be 0
+	'''
+	if ratio == 0: assert width_ratio != 0 and height_ratio != 0
 	else: width_ratio = height_ratio = ratio
 
 	return MOD(parent_size, modifier_type, pygame.math.Vector2(width_ratio, height_ratio))
@@ -46,6 +45,24 @@ def get_width(modifier : MOD
 def get_height(modifier : MOD
 	) -> int:
 	return modifier.parent_size.y * (modifier.modifier_type.value * modifier.ratio.y)
+
+def get_font_size(max_message_size : tuple[int, int], message : str
+	) -> int:
+	done = False
+	max_font_size = 0
+	max_width, max_height = max_message_size
+	while not done:
+		max_font_size += 1
+		font = pygame.font.Font(None, max_font_size)
+		message_width, message_height = pygame.font.Font.size(font, message)
+		if max_width < message_width or \
+			max_height < message_height: done = True
+	return max_font_size - 1
+
+
+
+
+
 
 def current_screen_size(
 	)-> pygame.math.Vector2:

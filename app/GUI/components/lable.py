@@ -10,7 +10,7 @@ class Lable(Component):
 				 font_size : int, 
 				 color : tuple[int, int, int], 
 				 alpha : float, 
-				 pos : tuple[int, int] = (0,0), 
+				 pos : tuple[int, int] = (0,0),
 				 r_topleft = False):
 		super().__init__(parent, pos, (font_size, font_size), alpha, color)
 		self._message = message
@@ -20,7 +20,6 @@ class Lable(Component):
 		self.blink_alpha = alpha
 		self.blink_speed  : int = ALPHA_CHANGE
 		self.blink_change  : int = -1
-
 		self.center()
 
 	@property

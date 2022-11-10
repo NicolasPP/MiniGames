@@ -52,8 +52,8 @@ class Minigame_GUI(Game_GUI):
 		button_modifier = SIZE.Modifier(
 				parent_size = SIZE.current_screen_size(),
 				modifier_type = SIZE.MODIFIER.PERCENTAGE,
-				width_ratio = 9,
-				height_ratio = 5
+				width_ratio = 8,
+				height_ratio = 4 
 			)
 		half_button = SIZE.get_width(SIZE.Modifier(
 				parent_size = pygame.math.Vector2(SIZE.get(button_modifier)) - pygame.math.Vector2(PADDING, 0),
@@ -66,25 +66,20 @@ class Minigame_GUI(Game_GUI):
 		snake 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
 		tetris 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
 		wordle 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		game_of_life 	= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Game of Life", show_lable = True, font_color = FONT_COLOR)
-		collapsed_menu  = Button(self.game, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+		life_game 		= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Life Game", show_lable = True, font_color = FONT_COLOR)
 
 
 
 		style_quit(quit)
 		full_screen.set_active_style(fullscreen_active_style, full_screen)
 		full_screen.set_inactive_style(fullscreen_inactive_style, full_screen)
-		collapsed_menu.set_active_style(expanded_menu_style, collapsed_menu)
-		collapsed_menu.set_inactive_style(collapsed_menu_style, collapsed_menu)
-		
 		self.buttons['quit'] 			= quit
 		self.buttons['full_screen'] 	= full_screen
 		self.buttons['menu'] 			= menu
 		self.buttons['snake'] 			= snake
 		self.buttons['tetris'] 			= tetris
 		self.buttons['wordle'] 			= wordle
-		self.buttons['game_of_life']	= game_of_life
-		self.buttons['collapsed_menu']  = collapsed_menu
+		self.buttons['life_game']		= life_game
 
 
 	def create_containers(self) -> None:
@@ -114,7 +109,7 @@ class Minigame_GUI(Game_GUI):
 		snake  			= self.buttons['snake'] 				
 		tetris  		= self.buttons['tetris'] 			
 		wordle  		= self.buttons['wordle']
-		game_of_life	= self.buttons['game_of_life']
+		life_game		= self.buttons['life_game']
 		sidebar  		= self.containers['sidebar'] 			
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
@@ -122,8 +117,8 @@ class Minigame_GUI(Game_GUI):
 
 		game_selection.add_component(snake)
 		game_selection.add_component(wordle)
+		game_selection.add_component(life_game)
 		game_selection.add_component(tetris)
-		game_selection.add_component(game_of_life)
 		settings.add_component(quit)
 		settings.add_component(full_screen)
 		game_menu.add_component(settings)
@@ -136,6 +131,19 @@ class Minigame_GUI(Game_GUI):
 		sidebar.add_component(game_menu)
 		sidebar.add_component(game_selection)
 
+		collapsed_mod = SIZE.Modifier(
+				parent_size = pygame.math.Vector2(sidebar.rect.size),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				width_ratio = 10,
+				height_ratio = 50
+			)
+
+		collapsed_menu  = Button(self.game, SIZE.get(collapsed_mod), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
+		
+		collapsed_menu.set_active_style(expanded_menu_style, collapsed_menu)
+		collapsed_menu.set_inactive_style(collapsed_menu_style, collapsed_menu)
+		
+		self.buttons['collapsed_menu']  = collapsed_menu
 
 
 	def center_collapse_menu(self) -> None:
