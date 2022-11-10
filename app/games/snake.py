@@ -1,5 +1,5 @@
 from config.games_config import *
-from games.game import Game
+from games.game import Game, Game_GUI
 from GUI.components.lable import Lable
 from GUI.components.containers import Relative_Container
 import pygame
@@ -156,21 +156,11 @@ class SNAKE:
 	# ----------------
 
 
-class Snake_GUI:
+class Snake_GUI(Game_GUI):
 	def __init__(self, snake_game):
-		self.snake_game = snake_game
-		self.containers : dict[str, Container] = {}
-		self.lables : dict[str, Lable] = {}
-		self._surface : pygame.Surface = snake_game.surface
+		super().__init__(snake_game)
 		self.populate_GUI()
 
-	@property
-	def surface(self) -> pygame.Surface: return self.snake_game.surface
-	@surface.setter
-	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
-	@surface.deleter
-	def surface(self) -> None: del self._surface
-	
 	def populate_GUI(self) -> None:
 		self.create_containers()
 		self.create_lables()
@@ -178,9 +168,9 @@ class Snake_GUI:
 		
 
 	def create_containers(self) -> None:
-		game_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True)
-		paused_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True, alpha = PAUSE_ALPHA)
-		loose_container = Relative_Container(self.snake_game, pygame.display.get_surface().get_size(), root = True, alpha = LOOSE_ALPHA)
+		game_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True)
+		paused_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = PAUSE_ALPHA)
+		loose_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = LOOSE_ALPHA)
 		
 		loose_surface = pygame.Surface(pygame.display.get_surface().get_size())
 		loose_surface.fill(LOOSE_COLOR)
@@ -220,10 +210,10 @@ class Snake_GUI:
 
 
 	def create_lables(self) -> None:
-		score_lable = Lable(self.snake_game, f'{self.snake_game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA)
-		paused_lable = Lable(self.snake_game, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,NORMAL_ALPHA)
-		retry_lable = Lable(self .snake_game, " SPACE TO RETRY ", 30 , SCORE_COLOR, NORMAL_ALPHA)
-		final_score_lable = Lable(self.snake_game, f'{self.snake_game.score}', SCORE_FONT_SIZE, SCORE_COLOR, NORMAL_ALPHA)
+		score_lable = Lable(self.game, f'{self.game.score}', SCORE_FONT_SIZE, LETTER_COLOR, PAUSE_ALPHA)
+		paused_lable = Lable(self.game, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,NORMAL_ALPHA)
+		retry_lable = Lable(self .game, " SPACE TO RETRY ", 30 , SCORE_COLOR, NORMAL_ALPHA)
+		final_score_lable = Lable(self.game, f'{self.game.score}', SCORE_FONT_SIZE, SCORE_COLOR, NORMAL_ALPHA)
 
 		self.lables['score_lable'] = score_lable
 		self.lables['paused_lable'] = paused_lable	

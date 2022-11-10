@@ -40,11 +40,11 @@ def get(modifier : MOD
 
 def get_width(modifier : MOD
 	) -> int:
-	return modifier.parent_size.x * (modifier.modifier_type.value * modifier.ratio.x)
+	return round(modifier.parent_size.x * (modifier.modifier_type.value * modifier.ratio.x))
 
 def get_height(modifier : MOD
 	) -> int:
-	return modifier.parent_size.y * (modifier.modifier_type.value * modifier.ratio.y)
+	return round(modifier.parent_size.y * (modifier.modifier_type.value * modifier.ratio.y))
 
 def get_font_size(max_message_size : tuple[int, int], message : str
 	) -> int:
