@@ -6,7 +6,17 @@ import pygame
 from random import choice
 from enum import Enum
 from utils.time import Time_Man
+import GUI.size as SIZE
 
+
+
+
+def get_cell_mod() -> SIZE.MOD:
+	return SIZE.Modifier(
+			parent_size = SIZE.current_screen_size(),
+			modifier_type = SIZE.MODIFIER.PERCENTAGE,
+			ratio = 5
+		)
 
 class DIRECTION(Enum):
 	UP = (0, -1)
@@ -47,14 +57,14 @@ class SNAKE:
 		self.rect : pygame.rect.Rect = get_mid_cell(snake_game.grid)
 		self.rect.width -= 1
 		self.rect.height -= 1
-		self.size : int = 0
+		self.size : int = 10
 		self.body : list[pygame.rect.Rect] = []
 		self.color : tuple[int, int, int] = SNAKE_COLOR
 		self.timer : Time_Man = Time_Man()
 		self._direction : DIRECTION = choice(list(DIRECTION))
 		self.distance_to_move : float = 0
 		self._pos : pygame.math.Vector2 = pygame.math.Vector2(self.rect.topleft)
-		self.speed : float = S_CELL_SIZE / (TIME_TO_COVER_CELL / 1000)
+		self.speed : float = SIZE.get_height(get_cell_mod()) / (TIME_TO_COVER_CELL / 1000)
 		self.alive : bool = True
 
 	# -- Direction --
@@ -150,7 +160,7 @@ class SNAKE:
 	
 	def set_move_distance(self, dt : float) -> None:
 		if self.timer.dt_wait(dt, SNAKE_MOVE_FREQ + TIME_TO_COVER_CELL):
-			self.distance_to_move += S_CELL_SIZE
+			self.distance_to_move += SIZE.get_height(get_cell_mod())
 			prev_rec = self.rect.copy()
 			self.add(prev_rec)
 	# ----------------
@@ -232,7 +242,7 @@ class Snake(Game):
 
 		self.snake_GUI : Snake_GUI = Snake_GUI(self)
 		self.food_timer : Time_Man = Time_Man()
-		
+	
 		create_grid(self)
 		self.snake : SNAKE = SNAKE(self)
 		
@@ -244,7 +254,6 @@ class Snake(Game):
 			self.snake_GUI.containers['game_container'].render(set_alpha = True)
 		
 		if self.paused: self.snake_GUI.containers['paused_container'].render(set_alpha = True)
-
 		
 		if not self.snake.alive: self.snake_GUI.containers['loose_container'].render(set_alpha = True)
 
@@ -267,6 +276,12 @@ class Snake(Game):
 		self.surface = self.get_game_surface(self.color)
 		self.snake_GUI = Snake_GUI(self)
 		create_grid(self)
+		c_size = SIZE.get_height(get_cell_mod()) -1
+		new_rect = pygame.rect.Rect(self.snake.rect.x, self.snake.rect.y, c_size, c_size)
+		self.snake.rect = new_rect
+		for b in self.snake.body:
+			new_rect1= pygame.rect.Rect((b.x, b.y),(c_size, c_size))
+			b = new_rect1
 	# ------------
 
 
@@ -284,7 +299,7 @@ class Snake(Game):
 
 # -- SNAKE helpers --
 def get_collision_points(snake : SNAKE) -> tuple[list[float], list[float]]:
-		h_offset = S_CELL_SIZE // 2
+		h_offset = SIZE.get_height(get_cell_mod()) // 2
 		direc_x, direc_y = snake.direction.value
 		center_x, center_y = snake.rect.center
 		center_head_x = center_x + (direc_x * h_offset)
@@ -332,10 +347,13 @@ def restart(snake_game : Snake) -> None:
 	snake_game.snake = SNAKE(snake_game)
 
 def create_grid(snake_game : Snake) -> None:
-	for h in range(snake_game.surface.get_rect().height // S_CELL_SIZE):
+	snake_game.cells = []
+	snake_game.grid = []
+	cell_mod = get_cell_mod()
+	for h in range(snake_game.surface.get_rect().height // SIZE.get_height(cell_mod)):
 		row = []
-		for w in range(snake_game.surface.get_rect().width // S_CELL_SIZE):
-			cell = pygame.rect.Rect((w * S_CELL_SIZE, h * S_CELL_SIZE),(S_CELL_SIZE, S_CELL_SIZE))
+		for w in range(snake_game.surface.get_rect().width // SIZE.get_height(cell_mod)):
+			cell = pygame.rect.Rect((w * SIZE.get_height(cell_mod), h * SIZE.get_height(cell_mod)),(SIZE.get_height(cell_mod), SIZE.get_height(cell_mod)))
 			row.append(cell)
 			snake_game.cells.append(cell)
 		snake_game.grid.append(row)
