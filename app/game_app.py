@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Type
 
 from GUI.screen import Screen
-
+import GUI.size as SIZE
 from GUI.components.button import Button,\
 								 style_quit,\
 								 fullscreen_inactive_style,\
@@ -49,15 +49,24 @@ class Minigame_GUI(Game_GUI):
 		settings  		= self.containers['settings'] 		
 		game_selection  = self.containers['game_selection']
 		half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		button_size = BUTTON_W, BUTTON_H
-		
-		quit 			= Button(settings, half_button_size, BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-		full_screen 	= Button(settings, half_button_size, BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
-		menu 			= Button(game_menu, button_size, BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		snake 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
-		tetris 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		wordle 			= Button(game_selection, button_size, BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		game_of_life 	= Button(game_selection, button_size, BUTTON_COLOR, message = "Game of Life", show_lable = True, font_color = FONT_COLOR)
+		button_modifier = SIZE.Modifier(
+				parent_size = SIZE.current_screen_size(),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				width_ratio = 9,
+				height_ratio = 5
+			)
+		half_button = SIZE.get_width(SIZE.Modifier(
+				parent_size = pygame.math.Vector2(SIZE.get(button_modifier)) - pygame.math.Vector2(PADDING, 0),
+				modifier_type = SIZE.MODIFIER.RATIO,
+				ratio = 0.5
+			))
+		quit 			= Button(settings, (half_button, half_button), BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+		full_screen 	= Button(settings, (half_button, half_button), BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
+		menu 			= Button(game_menu, SIZE.get(button_modifier), BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		snake 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
+		tetris 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		wordle 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
+		game_of_life 	= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Game of Life", show_lable = True, font_color = FONT_COLOR)
 		collapsed_menu  = Button(self.game, (COLLAPSE_WIDTH,COLLAPSE_HEIGHT), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
 
 
@@ -82,7 +91,9 @@ class Minigame_GUI(Game_GUI):
 		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
 		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
 		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0), size = (BUTTON_W, BUTTON_H * 3))
+		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0))
+
+
 		sidebar.conpensate_padding = False
 		self.containers['sidebar'] 			= sidebar
 		self.containers['game_menu'] 		= game_menu
@@ -91,6 +102,12 @@ class Minigame_GUI(Game_GUI):
 
 
 	def populate_containers(self) -> None:
+		size = SIZE.get_height(SIZE.Modifier(
+				parent_size = SIZE.current_screen_size(),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				ratio = 15
+			))
+
 		quit  			= self.buttons['quit'] 				
 		full_screen  	= self.buttons['full_screen'] 		
 		menu  			= self.buttons['menu'] 				
@@ -111,8 +128,14 @@ class Minigame_GUI(Game_GUI):
 		settings.add_component(full_screen)
 		game_menu.add_component(settings)
 		game_menu.add_component(menu)
+		
+
+		game_selection.set_size((game_menu.rect.width, size))
+		game_selection.fixed_size = True
+
 		sidebar.add_component(game_menu)
 		sidebar.add_component(game_selection)
+
 
 
 	def center_collapse_menu(self) -> None:
