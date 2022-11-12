@@ -245,7 +245,7 @@ class Minigames:
 
 	def toggle_fullscreen(self) -> None:
 		self.screen.toggle_full_screen()
-		for name, game in self.games.items(): game.update_surface_size()
+		for name, game in self.games.items(): game.update_screen_size()
 		self.GUI = Minigame_GUI(self)
 	
 	def get_current_game(self) -> Game: 

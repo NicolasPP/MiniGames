@@ -256,7 +256,7 @@ class Wordle(Game):
 			self.wordle_GUI.lables['restart_lable'].blink(dt)
 
 	
-	def update_surface_size(self) -> None:
+	def update_screen_size(self) -> None:
 		self.surface = self.get_game_surface(self.color)
 		self.wordle_GUI = Wordle_GUI(self)
 		self.update_letters_size()

@@ -43,7 +43,8 @@ class Game:
 
 	def render(self) -> None: 
 		self.app.surface.blit(self.surface, (0,0))
-	def update_surface_size(self) -> None: self.surface = self.get_game_surface(self.color)
+
+	def update_screen_size(self) -> None: self.surface = self.get_game_surface(self.color)
 
 	def get_game_surface(self, 
 						color : tuple[int, int, int], 

@@ -1,3 +1,4 @@
+import random
 from config.games_config import *
 from games.game import Game, Game_GUI
 from GUI.components.lable import Lable
@@ -54,10 +55,8 @@ class DIRECTION(Enum):
 class SNAKE:
 	def __init__(self, snake_game):
 		self.snake_game = snake_game
-		self.rect : pygame.rect.Rect = get_mid_cell(snake_game.grid)
-		self.rect.width -= 1
-		self.rect.height -= 1
-		self.size : int = 10
+		self.rect : pygame.rect.Rect = get_middle_rect()
+		self.size : int = 5
 		self.body : list[pygame.rect.Rect] = []
 		self.color : tuple[int, int, int] = SNAKE_COLOR
 		self.timer : Time_Man = Time_Man()
@@ -113,6 +112,12 @@ class SNAKE:
 		self.food_collision()
 		self.set_move_distance(dt)
 		self.move(dt)
+
+	def update_screen_size(self, c_size : int, scale : float):
+		self.rect 	= pygame.rect.Rect(round(self.rect.x * scale), round(self.rect.y * scale), c_size, c_size)
+		self.pos 	= pygame.math.Vector2(self.rect.topleft)
+		self.body 	= [ pygame.rect.Rect(round(body.x * scale), round(body.y * scale), c_size, c_size) \
+					  for body in self.body ]
 	# ------------
 	
 
@@ -235,15 +240,12 @@ class Snake_GUI(Game_GUI):
 class Snake(Game):
 	def __init__(self, app) -> None:
 		super().__init__(app)
-		self.grid :list[list[pygame.rect.Rect]] = []
-		self.cells :list[pygame.rect.Rect] = []
 		self.foods :list[pygame.rect.Rect] = []
 		self.score = 0
 
 		self.snake_GUI : Snake_GUI = Snake_GUI(self)
 		self.food_timer : Time_Man = Time_Man()
 	
-		create_grid(self)
 		self.snake : SNAKE = SNAKE(self)
 		
 	# -- Render --
@@ -272,16 +274,15 @@ class Snake(Game):
 			else: self.snake_GUI.lables['retry_lable'].blink(dt) 
 
 	
-	def update_surface_size(self) -> None:
-		self.surface = self.get_game_surface(self.color)
-		self.snake_GUI = Snake_GUI(self)
-		create_grid(self)
-		c_size = SIZE.get_height(get_cell_mod()) -1
-		new_rect = pygame.rect.Rect(self.snake.rect.x, self.snake.rect.y, c_size, c_size)
-		self.snake.rect = new_rect
-		for b in self.snake.body:
-			new_rect1= pygame.rect.Rect((b.x, b.y),(c_size, c_size))
-			b = new_rect1
+	def update_screen_size(self) -> None:
+		c_size 	= SIZE.get_height(get_cell_mod()) - 1
+		scale 	= c_size / self.snake.rect.height
+
+		self.surface 	= self.get_game_surface(self.color)
+		self.snake_GUI 	= Snake_GUI(self)
+		self.foods 		= [ pygame.Rect(round(food.x * scale), round(food.y * scale), c_size, c_size) \
+						  for food in self.foods ]
+		self.snake.update_screen_size(c_size, scale) 
 	# ------------
 
 
@@ -319,11 +320,11 @@ def get_collision_points(snake : SNAKE) -> tuple[list[float], list[float]]:
 # -------------------
 
 # -- snake game helpers --
-def get_mid_cell(snake_grid : list[list[pygame.rect.Rect]]) -> pygame.rect.Rect:
-	row_num = len(snake_grid)
-	col_num = len(snake_grid[0])
-	return snake_grid[row_num // 2][col_num // 2].copy()
-	
+def get_middle_rect() -> pygame.rect.Rect:
+	width, height = pygame.display.get_surface().get_size()
+	size = SIZE.get_height(get_cell_mod()) -1
+	return pygame.rect.Rect(width // 2, height // 2, size, size)
+
 
 def get_rect_surface(snake_game : Snake, rect : pygame.rect.Rect, color : tuple[int, int, int]) -> pygame.Surface:
 	rect_surface = pygame.Surface(rect.size)
@@ -340,31 +341,21 @@ def restart(snake_game : Snake) -> None:
 	snake_game.score = 0
 	snake_game.foods = []
 	snake_game.snake_GUI.lables['score_lable'].message = str(snake_game.score)
-	snake_game.cells = []
-	snake_game.grid = []
-	create_grid(snake_game)
 	del snake_game.snake
 	snake_game.snake = SNAKE(snake_game)
 
-def create_grid(snake_game : Snake) -> None:
-	snake_game.cells = []
-	snake_game.grid = []
-	cell_mod = get_cell_mod()
-	for h in range(snake_game.surface.get_rect().height // SIZE.get_height(cell_mod)):
-		row = []
-		for w in range(snake_game.surface.get_rect().width // SIZE.get_height(cell_mod)):
-			cell = pygame.rect.Rect((w * SIZE.get_height(cell_mod), h * SIZE.get_height(cell_mod)),(SIZE.get_height(cell_mod), SIZE.get_height(cell_mod)))
-			row.append(cell)
-			snake_game.cells.append(cell)
-		snake_game.grid.append(row)
-
 def spawn_food(snake_game : Snake, dt : float) -> None:
 	if snake_game.food_timer.dt_wait(dt, FOOD_SPAWN_DELAY):
-		food = choice(snake_game.cells)
-		while not is_valid_food_pos(snake_game, food): food =choice(snake_game.cells)
+		width, height = pygame.display.get_surface().get_size()
+		size = SIZE.get_height(get_cell_mod()) -1
+		food = pygame.rect.Rect(random.randint(0, width), random.randint(0, height), size, size)
+		while not is_valid_food_pos(snake_game, food): food = pygame.rect.Rect(random.randint(0, width), random.randint(0, height), size, size)
 		snake_game.foods.append(food)
 
-def is_valid_food_pos(snake_game : Snake, food : pygame.rect.Rect) -> bool:
-	return food not in snake_game.snake.body and \
-				food not in snake_game.foods
+def is_valid_food_pos(snake_game : Snake, food_rect : pygame.rect.Rect) -> bool:
+	for food in snake_game.foods:
+		if food.colliderect(food_rect): return False
+	for bdy in snake_game.snake.body:
+		if bdy.colliderect(food_rect): return False
+	return True
 # ------------------------
