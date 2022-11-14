@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from game_app import Minigames
 
-from config.games_config import *
+from config import *
 import pygame
 from dataclasses import dataclass
 from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container
@@ -16,7 +16,7 @@ from typing import Any
 class Game:
 	def __init__(self, 
 				app : Minigames, 
-				color : tuple[int, int, int] = GAME_BG
+				color : tuple[int, int, int] = COLORS['palette2']['primary']
 				) -> None:
 		self.color = color
 		self.app = app
@@ -48,7 +48,7 @@ class Game:
 
 	def get_game_surface(self, 
 						color : tuple[int, int, int], 
-						alpha : float = NORMAL_ALPHA
+						alpha : float = OPAQUE
 		) -> pygame.Surface:
 		game_surface = pygame.Surface(self.app.screen.get_current_size())
 		game_surface.set_alpha(int(round(alpha)))

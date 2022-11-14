@@ -2,8 +2,7 @@ from GUI.components.component import Component
 from GUI.components.lable import Lable
 from GUI.components.button import Button
 
-import config.games_config as gcfg
-from configs import PADDING
+from config import *
 from enum import Enum
 import pygame 
 from dataclasses import dataclass
@@ -47,7 +46,7 @@ class Container(Component):
 				 color : tuple[int, int, int],
 				 pos : tuple[int, int] = (0,0),
 				 size : tuple[int, int]= (0,0),
-				 alpha : float = gcfg.NORMAL_ALPHA,
+				 alpha : float = OPAQUE,
 				 root : bool = False,
 				 padding : Padding = Padding()): 
 		super().__init__(parent, pos, size, alpha, color)
@@ -157,7 +156,7 @@ class Linear_Container(Container):
 				 color : tuple[int, int ,int],
 				 pos : tuple[int, int] = (0,0),
 				 size : tuple[int, int] = (0,0),
-				 alpha : float = gcfg.NORMAL_ALPHA,
+				 alpha : float = OPAQUE,
 				 root  : bool = False,
 				 padding : Padding = Padding()): 
 		super().__init__(parent, plane, color, pos = pos, size = size, alpha = alpha, root = root, padding = padding)
@@ -170,7 +169,7 @@ class Scrollable_Container(Container):
 				 color : tuple[int, int, int],
 				 pos : tuple[int, int] = (0,0),
 				 size : tuple[int, int] = (0,0),
-				 alpha : float = gcfg.NORMAL_ALPHA,
+				 alpha : float = OPAQUE,
 				 root : bool = False,
 				 padding : Padding = Padding()):
 		super().__init__(parent, plane, color, pos, size, alpha, root, padding)
@@ -212,7 +211,7 @@ class Relative_Container(Container):
 				 size : tuple[int, int],
 				 color: tuple[int, int, int] = (-1, -1 ,-1),
 				 pos : tuple[int, int] = (0,0),
-				 alpha : float = gcfg.NORMAL_ALPHA,
+				 alpha : float = OPAQUE,
 				 root : bool = False,
 				 padding : Padding = Padding()):
 		super().__init__(parent, LAYOUT_PLANE.RELATIVE,color, pos, size, alpha, root, padding)

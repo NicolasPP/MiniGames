@@ -1,5 +1,5 @@
 import random
-from config.games_config import *
+from config import *
 from games.game import Game, Game_GUI
 from GUI.components.lable import Lable
 from GUI.components.containers import Relative_Container
@@ -9,33 +9,34 @@ from enum import Enum
 from utils.time import Time_Man
 import GUI.size as SIZE
 
+class SNAKE_CONFIG:
+	def __init__(self):
+		self.TIME_TO_COVER_CELL : float = 150
+		self.SNAKE_MOVE_FREQ : float = 250
+		self.FOOD_SPAWN_DELAY : float = 5000
 
-# -- GUI size --
-def get_cell_size() -> int:
-	return SIZE.get_height(SIZE.Modifier(
-			parent_size = SIZE.current_screen_size(),
-			modifier_type = SIZE.MODIFIER.PERCENTAGE,
-			ratio = 5
-			))
-# --------------
-'''
-TIME_TO_COVER_CELL
-SNAKE_MOVE_FREQ
-FOOD_SPAWN_DELAY
+		self.LOOSE_ALPHA : float = 75
+		
+		self.SCORE_FONT_SIZE : int = 40
+		self.RETRY_FONT_SIZE : int = 30
+		self.PAUSE_FONT_SIZE : int = 50
+		
+		self.LOOSE_COLOR : tuple[int, int, int] = COLORS['palette3']['on_primary']
+		self.PAUSE_COLOR : tuple[int, int, int] = (255, 255, 255)
+		self.LETTER_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary']
+		self.SCORE_COLOR : tuple[int, int, int] = COLORS['palette3']['on_secondary']
+		self.FOOD_COLOR  : tuple[int, int, int] = COLORS['palette3']['on_secondary'] 
+		self.SNAKE_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary']
+	
+	def CELL_SIZE(self) -> int:
+		return SIZE.get_height(SIZE.Modifier(
+				parent_size = SIZE.current_screen_size(),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				ratio = 5
+				))
 
-NORMAL_ALPHA
-PAUSE_ALPHA
-LOOSE_ALPHA
+CONFIG = SNAKE_CONFIG()
 
-SCORE_FONT_SIZE
-PAUSE_FONT_SIZE
-
-LOOSE_COLOR
-PAUSE_COLOR
-LETTER_COLOR
-SCORE_COLOR
-FOOD_COLOR
-'''
 
 class DIRECTION(Enum):
 	UP : pygame.math.Vector2 = pygame.math.Vector2(0, -1)
@@ -53,12 +54,12 @@ class SNAKE:
 		self.rect : pygame.rect.Rect = get_middle_rect()
 		self.size : int = 5
 		self.body : list[pygame.rect.Rect] = []
-		self.color : tuple[int, int, int] = SNAKE_COLOR
+		self.color : tuple[int, int, int] = CONFIG.SNAKE_COLOR
 		self.timer : Time_Man = Time_Man()
 		self._direction : DIRECTION = choice(list(DIRECTION))
 		self.distance_to_move : float = 0
 		self._pos : pygame.math.Vector2 = pygame.math.Vector2(self.rect.topleft)
-		self.speed : float = get_cell_size() / (TIME_TO_COVER_CELL / 1000)
+		self.speed : float = CONFIG.CELL_SIZE() / (CONFIG.TIME_TO_COVER_CELL / 1000)
 		self.alive : bool = True
 
 	# -- Direction --
@@ -158,8 +159,8 @@ class SNAKE:
 		if body_size > self.size: self.body = self.body[1:body_size]
 	
 	def set_move_distance(self, dt : float) -> None:
-		if self.timer.dt_wait(dt, SNAKE_MOVE_FREQ + TIME_TO_COVER_CELL):
-			self.distance_to_move += get_cell_size()
+		if self.timer.dt_wait(dt, CONFIG.SNAKE_MOVE_FREQ + CONFIG.TIME_TO_COVER_CELL):
+			self.distance_to_move += CONFIG.CELL_SIZE()
 			prev_rec = self.rect.copy()
 			self.add(prev_rec)
 	# ----------------
@@ -179,12 +180,12 @@ class Snake_GUI(Game_GUI):
 	def create_containers(self) -> None:
 		game_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True)
 		paused_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = PAUSE_ALPHA)
-		loose_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = LOOSE_ALPHA)
+		loose_container = Relative_Container(self.game, pygame.display.get_surface().get_size(), root = True, alpha = CONFIG.LOOSE_ALPHA)
 		
 		loose_surface = pygame.Surface(pygame.display.get_surface().get_size())
-		loose_surface.fill(LOOSE_COLOR)
+		loose_surface.fill(CONFIG.LOOSE_COLOR)
 		paused_surface = pygame.Surface(pygame.display.get_surface().get_size())
-		paused_surface.fill(PAUSE_COLOR)
+		paused_surface.fill(CONFIG.PAUSE_COLOR)
 		
 		loose_container.surface = loose_surface
 		loose_container.show_surface = True
@@ -219,10 +220,10 @@ class Snake_GUI(Game_GUI):
 
 
 	def create_lables(self) -> None:
-		score_lable = Lable(self.game, f'{self.game.score}', SCORE_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA)
-		paused_lable = Lable(self.game, " PAUSED ", PAUSE_FONT_SIZE , SCORE_COLOR ,NORMAL_ALPHA)
-		retry_lable = Lable(self .game, " SPACE TO RETRY ", 30 , SCORE_COLOR, NORMAL_ALPHA)
-		final_score_lable = Lable(self.game, f'{self.game.score}', SCORE_FONT_SIZE, SCORE_COLOR, NORMAL_ALPHA)
+		score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE, CONFIG.LETTER_COLOR, OPAQUE)
+		paused_lable = Lable(self.game, " PAUSED ", CONFIG.PAUSE_FONT_SIZE , CONFIG.SCORE_COLOR ,OPAQUE)
+		retry_lable = Lable(self .game, " SPACE TO RETRY ", CONFIG.RETRY_FONT_SIZE , CONFIG.SCORE_COLOR, OPAQUE)
+		final_score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE, CONFIG.SCORE_COLOR, OPAQUE)
 
 		self.lables['score_lable'] = score_lable
 		self.lables['paused_lable'] = paused_lable	
@@ -245,7 +246,7 @@ class Snake(Game):
 	# -- Render --
 	def render(self) -> None:
 		if self.snake.alive:
-			for food in self.foods: self.surface.blit(get_rect_surface(self, food, FOOD_COLOR), food.topleft)
+			for food in self.foods: self.surface.blit(get_rect_surface(self, food, CONFIG.FOOD_COLOR), food.topleft)
 			self.snake.render()
 			self.snake_GUI.containers['game_container'].render(set_alpha = True)
 		
@@ -269,7 +270,7 @@ class Snake(Game):
 
 	
 	def update_screen_size(self) -> None:
-		c_size 	= get_cell_size() - 1
+		c_size 	= CONFIG.CELL_SIZE() - 1
 
 		# at this point the snakes rect has not updated 
 		# the old rect dimension is used to calculate the scale
@@ -297,7 +298,7 @@ class Snake(Game):
 
 # -- SNAKE helpers --
 def get_collision_points(snake : SNAKE) -> tuple[list[float], list[float]]:
-		h_offset = get_cell_size() // 2
+		h_offset = CONFIG.CELL_SIZE() // 2
 		direc_x, direc_y = snake.direction.value.x, snake.direction.value.y
 		center_x, center_y = snake.rect.center
 		center_head_x = center_x + (direc_x * h_offset)
@@ -319,20 +320,20 @@ def get_collision_points(snake : SNAKE) -> tuple[list[float], list[float]]:
 # -- snake game helpers --
 def get_middle_rect() -> pygame.rect.Rect:
 	width, height = pygame.display.get_surface().get_size()
-	size = get_cell_size() -1
+	size = CONFIG.CELL_SIZE() -1
 	return pygame.rect.Rect(width // 2, height // 2, size, size)
 
 
 def get_rect_surface(snake_game : Snake, rect : pygame.rect.Rect, color : tuple[int, int, int]) -> pygame.Surface:
 	rect_surface = pygame.Surface(rect.size)
 	rect_surface.fill(color)
-	if snake_game.paused: rect_surface.set_alpha(PAUSE_ALPHA)
-	else: rect_surface.set_alpha(NORMAL_ALPHA)
+	if snake_game.paused: rect_surface.set_alpha(int(PAUSE_ALPHA))
+	else: rect_surface.set_alpha(int(OPAQUE))
 	return rect_surface
 
 def toggle_pause(snake_game : Snake) -> None: 
 	if snake_game.snake.alive: snake_game.paused = not snake_game.paused
-	snake_game.snake_GUI.lables['score_lable'].alpha = PAUSE_ALPHA if snake_game.paused else NORMAL_ALPHA
+	snake_game.snake_GUI.lables['score_lable'].alpha = PAUSE_ALPHA if snake_game.paused else OPAQUE
 
 def restart(snake_game : Snake) -> None:
 	snake_game.score = 0
@@ -342,9 +343,9 @@ def restart(snake_game : Snake) -> None:
 	snake_game.snake = SNAKE(snake_game)
 
 def spawn_food(snake_game : Snake, dt : float) -> None:
-	if snake_game.food_timer.dt_wait(dt, FOOD_SPAWN_DELAY):
+	if snake_game.food_timer.dt_wait(dt, CONFIG.FOOD_SPAWN_DELAY):
 		width, height = pygame.display.get_surface().get_size()
-		size = get_cell_size() -1
+		size = CONFIG.CELL_SIZE() -1
 		food = pygame.rect.Rect(random.randint(0, width), random.randint(0, height), size, size)
 		while not is_valid_food_pos(snake_game, food): food = pygame.rect.Rect(random.randint(0, width), random.randint(0, height), size, size)
 		snake_game.foods.append(food)

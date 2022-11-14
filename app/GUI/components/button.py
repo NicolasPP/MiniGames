@@ -1,15 +1,21 @@
 import pygame
 from enum import Enum
-import config.games_config as gcfg
 from GUI.components.lable import Lable
 from GUI.components.component import Component
 from typing import Callable, Any
 import GUI.size as SIZE
+from config import *
 
 
-FS_RECT_WIDTH : int = 9
-FS_RECT_HEIGHT : int = 3
-HOVER_ALPHA : float = 200
+
+
+
+class BUTTON_CONFIG:
+	def __init__(self):
+		self.FS_RECT_WIDTH : int = 9
+		self.FS_RECT_HEIGHT : int = 3
+		self.HOVER_ALPHA : float = 200
+CONFIG = BUTTON_CONFIG()
 
 
 def nothing(*kwargs) -> None: pass
@@ -26,7 +32,7 @@ class Button(Component):
 	 			pos : tuple[int, int] = (0, 0),
 	 			message : str = "",
 	 			on_click : Callable = nothing,
-	 			alpha : float = gcfg.NORMAL_ALPHA,
+	 			alpha : float = OPAQUE,
 	 			show_lable : bool = False,
 	 			font_color : tuple[int, int, int] = (0,0,0),
 	 			button_type : Button_Type = Button_Type.PRESS,
@@ -72,10 +78,10 @@ class Button(Component):
 	def on_hover(self, offset : tuple[float, float] = (0,0)) -> None:
 		if not self.show_hover: return
 		if self.is_hovered(pygame.math.Vector2(pygame.mouse.get_pos()) - pygame.math.Vector2(offset)):
-			if self.alpha == HOVER_ALPHA: return
-			self.alpha = HOVER_ALPHA
+			if self.alpha == CONFIG.HOVER_ALPHA: return
+			self.alpha = CONFIG.HOVER_ALPHA
 			return
-		if self.alpha == gcfg.NORMAL_ALPHA: return
+		if self.alpha == OPAQUE: return
 		self.alpha = self.old_alpha
 
 
@@ -99,17 +105,17 @@ def style_quit(button : Button) -> None:
 def fullscreen_active_style(button : Button) -> None:
 	rects = [
 		#topleft
-		pygame.Rect((FS_RECT_WIDTH - FS_RECT_HEIGHT, 0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
-		pygame.Rect((0, FS_RECT_WIDTH - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((CONFIG.FS_RECT_WIDTH - CONFIG.FS_RECT_HEIGHT, 0), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
+		pygame.Rect((0, CONFIG.FS_RECT_WIDTH - CONFIG.FS_RECT_HEIGHT), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
 		#topright
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, 0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, FS_RECT_WIDTH - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, 0), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_WIDTH - CONFIG.FS_RECT_HEIGHT), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
 		#bottomleft
-		pygame.Rect((0, button.rect.height - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((FS_RECT_WIDTH - FS_RECT_HEIGHT, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((0, button.rect.height - CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
+		pygame.Rect((CONFIG.FS_RECT_WIDTH - CONFIG.FS_RECT_HEIGHT, button.rect.h - CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
 		#bottomright
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, button.rect.h - CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, button.rect.h - CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
 	]
 	button.surface.fill(button.color)
 	for rect in rects: pygame.draw.rect(button.surface, "White", rect)
@@ -117,17 +123,17 @@ def fullscreen_active_style(button : Button) -> None:
 def fullscreen_inactive_style(button : Button) -> None:
 	rects = [
 		# topleft
-		pygame.Rect((0,0), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((0,0), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
+		pygame.Rect((0,0), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
+		pygame.Rect((0,0), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
 		#topright
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, 0), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
-		pygame.Rect((button.rect.w - FS_RECT_HEIGHT, 0), (FS_RECT_HEIGHT , FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, 0), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_HEIGHT, 0), (CONFIG.FS_RECT_HEIGHT , CONFIG.FS_RECT_WIDTH)),
 		#bottomleft
-		pygame.Rect((0, button.rect.h-FS_RECT_WIDTH), (FS_RECT_HEIGHT,FS_RECT_WIDTH)),
-		pygame.Rect((0, button.rect.h-FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((0, button.rect.h-CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_HEIGHT,CONFIG.FS_RECT_WIDTH)),
+		pygame.Rect((0, button.rect.h-CONFIG.FS_RECT_HEIGHT), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
 		#bottomright
-		pygame.Rect((button.rect.w - FS_RECT_HEIGHT, button.rect.h - FS_RECT_WIDTH), (FS_RECT_HEIGHT, FS_RECT_WIDTH)),
-		pygame.Rect((button.rect.w - FS_RECT_WIDTH, button.rect.h - FS_RECT_HEIGHT), (FS_RECT_WIDTH, FS_RECT_HEIGHT)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_HEIGHT, button.rect.h - CONFIG.FS_RECT_WIDTH), (CONFIG.FS_RECT_HEIGHT, CONFIG.FS_RECT_WIDTH)),
+		pygame.Rect((button.rect.w - CONFIG.FS_RECT_WIDTH, button.rect.h - CONFIG.FS_RECT_HEIGHT), (CONFIG.FS_RECT_WIDTH, CONFIG.FS_RECT_HEIGHT)),
 	]
 	button.surface.fill(button.color)
 

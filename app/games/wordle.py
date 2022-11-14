@@ -1,5 +1,4 @@
-from configs import PADDING
-from config.games_config import *
+from config import *
 
 from GUI.components.lable import Lable
 from GUI.components.containers import Relative_Container
@@ -25,18 +24,42 @@ WORDLE_DEBUG_MODE - when True,  - will not overwrite words data with
 '''
 WORDLE_DEBUG_MODE = True
 
+class WORDLE_CONFIG:
+	def __init__(self):
+		self.LETTER_OUTLINE_COLOR : 			tuple[int, int, int] = COLORS['palette3']['on_secondary']#rgb(231, 171, 121)
+		self.BLANK_COLOR : 						tuple[int, int, int] = COLORS['palette2']['primary']#rgb(44, 54, 57)
+		self.FILLED_COLOR : 					tuple[int, int, int] = COLORS['palette2']['primary']#rgb(44, 54, 57)
+		self.LETTER_COLOR : 					tuple[int, int, int] = COLORS['palette2']['on_secondary'] #rgb(220, 215, 201)
+		self.PRESENT_OUT_OF_PLACE_COLOR : 		tuple[int, int, int] = (181, 159, 59) #rgb(181, 159, 59)
+		self.PRESENT_IN_PLACE_COLOR : 			tuple[int, int, int] = (83, 141, 78) #rgb(83, 141, 78)
+		self.NOT_PRESENT_COLOR : 				tuple[int, int, int] = (58, 58, 60) #rgb(58, 58, 60)
+		self.WON_COLOR : 						tuple[int, int, int] = (83, 141, 78) #rgb(83, 141, 78)
+		self.LOOSE_COLOR : 						tuple[int, int, int] = COLORS['palette3']['on_primary']
+		
+		self.LETTER_CARD_SIZE : 				int = 65
+		self.LETTER_FONT_SIZE : 				int = 50
+		self.CARD_OUTLINE_THICKNESS :			int = 3
+		self.OUTLINE_ALPHA : 					int = 50
+		self.POST_GAME_ALPHA : 					int = 100
+		self.WORD_SIZE : 						int = 5
+		self.TRYS : 							int = 6
+		self.WORD_FILE : 						str = 'data/wordle_data/words'
+		self.ALPHABET : 						str = 'abcdefghijklmnopqrstuvwxyz'
 
+		
+
+CONFIG = WORDLE_CONFIG()
 
 class GAMELANG(Enum):
 	ENG : str = 'english'
 	PT : str = 'portuguese'
 
 class LSTATE(Enum):
-	BLANK : tuple[int, int, int] = BLANK_COLOR
-	FILLED : tuple[int, int, int] = FILLED_COLOR
-	PRESENT_OUT_OF_PLACE : tuple[int, int, int] = PRESENT_OUT_OF_PLACE_COLOR
-	PRESENT_IN_PLACE : tuple[int, int, int] = PRESENT_IN_PLACE_COLOR
-	NOT_PRESENT : tuple[int, int, int] = NOT_PRESENT_COLOR
+	BLANK : tuple[int, int, int] = CONFIG.BLANK_COLOR
+	FILLED : tuple[int, int, int] = CONFIG.FILLED_COLOR
+	PRESENT_OUT_OF_PLACE : tuple[int, int, int] = CONFIG.PRESENT_OUT_OF_PLACE_COLOR
+	PRESENT_IN_PLACE : tuple[int, int, int] = CONFIG.PRESENT_IN_PLACE_COLOR
+	NOT_PRESENT : tuple[int, int, int] = CONFIG.NOT_PRESENT_COLOR
 
 	def __eq__(self, state : object) -> bool:
 		if isinstance(state, LSTATE): return self.name == state.name
@@ -52,7 +75,7 @@ class Word_Bank:
 
 	def __init__(self, lang : GAMELANG):
 		self.language : str = lang.value
-		self.data : dict[str,dict[str, list[str]]] = Data_Man.get_wordle_data(WORD_FILE)
+		self.data : dict[str,dict[str, list[str]]] = Data_Man.get_wordle_data(CONFIG.WORD_FILE)
 		self.words : str = 'words'
 		self.used_words : str = 'used_words'
 
@@ -61,7 +84,7 @@ class Word_Bank:
 		if WORDLE_DEBUG_MODE:
 			self.add_used_word(word)
 			print(word)
-		else: Data_Man.write_data(WORD_FILE, self.data)
+		else: Data_Man.write_data(CONFIG.WORD_FILE, self.data)
 		return word
 
 	def available_words(self) -> Generator[str, None, None]:
@@ -77,7 +100,7 @@ class Word_Bank:
 
 	def empty_used_words(self, *languages : str):
 		for lang in languages: self.data[lang][self.used_words] = []
-		Data_Man.write_data(WORD_FILE, self.data)
+		Data_Man.write_data(CONFIG.WORD_FILE, self.data)
 
 class Letter:
 	def __init__(self, wordle_game, rect : pygame.rect.Rect):
@@ -101,7 +124,7 @@ class Letter:
 		self._state = new_state
 		self.bg_color = new_state.value
 		set_card_style(self)
-		if self.state != LSTATE.BLANK: self.card_bg_surface.set_alpha(NORMAL_ALPHA)
+		if self.state != LSTATE.BLANK: self.card_bg_surface.set_alpha(int(OPAQUE))
 		if self.wordle_game.result == GAME_RESULT.WON: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		if self.wordle_game.result == GAME_RESULT.LOOSE: self.card_bg_surface.set_alpha(PAUSE_ALPHA)
 		self.lable = get_value_lable(self)
@@ -138,11 +161,11 @@ class Letter:
 		self.card_bg_surface.blit(*self.lable.get_surface_blit())
 
 	def render_card_outline(self) -> None:
-		self.card_bg_surface.fill(LETTER_OUTLINE_COLOR)
-		bg = pygame.Surface((self.rect.width - round(CARD_OUTLINE_THICKNESS / 2) * 2, self.rect.height - round(CARD_OUTLINE_THICKNESS / 2) * 2))
+		self.card_bg_surface.fill(CONFIG.LETTER_OUTLINE_COLOR)
+		bg = pygame.Surface((self.rect.width - round(CONFIG.CARD_OUTLINE_THICKNESS / 2) * 2, self.rect.height - round(CONFIG.CARD_OUTLINE_THICKNESS / 2) * 2))
 		bg.fill(self.bg_color)
-		self.card_bg_surface.set_alpha(OUTLINE_ALPHA)
-		self.card_bg_surface.blit(bg, (round(CARD_OUTLINE_THICKNESS / 2), round(CARD_OUTLINE_THICKNESS / 2)))
+		self.card_bg_surface.set_alpha(CONFIG.OUTLINE_ALPHA)
+		self.card_bg_surface.blit(bg, (round(CONFIG.CARD_OUTLINE_THICKNESS / 2), round(CONFIG.CARD_OUTLINE_THICKNESS / 2)))
 	# ------------
 
 class Wordle_GUI(Game_GUI):
@@ -157,13 +180,13 @@ class Wordle_GUI(Game_GUI):
 		
 
 	def create_containers(self) -> None:
-		win_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
-		loose_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = POST_GAME_ALPHA)
+		win_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = CONFIG.POST_GAME_ALPHA)
+		loose_container = Relative_Container(self, pygame.display.get_surface().get_size(), root = True, alpha = CONFIG.POST_GAME_ALPHA)
 		
 		win_surface = pygame.Surface(pygame.display.get_surface().get_size())
-		win_surface.fill(PRESENT_IN_PLACE_COLOR)
+		win_surface.fill(CONFIG.WON_COLOR)
 		loose_surface = pygame.Surface(pygame.display.get_surface().get_size())
-		loose_surface.fill(LOOSE_COLOR)
+		loose_surface.fill(CONFIG.LOOSE_COLOR)
 
 		win_container.surface = win_surface
 		win_container.show_surface = True
@@ -195,10 +218,10 @@ class Wordle_GUI(Game_GUI):
 		loose_container.add_component(restart_lable, restart_pos)
 		
 	def create_lables(self) -> None:
-		win_lable = Lable(self.game, " GAME WON  ", 50, LETTER_COLOR, NORMAL_ALPHA)
-		loose_lable = Lable(self.game, " GAME LOST ", 50, LETTER_COLOR, NORMAL_ALPHA)
-		restart_lable = Lable(self.game, " SPACE TO RESTART ", 30, LETTER_COLOR, NORMAL_ALPHA)
-		play_again_lable = Lable(self.game, " SPACE TO PLAY AGAIN ", 30, LETTER_COLOR, NORMAL_ALPHA)
+		win_lable = Lable(self.game, " GAME WON  ", 50, CONFIG.LETTER_COLOR, OPAQUE)
+		loose_lable = Lable(self.game, " GAME LOST ", 50, CONFIG.LETTER_COLOR, OPAQUE)
+		restart_lable = Lable(self.game, " SPACE TO RESTART ", 30, CONFIG.LETTER_COLOR, OPAQUE)
+		play_again_lable = Lable(self.game, " SPACE TO PLAY AGAIN ", 30, CONFIG.LETTER_COLOR, OPAQUE)
 		
 		self.lables['win_lable'] = win_lable
 		self.lables['loose_lable'] = loose_lable
@@ -263,9 +286,9 @@ class Wordle(Game):
 
 	def update_letters_size(self) -> None:
 		x, y = get_first_letter_pos(self)
-		for t in range(TRYS):
-			for l in range(WORD_SIZE):
-				new_rect = pygame.Rect((x + ((LETTER_CARD_SIZE + PADDING) * l) ,y + ((LETTER_CARD_SIZE + PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
+		for t in range(CONFIG.TRYS):
+			for l in range(CONFIG.WORD_SIZE):
+				new_rect = pygame.Rect((x + ((CONFIG.LETTER_CARD_SIZE + PADDING) * l) ,y + ((CONFIG.LETTER_CARD_SIZE + PADDING) * t)),(CONFIG.LETTER_CARD_SIZE,CONFIG.LETTER_CARD_SIZE))
 				self.words[t][l].rect = new_rect
 	# ------------
 
@@ -288,7 +311,7 @@ def set_card_style(letter : Letter) -> None :
 	if letter.state == LSTATE.BLANK: letter.render_card_outline() 
 
 def get_value_lable(letter : Letter) -> Lable :
-	return Lable(letter, letter.value, LETTER_FONT_SIZE, LETTER_COLOR, NORMAL_ALPHA, pos = letter.card_bg_surface.get_rect().center)
+	return Lable(letter, letter.value, CONFIG.LETTER_FONT_SIZE, CONFIG.LETTER_COLOR, OPAQUE, pos = letter.card_bg_surface.get_rect().center)
 	
 
 def reset(letter : Letter) -> None :
@@ -298,7 +321,7 @@ def reset(letter : Letter) -> None :
 
 # -- wordle game helpers --
 def get_first_letter_pos(wordle_game : Wordle) -> tuple[int, int]:
-	board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (PADDING * WORD_SIZE - 1)
+	board_size = (CONFIG.LETTER_CARD_SIZE * CONFIG.WORD_SIZE) + (PADDING * CONFIG.WORD_SIZE - 1)
 	s_width = wordle_game.surface.get_width()
 	return round(s_width / 2) - round(board_size / 2), PADDING
 
@@ -319,10 +342,10 @@ def create_board(wordle_game : Wordle) -> None:
 	wordle_game.words = []
 	wordle_game.letters = []
 	x, y = get_first_letter_pos(wordle_game)
-	for t in range(TRYS):
+	for t in range(CONFIG.TRYS):
 		word = []
-		for l in range(WORD_SIZE):
-			rect = pygame.Rect((x + ((LETTER_CARD_SIZE + PADDING) * l) ,y + ((LETTER_CARD_SIZE + PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
+		for l in range(CONFIG.WORD_SIZE):
+			rect = pygame.Rect((x + ((CONFIG.LETTER_CARD_SIZE + PADDING) * l) ,y + ((CONFIG.LETTER_CARD_SIZE + PADDING) * t)),(CONFIG.LETTER_CARD_SIZE,CONFIG.LETTER_CARD_SIZE))
 			letter = Letter(wordle_game, rect)
 			word.append(letter)
 			wordle_game.letters.append(letter)
@@ -331,8 +354,8 @@ def create_board(wordle_game : Wordle) -> None:
 def invalidate_letters_state(wordle_game : Wordle) -> None:
 	for letter in wordle_game.letters: letter.state = letter.state
 def add_letter_value(wordle_game, letter_value):
-	if not letter_value in ALPHABET: return 
-	if wordle_game.current_letter_index == (WORD_SIZE): return
+	if not letter_value in CONFIG.ALPHABET: return 
+	if wordle_game.current_letter_index == (CONFIG.WORD_SIZE): return
 	current_letter = wordle_game.words[wordle_game.current_word_index][wordle_game.current_letter_index]
 	wordle_game.current_letter_index += 1
 	current_letter.state = LSTATE.FILLED
@@ -349,7 +372,7 @@ def remove_letter_value(wordle_game: Wordle) -> None:
 def check_current_board_word(wordle_game: Wordle) -> None:
 	correct_letters = 0
 	game_word = wordle_game.game_word
-	if wordle_game.current_letter_index != WORD_SIZE: return
+	if wordle_game.current_letter_index != CONFIG.WORD_SIZE: return
 	if not wordle_game.word_bank.is_guess_valid(get_board_word(wordle_game)): return
 	for game_word_letter, user_letter in zip(game_word, wordle_game.words[wordle_game.current_word_index]):
 		if game_word_letter == user_letter.value:
@@ -357,9 +380,9 @@ def check_current_board_word(wordle_game: Wordle) -> None:
 			correct_letters += 1
 		elif user_letter.value in game_word: user_letter.state = LSTATE.PRESENT_OUT_OF_PLACE
 		else: user_letter.state = LSTATE.NOT_PRESENT
-	if correct_letters == WORD_SIZE: wordle_game.result = GAME_RESULT.WON
-	if wordle_game.current_word_index == TRYS - 1\
-		and correct_letters != WORD_SIZE: wordle_game.result = GAME_RESULT.LOOSE
+	if correct_letters == CONFIG.WORD_SIZE: wordle_game.result = GAME_RESULT.WON
+	if wordle_game.current_word_index == CONFIG.TRYS - 1\
+		and correct_letters != CONFIG.WORD_SIZE: wordle_game.result = GAME_RESULT.LOOSE
 	wordle_game.current_word_index += 1
 	wordle_game.current_letter_index = 0
 # -------------------------

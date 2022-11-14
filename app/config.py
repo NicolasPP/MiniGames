@@ -22,6 +22,10 @@ COLORS = {
 FULLSCREEN : bool = False
 PADDING : int = 10
 
+# -- ALPHAS --
+OPAQUE : float = 255
+PAUSE_ALPHA : 	int = 30 
+
 
 
 '''

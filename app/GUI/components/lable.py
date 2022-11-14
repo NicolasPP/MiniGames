@@ -1,8 +1,13 @@
 import pygame
 from GUI.components.component import Component
 
-ALPHA_CHANGE : int = 700
 
+
+
+class LABLE_CONFIG:
+	def __init__(self):
+		self.ALPHA_CHANGE : int = 700
+CONFIG = LABLE_CONFIG()
 
 class Lable(Component):
 	def __init__(self, 
@@ -19,7 +24,7 @@ class Lable(Component):
 		self.r_topleft = r_topleft # default is center
 		self.pos = pos
 		self.blink_alpha = alpha
-		self.blink_speed  : int = ALPHA_CHANGE
+		self.blink_speed  : int = CONFIG.ALPHA_CHANGE
 		self.blink_change  : int = -1
 		self.center()
 

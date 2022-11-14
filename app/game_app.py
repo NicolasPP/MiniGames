@@ -19,17 +19,17 @@ from games.wordle import Wordle
 from games.tetris import Tetris
 from games.main_menu import Main_menu
 
-from configs import *
+from config import *
 
 class MG_CONFIG:
 	def __init__(self):
 		self.SIDEBAR_SPEED = 600
-		self.FONT_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary'] #rgb(220, 215, 201)
-		self.BUTTON_COLOR : tuple[int, int, int] = COLORS['palette2']['on_primary'] #rgb(63, 78, 79)
-		self.BG_COLOR : tuple[int, int, int] = COLORS['palette1']['primary'] #rgb(27, 36, 48)
-		self.APP_BG_COLOR : tuple[int, int, int] = COLORS['palette2']['primary'] #rgb(44, 54, 57)
-		self.MEDIUM_SCREEN : tuple[int, int] = 960, 600
-		self.LARGE_SCREEN : tuple[int, int] = 1280, 800
+		self.FONT_COLOR : tuple[int, int, int] 		= COLORS['palette2']['on_secondary'] #rgb(220, 215, 201)
+		self.BUTTON_COLOR : tuple[int, int, int] 	= COLORS['palette2']['on_primary'] #rgb(63, 78, 79)
+		self.BG_COLOR : tuple[int, int, int] 		= COLORS['palette1']['primary'] #rgb(27, 36, 48)
+		self.APP_BG_COLOR : tuple[int, int, int] 	= COLORS['palette2']['primary'] #rgb(44, 54, 57)
+		self.MEDIUM_SCREEN : tuple[int, int] 		= 960, 600
+		self.LARGE_SCREEN : tuple[int, int]			= 1280, 800
 
 	def BUTTON_SIZE(self):
 		return SIZE.get(SIZE.Modifier(
@@ -61,9 +61,6 @@ class MG_CONFIG:
 				width_ratio = 10,
 				height_ratio = 50
 			))
-
-
-
 CONFIG = MG_CONFIG()
 
 
