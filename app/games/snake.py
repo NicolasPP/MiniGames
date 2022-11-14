@@ -20,37 +20,14 @@ def get_cell_size() -> int:
 # --------------
 
 class DIRECTION(Enum):
-	UP = (0, -1)
-	DOWN = (0 ,1)
-	RIGHT = (1,0)
-	LEFT = (-1, 0)
+	UP : pygame.math.Vector2 = pygame.math.Vector2(0, -1)
+	DOWN : pygame.math.Vector2 = pygame.math.Vector2(0 ,1)
+	RIGHT : pygame.math.Vector2 = pygame.math.Vector2(1,0)
+	LEFT : pygame.math.Vector2 = pygame.math.Vector2(-1, 0)
 
-	def inverse(direction):
-		x, y = direction.value
-		return x * -1, y * -1
+	def opposite(self) -> pygame.math.Vector2:
+		return self.value * -1
 
-	def __mul__(self, other):
-		x1, y1 = self.value
-		x2 = y2 = 1
-		self.assert_opperation_types(other)
-		if isinstance(other, tuple): x2, y2 = other
-		else: x2 = y2 = other
-		return x1 * x2 , y1 * y2
-
-	def __rmul__(self, other):
-		x1 = y1 = 1
-		x2, y2 = self.value
-		self.assert_opperation_types(other)
-		if isinstance(other, tuple): x1, y1 = other
-		else: x1 = y1 = other
-		return x1 * x2 , y1 * y2
-
-	def assert_opperation_types(self, other):
-		assert isinstance(other, (tuple, int, float))
-		if isinstance(other, tuple):
-			assert len(other) == 2
-			for i in other: assert isinstance(i, (int, float))
-			return 
 
 class SNAKE:
 	def __init__(self, snake_game):
@@ -74,7 +51,7 @@ class SNAKE:
 	def direction(self, new_direction : DIRECTION) -> None:
 		assert isinstance(new_direction, DIRECTION)
 		if new_direction is self._direction: return
-		if new_direction.value == self.direction.inverse(): return
+		if new_direction.value == self.direction.opposite(): return
 		self._direction = new_direction
 
 	@direction.deleter
@@ -91,8 +68,7 @@ class SNAKE:
 	@pos.setter
 	def pos(self, new_pos : pygame.math.Vector2) -> None: 
 		self._pos = new_pos
-		x, y = new_pos.x, new_pos.y
-		self.rect.x, self.rect.y = round(x), round(y)
+		self.rect.x, self.rect.y = round(self.pos.x), round(self.pos.y)
 
 	@pos.deleter
 	def pos(self) -> None: del self._pos
@@ -155,7 +131,7 @@ class SNAKE:
 		if self.distance_to_move <= 0: return
 		dist = self.speed * dt
 		if self.distance_to_move - dist < 0: dist += (self.distance_to_move - dist)
-		self.pos = self.pos + (self.direction * dist)
+		self.pos = self.pos + (self.direction.value * dist)
 		self.distance_to_move -= dist	
 	
 	def add(self, rect : pygame.rect.Rect) -> None:
@@ -276,6 +252,9 @@ class Snake(Game):
 	
 	def update_screen_size(self) -> None:
 		c_size 	= get_cell_size() - 1
+
+		# at this point the snakes rect has not updated 
+		# the old rect dimension is used to calculate the scale
 		scale 	= c_size / self.snake.rect.height
 
 		self.surface 	= self.get_game_surface(self.color)
@@ -301,7 +280,7 @@ class Snake(Game):
 # -- SNAKE helpers --
 def get_collision_points(snake : SNAKE) -> tuple[list[float], list[float]]:
 		h_offset = get_cell_size() // 2
-		direc_x, direc_y = snake.direction.value
+		direc_x, direc_y = snake.direction.value.x, snake.direction.value.y
 		center_x, center_y = snake.rect.center
 		center_head_x = center_x + (direc_x * h_offset)
 		center_head_y = center_y + (direc_y * h_offset)
