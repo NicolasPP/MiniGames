@@ -16,7 +16,7 @@ class Screen:
         screen_info = pygame.display.Info()
         return screen_info.current_w, screen_info.current_h
 
-    def __init__(self, window_width, window_height, full_screen = True, color = "black"):
+    def __init__(self, window_width, window_height, full_screen = False, color = "black"):
         pygame.init()
         self.bg_color = color
 

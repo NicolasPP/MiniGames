@@ -1,4 +1,4 @@
-import config.app_config as acfg
+from configs import PADDING
 from config.games_config import *
 
 from GUI.components.lable import Lable
@@ -265,7 +265,7 @@ class Wordle(Game):
 		x, y = get_first_letter_pos(self)
 		for t in range(TRYS):
 			for l in range(WORD_SIZE):
-				new_rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
+				new_rect = pygame.Rect((x + ((LETTER_CARD_SIZE + PADDING) * l) ,y + ((LETTER_CARD_SIZE + PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
 				self.words[t][l].rect = new_rect
 	# ------------
 
@@ -298,9 +298,9 @@ def reset(letter : Letter) -> None :
 
 # -- wordle game helpers --
 def get_first_letter_pos(wordle_game : Wordle) -> tuple[int, int]:
-	board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (acfg.PADDING * WORD_SIZE - 1)
+	board_size = (LETTER_CARD_SIZE * WORD_SIZE) + (PADDING * WORD_SIZE - 1)
 	s_width = wordle_game.surface.get_width()
-	return round(s_width / 2) - round(board_size / 2), acfg.PADDING
+	return round(s_width / 2) - round(board_size / 2), PADDING
 
 def get_board_word(wordle_game : Wordle) -> str:
 	result = ''
@@ -322,7 +322,7 @@ def create_board(wordle_game : Wordle) -> None:
 	for t in range(TRYS):
 		word = []
 		for l in range(WORD_SIZE):
-			rect = pygame.Rect((x + ((LETTER_CARD_SIZE + acfg.PADDING) * l) ,y + ((LETTER_CARD_SIZE + acfg.PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
+			rect = pygame.Rect((x + ((LETTER_CARD_SIZE + PADDING) * l) ,y + ((LETTER_CARD_SIZE + PADDING) * t)),(LETTER_CARD_SIZE,LETTER_CARD_SIZE))
 			letter = Letter(wordle_game, rect)
 			word.append(letter)
 			wordle_game.letters.append(letter)

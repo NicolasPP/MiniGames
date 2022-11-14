@@ -19,13 +19,52 @@ from games.wordle import Wordle
 from games.tetris import Tetris
 from games.main_menu import Main_menu
 
-from config.app_config import *
-import config.games_config as gcfg
+from configs import *
 
-class RES1610:
-    MEDIUM : tuple[int, int] = 960, 600
-    LARGE : tuple[int, int] = 1280, 800
+class MG_CONFIG:
+	def __init__(self):
+		self.SIDEBAR_SPEED = 600
+		self.FONT_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary'] #rgb(220, 215, 201)
+		self.BUTTON_COLOR : tuple[int, int, int] = COLORS['palette2']['on_primary'] #rgb(63, 78, 79)
+		self.BG_COLOR : tuple[int, int, int] = COLORS['palette1']['primary'] #rgb(27, 36, 48)
+		self.APP_BG_COLOR : tuple[int, int, int] = COLORS['palette2']['primary'] #rgb(44, 54, 57)
+		self.MEDIUM_SCREEN : tuple[int, int] = 960, 600
+		self.LARGE_SCREEN : tuple[int, int] = 1280, 800
 
+	def BUTTON_SIZE(self):
+		return SIZE.get(SIZE.Modifier(
+				parent_size = SIZE.current_screen_size(),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				width_ratio = 8,
+				height_ratio = 4 
+			))
+
+	def HALF_BUTTON_SIZE(self):
+		size = SIZE.get_width(SIZE.Modifier(
+				parent_size = pygame.math.Vector2(self.BUTTON_SIZE()) - pygame.math.Vector2(PADDING, 0),
+				modifier_type = SIZE.MODIFIER.RATIO,
+				ratio = 0.5
+			))
+		return size, size
+
+	def GAME_SELECT_HEIGHT(self):
+		return SIZE.get_height(SIZE.Modifier(
+				parent_size = SIZE.current_screen_size(),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				ratio = 15
+			))
+
+	def COLLAPSE_BUTTON_SIZE(self, sidebar):
+		return SIZE.get(SIZE.Modifier(
+				parent_size = pygame.math.Vector2(sidebar.rect.size),
+				modifier_type = SIZE.MODIFIER.PERCENTAGE,
+				width_ratio = 10,
+				height_ratio = 50
+			))
+
+
+
+CONFIG = MG_CONFIG()
 
 
 class Minigame_GUI(Game_GUI):
@@ -34,7 +73,7 @@ class Minigame_GUI(Game_GUI):
 		self.show_sidebar : bool = True
 		self.sidebar_move_distance : int = 0
 		self.sidebar_move_direction : int = 1
-		self.sidebar_speed = SIDEBAR_SPEED
+		self.sidebar_speed = CONFIG.SIDEBAR_SPEED
 		self.populate_GUI()
 	
 	def populate_GUI(self) -> None:
@@ -48,25 +87,15 @@ class Minigame_GUI(Game_GUI):
 		game_menu  		= self.containers['game_menu'] 		
 		settings  		= self.containers['settings'] 		
 		game_selection  = self.containers['game_selection']
-		half_button_size = ((BUTTON_W - PADDING) // 2, BUTTON_H)
-		button_modifier = SIZE.Modifier(
-				parent_size = SIZE.current_screen_size(),
-				modifier_type = SIZE.MODIFIER.PERCENTAGE,
-				width_ratio = 8,
-				height_ratio = 4 
-			)
-		half_button = SIZE.get_width(SIZE.Modifier(
-				parent_size = pygame.math.Vector2(SIZE.get(button_modifier)) - pygame.math.Vector2(PADDING, 0),
-				modifier_type = SIZE.MODIFIER.RATIO,
-				ratio = 0.5
-			))
-		quit 			= Button(settings, (half_button, half_button), BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-		full_screen 	= Button(settings, (half_button, half_button), BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
-		menu 			= Button(game_menu, SIZE.get(button_modifier), BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		snake 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = FONT_COLOR)
-		tetris 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		wordle 			= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = FONT_COLOR)
-		life_game 		= Button(game_selection, SIZE.get(button_modifier), BUTTON_COLOR, message = "Life Game", show_lable = True, font_color = FONT_COLOR)
+
+		
+		quit 			= Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+		full_screen 	= Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
+		menu 			= Button(game_menu, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		snake 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = CONFIG.FONT_COLOR)
+		tetris 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		wordle 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		life_game 		= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Life Game", show_lable = True, font_color = CONFIG.FONT_COLOR)
 
 
 
@@ -83,10 +112,10 @@ class Minigame_GUI(Game_GUI):
 
 
 	def create_containers(self) -> None:
-		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
-		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = BG_COLOR, padding = Padding(0,0,0,0))
+		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
+		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0,PADDING))
+		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0))
 
 
 		sidebar.conpensate_padding = False
@@ -97,12 +126,6 @@ class Minigame_GUI(Game_GUI):
 
 
 	def populate_containers(self) -> None:
-		size = SIZE.get_height(SIZE.Modifier(
-				parent_size = SIZE.current_screen_size(),
-				modifier_type = SIZE.MODIFIER.PERCENTAGE,
-				ratio = 15
-			))
-
 		quit  			= self.buttons['quit'] 				
 		full_screen  	= self.buttons['full_screen'] 		
 		menu  			= self.buttons['menu'] 				
@@ -125,24 +148,15 @@ class Minigame_GUI(Game_GUI):
 		game_menu.add_component(menu)
 		
 
-		game_selection.set_size((game_menu.rect.width, size))
+		game_selection.set_size((game_menu.rect.width, CONFIG.GAME_SELECT_HEIGHT()))
 		game_selection.fixed_size = True
 
 		sidebar.add_component(game_menu)
 		sidebar.add_component(game_selection)
 
-		collapsed_mod = SIZE.Modifier(
-				parent_size = pygame.math.Vector2(sidebar.rect.size),
-				modifier_type = SIZE.MODIFIER.PERCENTAGE,
-				width_ratio = 10,
-				height_ratio = 50
-			)
-
-		collapsed_menu  = Button(self.game, SIZE.get(collapsed_mod), FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
-		
+		collapsed_menu  = Button(self.game, CONFIG.COLLAPSE_BUTTON_SIZE(sidebar), CONFIG.FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
 		collapsed_menu.set_active_style(expanded_menu_style, collapsed_menu)
 		collapsed_menu.set_inactive_style(collapsed_menu_style, collapsed_menu)
-		
 		self.buttons['collapsed_menu']  = collapsed_menu
 
 
@@ -179,9 +193,9 @@ class Minigame_GUI(Game_GUI):
 
 
 class Minigames:
-	def __init__(self, s_width : int, s_height : int, full_screen : bool) -> None:
+	def __init__(self) -> None:
 		# initialize main pygame surface
-		self.screen : Screen = Screen(*RES1610.MEDIUM, full_screen, color = APP_BG_COLOR)
+		self.screen : Screen = Screen(*CONFIG.MEDIUM_SCREEN, color = CONFIG.APP_BG_COLOR)
 		self.running : bool = True
 
 		# time

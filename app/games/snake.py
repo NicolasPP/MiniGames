@@ -18,6 +18,24 @@ def get_cell_size() -> int:
 			ratio = 5
 			))
 # --------------
+'''
+TIME_TO_COVER_CELL
+SNAKE_MOVE_FREQ
+FOOD_SPAWN_DELAY
+
+NORMAL_ALPHA
+PAUSE_ALPHA
+LOOSE_ALPHA
+
+SCORE_FONT_SIZE
+PAUSE_FONT_SIZE
+
+LOOSE_COLOR
+PAUSE_COLOR
+LETTER_COLOR
+SCORE_COLOR
+FOOD_COLOR
+'''
 
 class DIRECTION(Enum):
 	UP : pygame.math.Vector2 = pygame.math.Vector2(0, -1)

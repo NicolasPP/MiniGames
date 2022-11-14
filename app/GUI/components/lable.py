@@ -1,6 +1,7 @@
 import pygame
-from config.games_config import *
 from GUI.components.component import Component
+
+ALPHA_CHANGE : int = 700
 
 
 class Lable(Component):

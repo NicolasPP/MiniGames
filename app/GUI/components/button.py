@@ -1,11 +1,16 @@
 import pygame
 from enum import Enum
-from config.app_config import *
 import config.games_config as gcfg
 from GUI.components.lable import Lable
 from GUI.components.component import Component
 from typing import Callable, Any
 import GUI.size as SIZE
+
+
+FS_RECT_WIDTH : int = 9
+FS_RECT_HEIGHT : int = 3
+HOVER_ALPHA : float = 200
+
 
 def nothing(*kwargs) -> None: pass
 

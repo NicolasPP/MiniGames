@@ -18,7 +18,6 @@ ALPHABET : 		str = 'abcdefghijklmnopqrstuvwxyz'
 SNAKE_COLOR : 			tuple[int, int, int] = color_palette2[3] #rgb(220, 215, 201)
 FOOD_COLOR : 			tuple[int, int, int] = color_palette3[3] #rgb(231, 171, 121)
 
-S_CELL_SIZE : 			int = 10
 PAUSE_FONT_SIZE : 		int = 50
 SCORE_FONT_SIZE : 		int = 40
 
@@ -26,7 +25,6 @@ SCORE_FONT_SIZE : 		int = 40
 	# time (ms)
 FOOD_SPAWN_DELAY :  	float = 5000
 SNAKE_MOVE_FREQ : 		float = 250
-ALPHA_CHANGE : 			int = 700
 TIME_TO_COVER_CELL :    float = 150
 #-------------------
 

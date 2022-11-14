@@ -3,7 +3,7 @@ from GUI.components.lable import Lable
 from GUI.components.button import Button
 
 import config.games_config as gcfg
-import config.app_config as acfg
+from configs import PADDING
 from enum import Enum
 import pygame 
 from dataclasses import dataclass
@@ -25,11 +25,11 @@ class LAYOUT_PLANE(Enum):
 
 @dataclass
 class Padding:
-	top : int = acfg.PADDING
-	bottom : int = acfg.PADDING
-	right : int = acfg.PADDING
-	left : int = acfg.PADDING
-	spacing : int = acfg.PADDING
+	top : int = PADDING
+	bottom : int = PADDING
+	right : int = PADDING
+	left : int = PADDING
+	spacing : int = PADDING
 
 	def __sub__(self, other):
 		top = abs(self.top - other.top)

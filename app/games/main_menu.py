@@ -1,6 +1,8 @@
-from config.app_config import *
 from GUI.components.containers import Relative_Container
 from games.game import Game
+from configs import *
+
+MAIN_MENU_COLOR : tuple[int, int, int] = COLORS['palette2']['on_primary'] #rgb(63, 78, 79)
 
 class Main_menu(Game):
 	def __init__(self, app):
