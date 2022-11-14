@@ -72,11 +72,6 @@ class Game_GUI:
 	def surface(self, new_surface : pygame.Surface) -> None: self._surface = new_surface
 	@surface.deleter
 	def surface(self) -> None: del self._surface
-
 	def populate_GUI(self) ->None: assert "not implemented"
-
-	def add_component(self, component : Component): pass
-
-
 
 

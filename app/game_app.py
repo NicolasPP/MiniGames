@@ -2,24 +2,18 @@ import pygame, sys, time
 from enum import Enum
 from typing import Type
 
-from GUI.screen import Screen
-import GUI.size as SIZE
-from GUI.components.button import Button,\
-								 style_quit,\
-								 fullscreen_inactive_style,\
-								 fullscreen_active_style,\
-								 Button_Type,\
-								 collapsed_menu_style,\
-								 expanded_menu_style
-from GUI.components.containers import Linear_Container, Scrollable_Container, Relative_Container, LAYOUT_PLANE, Padding
 
+import GUI.size as SIZE
+import GUI.components.button as btn
+import GUI.components.containers as ctn
+from GUI.screen import Screen
 from games.game import Game, Game_GUI
 from games.snake import Snake
 from games.wordle import Wordle
 from games.tetris import Tetris
 from games.main_menu import Main_menu
-
 from config import *
+
 
 class MG_CONFIG:
 	def __init__(self):
@@ -86,19 +80,19 @@ class Minigame_GUI(Game_GUI):
 		game_selection  = self.containers['game_selection']
 
 		
-		quit 			= Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
-		full_screen 	= Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = Button_Type.SWITCH, active = self.game.screen.full_screen)
-		menu 			= Button(game_menu, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
-		snake 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = CONFIG.FONT_COLOR)
-		tetris 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
-		wordle 			= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
-		life_game 		= Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Life Game", show_lable = True, font_color = CONFIG.FONT_COLOR)
+		quit 			= btn.Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Quit", on_click = quit_game, show_lable= False)
+		full_screen 	= btn.Button(settings, CONFIG.HALF_BUTTON_SIZE(), CONFIG.BG_COLOR, message = "Fullscreen", on_click = fullscreen, show_lable= False, button_type = btn.Button_Type.SWITCH, active = self.game.screen.full_screen)
+		menu 			= btn.Button(game_menu, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Menu", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		snake 			= btn.Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Snake", on_click = set_game, show_lable = True, font_color = CONFIG.FONT_COLOR)
+		tetris 			= btn.Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Tetris", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		wordle 			= btn.Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Wordle", on_click = set_game, show_lable= True, font_color = CONFIG.FONT_COLOR)
+		life_game 		= btn.Button(game_selection, CONFIG.BUTTON_SIZE(), CONFIG.BUTTON_COLOR, message = "Life Game", show_lable = True, font_color = CONFIG.FONT_COLOR)
 
 
 
-		style_quit(quit)
-		full_screen.set_active_style(fullscreen_active_style, full_screen)
-		full_screen.set_inactive_style(fullscreen_inactive_style, full_screen)
+		btn.style_quit(quit)
+		full_screen.set_active_style(btn.fullscreen_active_style, full_screen)
+		full_screen.set_inactive_style(btn.fullscreen_inactive_style, full_screen)
 		self.buttons['quit'] 			= quit
 		self.buttons['full_screen'] 	= full_screen
 		self.buttons['menu'] 			= menu
@@ -109,10 +103,10 @@ class Minigame_GUI(Game_GUI):
 
 
 	def create_containers(self) -> None:
-		sidebar 			= Linear_Container(self, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(spacing = PADDING * 2), root = True)
-		game_menu 			= Linear_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		settings 			= Linear_Container(game_menu, LAYOUT_PLANE.HORIZONTAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0,PADDING))
-		game_selection 		= Scrollable_Container(sidebar, LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = Padding(0,0,0,0))
+		sidebar 			= ctn.Linear_Container(self, ctn.LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = ctn.Padding(spacing = PADDING * 2), root = True)
+		game_menu 			= ctn.Linear_Container(sidebar, ctn.LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = ctn.Padding(0,0,0,0,PADDING))
+		settings 			= ctn.Linear_Container(game_menu, ctn.LAYOUT_PLANE.HORIZONTAL, color = CONFIG.BG_COLOR, padding = ctn.Padding(0,0,0,0,PADDING))
+		game_selection 		= ctn.Scrollable_Container(sidebar, ctn.LAYOUT_PLANE.VERTICAL, color = CONFIG.BG_COLOR, padding = ctn.Padding(0,0,0,0))
 
 
 		sidebar.conpensate_padding = False
@@ -151,9 +145,9 @@ class Minigame_GUI(Game_GUI):
 		sidebar.add_component(game_menu)
 		sidebar.add_component(game_selection)
 
-		collapsed_menu  = Button(self.game, CONFIG.COLLAPSE_BUTTON_SIZE(sidebar), CONFIG.FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = Button_Type.SWITCH, active = self.show_sidebar)
-		collapsed_menu.set_active_style(expanded_menu_style, collapsed_menu)
-		collapsed_menu.set_inactive_style(collapsed_menu_style, collapsed_menu)
+		collapsed_menu  = btn.Button(self.game, CONFIG.COLLAPSE_BUTTON_SIZE(sidebar), CONFIG.FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = btn.Button_Type.SWITCH, active = self.show_sidebar)
+		collapsed_menu.set_active_style(btn.expanded_menu_style, collapsed_menu)
+		collapsed_menu.set_inactive_style(btn.collapsed_menu_style, collapsed_menu)
 		self.buttons['collapsed_menu']  = collapsed_menu
 
 
