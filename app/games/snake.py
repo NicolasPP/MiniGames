@@ -17,16 +17,17 @@ class SNAKE_CONFIG:
 
 		self.LOOSE_ALPHA : float = 75
 		
-		self.SCORE_FONT_SIZE : int = 40
-		self.RETRY_FONT_SIZE : int = 30
-		self.PAUSE_FONT_SIZE : int = 50
-		
 		self.LOOSE_COLOR : tuple[int, int, int] = COLORS['palette3']['on_primary']
 		self.PAUSE_COLOR : tuple[int, int, int] = (255, 255, 255)
 		self.LETTER_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary']
 		self.SCORE_COLOR : tuple[int, int, int] = COLORS['palette3']['on_secondary']
 		self.FOOD_COLOR  : tuple[int, int, int] = COLORS['palette3']['on_secondary'] 
 		self.SNAKE_COLOR : tuple[int, int, int] = COLORS['palette2']['on_secondary']
+
+		self.PAUSE_M : str = " PAUSED "
+		self.RETRY_M : str = " SPACE TO RETRY "
+
+		self.MILISECONDS = 1000
 	
 	def CELL_SIZE(self) -> int:
 		return SIZE.get_height(SIZE.Modifier(
@@ -34,6 +35,27 @@ class SNAKE_CONFIG:
 				modifier_type = SIZE.MODIFIER.PERCENTAGE,
 				ratio = 5
 				))
+	def SCORE_FONT_SIZE(self, message : str) -> int:
+		max_size = SIZE.get(SIZE.Modifier(
+			parent_size = SIZE.current_screen_size(),
+			modifier_type = SIZE.MODIFIER.PERCENTAGE,
+			ratio = 5
+			))
+		return SIZE.get_font_size(max_size, message)
+	def RETRY_FONT_SIZE(self, message : str) -> int:
+		max_size = SIZE.get(SIZE.Modifier(
+			parent_size = SIZE.current_screen_size(),
+			modifier_type = SIZE.MODIFIER.PERCENTAGE,
+			ratio = 15
+			))
+		return SIZE.get_font_size(max_size, message)
+	def PAUSE_FONT_SIZE(self, message : str) -> int:
+		max_size = SIZE.get(SIZE.Modifier(
+			parent_size = SIZE.current_screen_size(),
+			modifier_type = SIZE.MODIFIER.PERCENTAGE,
+			ratio = 20
+			))
+		return SIZE.get_font_size(max_size, message)
 
 CONFIG = SNAKE_CONFIG()
 
@@ -52,14 +74,14 @@ class SNAKE:
 	def __init__(self, snake_game):
 		self.snake_game = snake_game
 		self.rect : pygame.rect.Rect = get_middle_rect()
-		self.size : int = 5
+		self.size : int = 0
 		self.body : list[pygame.rect.Rect] = []
 		self.color : tuple[int, int, int] = CONFIG.SNAKE_COLOR
 		self.timer : Time_Man = Time_Man()
 		self._direction : DIRECTION = choice(list(DIRECTION))
 		self.distance_to_move : float = 0
 		self._pos : pygame.math.Vector2 = pygame.math.Vector2(self.rect.topleft)
-		self.speed : float = CONFIG.CELL_SIZE() / (CONFIG.TIME_TO_COVER_CELL / 1000)
+		self.speed : float = CONFIG.CELL_SIZE() / (CONFIG.TIME_TO_COVER_CELL / CONFIG.MILISECONDS)
 		self.alive : bool = True
 
 	# -- Direction --
@@ -201,7 +223,7 @@ class Snake_GUI(Game_GUI):
 	def populate_containers(self) -> None:
 		s_width, s_height = pygame.display.get_surface().get_size()
 		center = s_width // 2, s_height // 2
-		score_pos = s_width - 30, 30
+		score_pos = s_width - CONFIG.RETRY_FONT_SIZE(CONFIG.RETRY_M), CONFIG.RETRY_FONT_SIZE(CONFIG.RETRY_M)
 		retry_pos = center[0] , center[1] + 60
 
 		score_lable = self.lables['score_lable']
@@ -220,10 +242,10 @@ class Snake_GUI(Game_GUI):
 
 
 	def create_lables(self) -> None:
-		score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE, CONFIG.LETTER_COLOR, OPAQUE)
-		paused_lable = Lable(self.game, " PAUSED ", CONFIG.PAUSE_FONT_SIZE , CONFIG.SCORE_COLOR ,OPAQUE)
-		retry_lable = Lable(self .game, " SPACE TO RETRY ", CONFIG.RETRY_FONT_SIZE , CONFIG.SCORE_COLOR, OPAQUE)
-		final_score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE, CONFIG.SCORE_COLOR, OPAQUE)
+		score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE(f'{self.game.score}'), CONFIG.LETTER_COLOR, OPAQUE)
+		paused_lable = Lable(self.game, CONFIG.PAUSE_M, CONFIG.PAUSE_FONT_SIZE(CONFIG.PAUSE_M), CONFIG.SCORE_COLOR ,OPAQUE)
+		retry_lable = Lable(self .game, CONFIG.RETRY_M, CONFIG.RETRY_FONT_SIZE(CONFIG.RETRY_M) , CONFIG.SCORE_COLOR, OPAQUE)
+		final_score_lable = Lable(self.game, f'{self.game.score}', CONFIG.SCORE_FONT_SIZE(f'{self.game.score}'), CONFIG.SCORE_COLOR, OPAQUE)
 
 		self.lables['score_lable'] = score_lable
 		self.lables['paused_lable'] = paused_lable	
