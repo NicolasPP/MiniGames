@@ -292,17 +292,17 @@ class Snake(Game):
 
 	
 	def update_screen_size(self) -> None:
-		c_size 	= CONFIG.CELL_SIZE() - 1
+		cell_size 	= CONFIG.CELL_SIZE() - 1
 
 		# at this point the snakes rect has not updated 
 		# the old rect dimension is used to calculate the scale
-		scale 	= c_size / self.snake.rect.height
+		scale 	= cell_size / self.snake.rect.height
 
 		self.surface 	= self.get_game_surface(self.color)
 		self.snake_GUI 	= Snake_GUI(self)
-		self.foods 		= [ pygame.Rect(round(food.x * scale), round(food.y * scale), c_size, c_size) \
+		self.foods 		= [ pygame.Rect(round(food.x * scale), round(food.y * scale), cell_size, cell_size) \
 						  for food in self.foods ]
-		self.snake.update_screen_size(c_size, scale) 
+		self.snake.update_screen_size(cell_size, scale) 
 	# ------------
 
 
@@ -344,7 +344,6 @@ def get_middle_rect() -> pygame.rect.Rect:
 	width, height = pygame.display.get_surface().get_size()
 	size = CONFIG.CELL_SIZE() -1
 	return pygame.rect.Rect(width // 2, height // 2, size, size)
-
 
 def get_rect_surface(snake_game : Snake, rect : pygame.rect.Rect, color : tuple[int, int, int]) -> pygame.Surface:
 	rect_surface = pygame.Surface(rect.size)
