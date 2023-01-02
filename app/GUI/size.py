@@ -61,9 +61,6 @@ def get_font_size(max_message_size : tuple[int, int], message : str
 
 
 
-
-
-
 def current_screen_size(
 	)-> pygame.math.Vector2:
 	return pygame.math.Vector2(pygame.display.get_surface().get_size())

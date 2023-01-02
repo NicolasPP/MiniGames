@@ -122,6 +122,7 @@ class SNAKE:
 		self.snake_game.surface.blit(get_rect_surface(self.snake_game, self.rect, self.color), self.rect.topleft)
 	# ------------
 
+
 	# -- Update --
 	def update(self, dt : float) -> None:
 		self.body_collision()
@@ -133,7 +134,7 @@ class SNAKE:
 	def update_screen_size(self, c_size : int, scale : float):
 		self.rect 	= pygame.rect.Rect(round(self.rect.x * scale), round(self.rect.y * scale), c_size, c_size)
 		self.pos 	= pygame.math.Vector2(self.rect.topleft)
-		self.body 	= [ pygame.rect.Rect(round(body.x * scale), round(body.y * scale), c_size, c_size) \
+		self.body 	= [ pygame.rect.Rect(round(body.x * scale), round(body.y * scale), c_size, c_size)
 					  for body in self.body ]
 	# ------------
 	

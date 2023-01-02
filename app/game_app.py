@@ -15,17 +15,18 @@ from games.main_menu import Main_menu
 from config import *
 
 
-class MG_CONFIG:
+class MINIGAME_CONFIG:
 	def __init__(self):
-		self.SIDEBAR_SPEED = 600
+		self.SIDEBAR_SPEED  : int 					= 600
 		self.FONT_COLOR : tuple[int, int, int] 		= COLORS['palette2']['on_secondary'] #rgb(220, 215, 201)
 		self.BUTTON_COLOR : tuple[int, int, int] 	= COLORS['palette2']['on_primary'] #rgb(63, 78, 79)
 		self.BG_COLOR : tuple[int, int, int] 		= COLORS['palette1']['primary'] #rgb(27, 36, 48)
 		self.APP_BG_COLOR : tuple[int, int, int] 	= COLORS['palette2']['primary'] #rgb(44, 54, 57)
 		self.MEDIUM_SCREEN : tuple[int, int] 		= 960, 600
 		self.LARGE_SCREEN : tuple[int, int]			= 1280, 800
-
-	def BUTTON_SIZE(self):
+		self.COLLAPSE_ALPHA : float					= 20
+	
+	def BUTTON_SIZE(self) -> int:
 		return SIZE.get(SIZE.Modifier(
 				parent_size = SIZE.current_screen_size(),
 				modifier_type = SIZE.MODIFIER.PERCENTAGE,
@@ -33,7 +34,7 @@ class MG_CONFIG:
 				height_ratio = 4 
 			))
 
-	def HALF_BUTTON_SIZE(self):
+	def HALF_BUTTON_SIZE(self) -> tuple[int, int]:
 		size = SIZE.get_width(SIZE.Modifier(
 				parent_size = pygame.math.Vector2(self.BUTTON_SIZE()) - pygame.math.Vector2(PADDING, 0),
 				modifier_type = SIZE.MODIFIER.RATIO,
@@ -41,21 +42,21 @@ class MG_CONFIG:
 			))
 		return size, size
 
-	def GAME_SELECT_HEIGHT(self):
+	def GAME_SELECT_HEIGHT(self) -> int:
 		return SIZE.get_height(SIZE.Modifier(
 				parent_size = SIZE.current_screen_size(),
 				modifier_type = SIZE.MODIFIER.PERCENTAGE,
 				ratio = 15
 			))
 
-	def COLLAPSE_BUTTON_SIZE(self, sidebar):
+	def COLLAPSE_BUTTON_SIZE(self, sidebar) -> int:
 		return SIZE.get(SIZE.Modifier(
 				parent_size = pygame.math.Vector2(sidebar.rect.size),
 				modifier_type = SIZE.MODIFIER.PERCENTAGE,
 				width_ratio = 10,
 				height_ratio = 50
 			))
-CONFIG = MG_CONFIG()
+CONFIG = MINIGAME_CONFIG()
 
 
 class Minigame_GUI(Game_GUI):
@@ -131,21 +132,20 @@ class Minigame_GUI(Game_GUI):
 
 		game_selection.add_component(snake)
 		game_selection.add_component(wordle)
-		game_selection.add_component(life_game)
 		game_selection.add_component(tetris)
+		game_selection.add_component(life_game)
 		settings.add_component(quit)
 		settings.add_component(full_screen)
 		game_menu.add_component(settings)
 		game_menu.add_component(menu)
 		
-
 		game_selection.set_size((game_menu.rect.width, CONFIG.GAME_SELECT_HEIGHT()))
 		game_selection.fixed_size = True
 
 		sidebar.add_component(game_menu)
 		sidebar.add_component(game_selection)
 
-		collapsed_menu  = btn.Button(self.game, CONFIG.COLLAPSE_BUTTON_SIZE(sidebar), CONFIG.FONT_COLOR , message = "collapsed_menu", on_click =toggle_sidebar, alpha = 20, show_lable = False, button_type = btn.Button_Type.SWITCH, active = self.show_sidebar)
+		collapsed_menu  = btn.Button(self.game, CONFIG.COLLAPSE_BUTTON_SIZE(sidebar), CONFIG.FONT_COLOR , on_click =toggle_sidebar, alpha = CONFIG.COLLAPSE_ALPHA, show_lable = False, button_type = btn.Button_Type.SWITCH, active = self.show_sidebar)
 		collapsed_menu.set_active_style(btn.expanded_menu_style, collapsed_menu)
 		collapsed_menu.set_inactive_style(btn.collapsed_menu_style, collapsed_menu)
 		self.buttons['collapsed_menu']  = collapsed_menu
